@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Models\Musuario;
+use App\Models\musuario;
 
 class Clogin extends BaseController
 {
@@ -18,7 +18,7 @@ class Clogin extends BaseController
         $txtnombre = trim($this->request->getPost('txtnombre'));
         $txtpass   = trim($this->request->getPost('txtpass'));
 
-        $model = new Musuario();
+        $model = new musuario();
         $res   = $model->mlogeo($txtnombre, $txtpass);
 
         if (!$res) {
