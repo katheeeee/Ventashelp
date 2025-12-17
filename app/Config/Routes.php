@@ -15,4 +15,9 @@ $routes->get('logout', 'clogin::clogout');
 
 $routes->get('dashboard', 'Home::index');
 
-
+$routes->group('', ['filter' => 'auth'], function($routes){
+    $routes->get('dashboard', 'Home::index');
+    // aquí metes todas las rutas privadas:
+    // $routes->get('productos', 'Producto::index');
+    // $routes->get('ventas', 'Venta::index');
+});
