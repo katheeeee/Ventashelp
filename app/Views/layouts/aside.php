@@ -1,21 +1,23 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
 
-  <a href="<?= base_url('admin') ?>" class="brand-link">
+  <a href="<?= base_url('dashboard') ?>" class="brand-link">
     <span class="brand-text font-weight-bold">HELPNET</span>
   </a>
 
   <div class="sidebar">
 
     <nav class="mt-2">
-      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
+        <!-- DASHBOARD -->
         <li class="nav-item">
-          <a href="<?= base_url('admin') ?>" class="nav-link <?= ($active=='dashboard')?'active':'' ?>">
+          <a href="<?= base_url('dashboard') ?>" class="nav-link <?= ($active=='dashboard')?'active':'' ?>">
             <i class="nav-icon fas fa-home"></i>
             <p>Dashboard</p>
           </a>
         </li>
 
+        <!-- MANTENIMIENTO -->
         <li class="nav-item has-treeview <?= ($active=='mantenimiento')?'menu-open':'' ?>">
           <a href="#" class="nav-link <?= ($active=='mantenimiento')?'active':'' ?>">
             <i class="nav-icon fas fa-tools"></i>
@@ -24,16 +26,37 @@
               <i class="right fas fa-angle-left"></i>
             </p>
           </a>
+
           <ul class="nav nav-treeview">
+
+            <!-- CATEGORIA (YA FUNCIONA) -->
             <li class="nav-item">
-              <a href="#" class="nav-link">
+              <a href="<?= base_url('categoria') ?>" class="nav-link <?= ($subactive=='categoria')?'active':'' ?>">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Categorías</p>
+              </a>
+            </li>
+
+            <!-- CLIENTES (LO CREARÁS DESPUÉS) -->
+            <li class="nav-item">
+              <a href="<?= base_url('cliente') ?>" class="nav-link <?= ($subactive=='cliente')?'active':'' ?>">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Clientes</p>
+              </a>
+            </li>
+
+            <!-- PRODUCTOS (LO CREARÁS DESPUÉS) -->
+            <li class="nav-item">
+              <a href="<?= base_url('producto') ?>" class="nav-link <?= ($subactive=='producto')?'active':'' ?>">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Productos</p>
               </a>
             </li>
+
           </ul>
         </li>
 
+        <!-- MOVIMIENTOS -->
         <li class="nav-item has-treeview <?= ($active=='movimientos')?'menu-open':'' ?>">
           <a href="#" class="nav-link <?= ($active=='movimientos')?'active':'' ?>">
             <i class="nav-icon fas fa-exchange-alt"></i>
@@ -44,6 +67,7 @@
           </a>
         </li>
 
+        <!-- REPORTES -->
         <li class="nav-item has-treeview <?= ($active=='reportes')?'menu-open':'' ?>">
           <a href="#" class="nav-link <?= ($active=='reportes')?'active':'' ?>">
             <i class="nav-icon fas fa-chart-bar"></i>
@@ -54,6 +78,7 @@
           </a>
         </li>
 
+        <!-- ADMIN -->
         <li class="nav-item has-treeview <?= ($active=='admin')?'menu-open':'' ?>">
           <a href="#" class="nav-link <?= ($active=='admin')?'active':'' ?>">
             <i class="nav-icon fas fa-user-shield"></i>
