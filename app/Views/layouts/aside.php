@@ -3,6 +3,10 @@
   <a href="<?= base_url('dashboard') ?>" class="brand-link">
     <span class="brand-text font-weight-bold">HELPNET</span>
   </a>
+<?php
+$active = $active ?? '';
+$subactive = $subactive ?? '';
+?>
 
   <div class="sidebar">
 

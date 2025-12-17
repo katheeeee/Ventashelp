@@ -5,6 +5,11 @@ namespace App\Controllers\mantenimiento;
 use App\Controllers\BaseController;
 use App\Models\mcategoria;
 
+
+$data['active'] = 'mantenimiento';
+$data['subactive'] = 'categoria';
+return view('admin/categoria/vlist', $data);
+
 class ccategoria extends BaseController
 {
     public function index()
