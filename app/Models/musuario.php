@@ -4,32 +4,21 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class Musuario extends Model
+class musuario extends Model
 {
     protected $table      = 'usuario';
-    protected $primaryKey = 'idtipo_usuario';
-    protected $returnType = 'array';
+    protected $primaryKey = 'idtipo_usuario'; // si tu PK real es otro, cámbialo
 
+    protected $returnType = 'array';
     protected $allowedFields = [
-        'codigo',
-        'nombre',
-        'apellido',
-        'estado',
-        'telefono',
-        'user',
-        'pass',
-        'idrol'
+        'idtipo_usuario','codigo','nombre','apellido','estado','telefono','user','pass','idrol'
     ];
 
-    // login como en el video, pero bien hecho
-    public function mlogeo($user, $pass)
+    public function mlogeo(string $user, string $pass)
     {
-        $user = trim($user);
-        $pass = trim($pass);
-
-        return $this->where('estado', 1)
-                    ->where('UPPER(user)', strtoupper($user), false)
+        return $this->where('user', $user)
                     ->where('pass', $pass)
+                    ->where('estado', 1)   // opcional (solo si manejas estado)
                     ->first();
     }
 }
