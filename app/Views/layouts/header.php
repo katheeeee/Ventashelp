@@ -45,7 +45,7 @@
         </a>
 
         <div class="dropdown-menu dropdown-menu-right">
-          <a class="dropdown-item text-danger" href="<?= base_url('clogout') ?>">
+          <a class="dropdown-item text-danger" href="<?= base_url('logout') ?>">
             <i class="fas fa-sign-out-alt mr-2"></i> Salir
           </a>
         </div>
