@@ -5,7 +5,7 @@
 
 <div class="card">
 <div class="card-header">
-  <a href="<?= base_url('tipo_documento/add') ?>" class="btn btn-primary btn-sm">
+  <a href="<?= base_url('mantenimiento/tipo_documento/add') ?>" class="btn btn-primary btn-sm">
     <i class="fa fa-plus"></i> Nuevo
   </a>
 </div>
@@ -35,15 +35,17 @@
   </td>
   <td>
     <a class="btn btn-info btn-sm"
-       href="<?= base_url('tipo_documento/view/'.$r['idtipo_documento']) ?>">
+       href="<?= base_url('mantenimiento/tipo_documento/view/'.$r['idtipo_documento']) ?>">
        <i class="fa fa-eye"></i>
     </a>
+
     <a class="btn btn-warning btn-sm"
-       href="<?= base_url('tipo_documento/edit/'.$r['idtipo_documento']) ?>">
+       href="<?= base_url('mantenimiento/tipo_documento/edit/'.$r['idtipo_documento']) ?>">
        <i class="fa fa-edit"></i>
     </a>
+
     <a class="btn btn-danger btn-sm"
-       href="<?= base_url('tipo_documento/delete/'.$r['idtipo_documento']) ?>"
+       href="<?= base_url('mantenimiento/tipo_documento/delete/'.$r['idtipo_documento']) ?>"
        onclick="return confirm('¿Eliminar?')">
        <i class="fa fa-trash"></i>
     </a>

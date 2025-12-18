@@ -5,7 +5,7 @@
 
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Detalle de categoría</h3>
+        <h3 class="card-title">Detalle de tipo de documento</h3>
       </div>
 
       <div class="card-body">
@@ -13,28 +13,28 @@
         <div class="form-group">
           <label>Código</label>
           <input type="text" class="form-control"
-                 value="<?= esc($cat['codigo']) ?>" disabled>
+                 value="<?= esc($row['codigo']) ?>" disabled>
         </div>
 
         <div class="form-group">
           <label>Nombre</label>
           <input type="text" class="form-control"
-                 value="<?= esc($cat['nombre']) ?>" disabled>
+                 value="<?= esc($row['nombre']) ?>" disabled>
         </div>
 
         <div class="form-group">
           <label>Descripción</label>
           <input type="text" class="form-control"
-                 value="<?= esc($cat['descripcion']) ?>" disabled>
+                 value="<?= esc($row['descripcion']) ?>" disabled>
         </div>
 
         <div class="form-group">
           <label>Estado</label>
           <input type="text" class="form-control"
-                 value="<?= $cat['estado'] == 1 ? 'Activo' : 'Inactivo' ?>" disabled>
+                 value="<?= ($row['estado'] == 1) ? 'Activo' : 'Inactivo' ?>" disabled>
         </div>
 
-        <a href="<?= base_url('categoria') ?>" class="btn btn-secondary">
+        <a href="<?= base_url('mantenimiento/tipo_documento') ?>" class="btn btn-secondary">
           Volver
         </a>
 
