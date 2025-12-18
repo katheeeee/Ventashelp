@@ -1,47 +1,109 @@
 <?= $this->include('layouts/header') ?>
 
-<section class="content pt-3">
-<div class="container-fluid">
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Categorías</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item">
+            <a href="<?= base_url('dashboard') ?>">Home</a>
+          </li>
+          <li class="breadcrumb-item active">Categorías</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
 
-<div class="card">
-<div class="card-header"><h3>Nuevo tipo documento</h3></div>
+<section class="content">
+  <div class="container-fluid">
 
-<div class="card-body">
+    <div class="card">
 
-<?php if (session()->getFlashdata('error')): ?>
-<div class="alert alert-danger">
-<?php foreach (session('error') as $e): ?>
-  <?= $e ?><br>
-<?php endforeach; ?>
-</div>
-<?php endif; ?>
+      <div class="card-header">
+        <a href="<?= base_url('mantenimiento/categoria/add') ?>" class="btn btn-primary btn-sm">
+          <i class="fa fa-plus"></i> Nuevo
+        </a>
+      </div>
 
-<form method="post" action="<?= base_url('tipo_documento/store') ?>">
-<?= csrf_field() ?>
+      <div class="card-body">
 
-<div class="form-group">
-<label>Código</label>
-<input type="text" name="codigo" class="form-control" required>
-</div>
+        <!-- MENSAJES -->
+        <?php if (session()->getFlashdata('success')): ?>
+          <div class="alert alert-success alert-dismissible fade show">
+            <?= session()->getFlashdata('success') ?>
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+          </div>
+        <?php endif; ?>
 
-<div class="form-group">
-<label>Nombre</label>
-<input type="text" name="nombre" class="form-control" required>
-</div>
+        <?php if (session()->getFlashdata('error')): ?>
+          <div class="alert alert-danger">
+            <?php foreach (session()->getFlashdata('error') as $err): ?>
+              <div><?= esc($err) ?></div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
 
-<div class="form-group">
-<label>Descripción</label>
-<input type="text" name="descripcion" class="form-control" required>
-</div>
+        <table id="tablaCategorias" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Estado</th>
+              <th style="width:120px;">Acciones</th>
+            </tr>
+          </thead>
 
-<button class="btn btn-primary">Guardar</button>
-<a href="<?= base_url('tipo_documento') ?>" class="btn btn-secondary">Volver</a>
+          <tbody>
+            <?php foreach ($categorias as $c): ?>
+              <tr>
+                <td><?= esc($c['idcategoria']) ?></td>
+                <td><?= esc($c['codigo']) ?></td>
+                <td><?= esc($c['nombre']) ?></td>
+                <td><?= esc($c['descripcion']) ?></td>
 
-</form>
-</div>
-</div>
+                <td>
+                  <?php if ($c['estado'] == 1): ?>
+                    <span class="badge badge-success">Activo</span>
+                  <?php else: ?>
+                    <span class="badge badge-danger">Inactivo</span>
+                  <?php endif; ?>
+                </td>
 
-</div>
+                <td>
+                  <a class="btn btn-sm btn-info"
+                     href="<?= base_url('mantenimiento/categoria/view/'.$c['idcategoria']) ?>"
+                     title="Ver">
+                    <i class="fa fa-eye"></i>
+                  </a>
+
+                  <a class="btn btn-sm btn-warning"
+                     href="<?= base_url('mantenimiento/categoria/edit/'.$c['idcategoria']) ?>"
+                     title="Editar">
+                    <i class="fa fa-pencil-alt"></i>
+                  </a>
+
+                  <a class="btn btn-sm btn-danger"
+                     href="<?= base_url('mantenimiento/categoria/delete/'.$c['idcategoria']) ?>"
+                     onclick="return confirm('¿Eliminar categoría?')"
+                     title="Eliminar">
+                    <i class="fa fa-trash"></i>
+                  </a>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+  </div>
 </section>
 
 <?= $this->include('layouts/footer') ?>

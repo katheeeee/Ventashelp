@@ -35,7 +35,7 @@ $subactive = $subactive ?? '';
 
             <!-- CATEGORIA (YA FUNCIONA) -->
             <li class="nav-item">
-              <a href="<?= base_url('categoria') ?>" class="nav-link <?= ($subactive=='categoria')?'active':'' ?>">
+              <a href="<?= base_url('mantenimiento/categoria') ?>" class="nav-link <?= ($subactive=='categoria')?'active':'' ?>">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Categorías</p>
               </a>
@@ -43,7 +43,7 @@ $subactive = $subactive ?? '';
 
             <!-- CLIENTES (LO CREARÁS DESPUÉS) -->
             <li class="nav-item">
-              <a href="<?= base_url('cliente') ?>" class="nav-link <?= ($subactive=='cliente')?'active':'' ?>">
+              <a href="<?= base_url('mantenimiento/cliente') ?>" class="nav-link <?= ($subactive=='cliente')?'active':'' ?>">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Clientes</p>
               </a>
@@ -51,7 +51,7 @@ $subactive = $subactive ?? '';
 
             <!-- PRODUCTOS (LO CREARÁS DESPUÉS) -->
             <li class="nav-item">
-              <a href="<?= base_url('producto') ?>" class="nav-link <?= ($subactive=='producto')?'active':'' ?>">
+              <a href="<?= base_url('mantenimiento/producto') ?>" class="nav-link <?= ($subactive=='producto')?'active':'' ?>">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Productos</p>
               </a>
@@ -61,7 +61,7 @@ $subactive = $subactive ?? '';
         </li>
 
         <li class="nav-item">
-  <a href="<?= base_url('tipo_documento') ?>"
+  <a href="<?= base_url('mantenimiento/tipo_documento') ?>"
      class="nav-link <?= ($subactive=='tipo_documento')?'active':'' ?>">
     <i class="far fa-circle nav-icon"></i>
     <p>Tipo documento</p>
