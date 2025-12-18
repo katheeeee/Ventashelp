@@ -24,40 +24,27 @@
 
           <div class="form-group">
             <label>Código</label>
-            <input type="text"
-                   name="codigo"
-                   class="form-control"
-                   value="<?= old('codigo', $row['codigo']) ?>"
-                   required>
+            <input type="text" name="codigo" class="form-control"
+                   value="<?= old('codigo', $row['codigo']) ?>" required>
           </div>
 
           <div class="form-group">
             <label>Nombre</label>
-            <input type="text"
-                   name="nombre"
-                   class="form-control"
-                   value="<?= old('nombre', $row['nombre']) ?>"
-                   required>
+            <input type="text" name="nombre" class="form-control"
+                   value="<?= old('nombre', $row['nombre']) ?>" required>
           </div>
 
           <div class="form-group">
             <label>Descripción</label>
-            <input type="text"
-                   name="descripcion"
-                   class="form-control"
-                   value="<?= old('descripcion', $row['descripcion']) ?>"
-                   required>
+            <input type="text" name="descripcion" class="form-control"
+                   value="<?= old('descripcion', $row['descripcion']) ?>" required>
           </div>
 
           <div class="form-group">
             <label>Estado</label>
             <select name="estado" class="form-control">
-              <option value="1" <?= old('estado', $row['estado']) == 1 ? 'selected' : '' ?>>
-                Activo
-              </option>
-              <option value="0" <?= old('estado', $row['estado']) == 0 ? 'selected' : '' ?>>
-                Inactivo
-              </option>
+              <option value="1" <?= old('estado', $row['estado']) == 1 ? 'selected' : '' ?>>Activo</option>
+              <option value="0" <?= old('estado', $row['estado']) == 0 ? 'selected' : '' ?>>Inactivo</option>
             </select>
           </div>
 
