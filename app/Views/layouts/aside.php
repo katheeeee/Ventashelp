@@ -49,6 +49,7 @@ $subactive = $subactive ?? '';
               </a>
             </li>
 
+            
             <!-- PRODUCTOS (LO CREARÁS DESPUÉS) -->
             <li class="nav-item">
               <a href="<?= base_url('mantenimiento/producto') ?>" class="nav-link <?= ($subactive=='producto')?'active':'' ?>">
@@ -57,16 +58,18 @@ $subactive = $subactive ?? '';
               </a>
             </li>
 
+            <li class="nav-item">
+            <a href="<?= base_url('mantenimiento/tipo_documento') ?>"
+             class="nav-link <?= ($subactive=='tipo_documento')?'active':'' ?>">
+                <i class="far fa-circle nav-icon"></i>
+                  <p>Tipo documento</p>
+                 </a>
+                </li>
+
           </ul>
         </li>
 
-        <li class="nav-item">
-  <a href="<?= base_url('mantenimiento/tipo_documento') ?>"
-     class="nav-link <?= ($subactive=='tipo_documento')?'active':'' ?>">
-    <i class="far fa-circle nav-icon"></i>
-    <p>Tipo documento</p>
-  </a>
-</li>
+      
 
         <!-- MOVIMIENTOS -->
         <li class="nav-item has-treeview <?= ($active=='movimientos')?'menu-open':'' ?>">
