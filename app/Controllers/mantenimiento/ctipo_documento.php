@@ -61,7 +61,7 @@ class ctipo_documento extends BaseController
             'estado'      => 1
         ]);
 
-        return redirect()->to(base_url('tipo_documento'))
+        return redirect()->to(base_url('mantenimiento/tipo_documento'))
             ->with('success', 'Tipo de documento registrado');
     }
 
@@ -98,7 +98,7 @@ class ctipo_documento extends BaseController
             'estado'      => $this->request->getPost('estado')
         ]);
 
-        return redirect()->to(base_url('tipo_documento'))
+        return redirect()->to(base_url('mantenimiento/tipo_documento'))
             ->with('success', 'Actualizado correctamente');
     }
 
@@ -118,7 +118,7 @@ class ctipo_documento extends BaseController
         $model = new mtipo_documento();
         $model->delete($id);
 
-        return redirect()->to(base_url('tipo_documento'))
+        return redirect()->to(base_url('mantenimiento/tipo_documento'))
             ->with('success', 'Eliminado correctamente');
     }
 }
