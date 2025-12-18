@@ -61,17 +61,22 @@ class ccategoria extends BaseController
     }
 
     public function update($id)
-    {
-        $model = new mcategoria();
-
-        $model->update($id, [
-            'nombre'      => $this->request->getPost('nombre'),
-            'descripcion' => $this->request->getPost('descripcion'),
-            'estado'      => $this->request->getPost('estado'),
-        ]);
-
-        return redirect()->to(base_url('categoria'));
+{
+    if (!session()->get('login')) {
+        return redirect()->to(base_url('login'));
     }
+
+    $model = new mcategoria();
+
+    $model->update($id, [
+        'nombre'      => $this->request->getPost('nombre'),
+        'descripcion' => $this->request->getPost('descripcion'), // 👈 AQUÍ
+        'estado'      => $this->request->getPost('estado'),
+    ]);
+
+    return redirect()->to(base_url('categoria'));
+}
+
 
     public function delete($id)
     {
