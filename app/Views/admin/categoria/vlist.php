@@ -28,11 +28,28 @@
         </a>
       </div>
 
+      <?php if (session()->getFlashdata('success')): ?>
+  <div class="alert alert-success alert-dismissible fade show">
+    <?= session()->getFlashdata('success') ?>
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+<?php endif; ?>
+
+<?php if (session()->getFlashdata('error')): ?>
+  <div class="alert alert-danger">
+    <?php foreach (session()->getFlashdata('error') as $err): ?>
+      <div><?= esc($err) ?></div>
+    <?php endforeach; ?>
+  </div>
+<?php endif; ?>
+
+
       <div class="card-body">
-<table id="tablaCategorias" class="table table-bordered table-striped">
+        <table id="tablaCategorias" class="table table-bordered table-striped">
           <thead>
             <tr>
               <th>ID</th>
+              <th>Código</th> <!-- 👈 NUEVO -->
               <th>Nombre</th>
               <th>Descripción</th>
               <th>Estado</th>
@@ -44,6 +61,7 @@
             <?php foreach ($categorias as $c): ?>
               <tr>
                 <td><?= esc($c['idcategoria']) ?></td>
+                <td><?= esc($c['codigo']) ?></td> <!-- 👈 NUEVO -->
                 <td><?= esc($c['nombre']) ?></td>
                 <td><?= esc($c['descripcion']) ?></td>
 

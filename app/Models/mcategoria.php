@@ -11,6 +11,7 @@ class mcategoria extends Model
 
     protected $returnType = 'array';
     protected $allowedFields = [
+        'codigo',
         'nombre',
         'descripcion',
         'estado'
