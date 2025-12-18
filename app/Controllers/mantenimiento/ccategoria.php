@@ -5,11 +5,6 @@ namespace App\Controllers\mantenimiento;
 use App\Controllers\BaseController;
 use App\Models\mcategoria;
 
-
-$data['active'] = 'mantenimiento';
-$data['subactive'] = 'categoria';
-return view('admin/categoria/vlist', $data);
-
 class ccategoria extends BaseController
 {
     public function index()
@@ -19,22 +14,34 @@ class ccategoria extends BaseController
         }
 
         $model = new mcategoria();
-        $data['categorias'] = $model->findAll();
+
+        $data = [
+            'active'     => 'mantenimiento',
+            'subactive'  => 'categoria',
+            'categorias' => $model->findAll(),
+        ];
 
         return view('admin/categoria/vlist', $data);
     }
 
     public function add()
     {
-        return view('admin/categoria/vadd');
+        $data = [
+            'active'    => 'mantenimiento',
+            'subactive' => 'categoria',
+        ];
+
+        return view('admin/categoria/vadd', $data);
     }
 
     public function store()
     {
         $model = new mcategoria();
+
         $model->insert([
-            'nombre' => $this->request->getPost('nombre'),
-            'estado' => 1
+            'nombre'      => $this->request->getPost('nombre'),
+            'descripcion' => $this->request->getPost('descripcion'),
+            'estado'      => 1
         ]);
 
         return redirect()->to(base_url('categoria'));
@@ -43,7 +50,12 @@ class ccategoria extends BaseController
     public function edit($id)
     {
         $model = new mcategoria();
-        $data['cat'] = $model->find($id);
+
+        $data = [
+            'active'    => 'mantenimiento',
+            'subactive' => 'categoria',
+            'cat'       => $model->find($id),
+        ];
 
         return view('admin/categoria/vedit', $data);
     }
@@ -51,9 +63,11 @@ class ccategoria extends BaseController
     public function update($id)
     {
         $model = new mcategoria();
+
         $model->update($id, [
-            'nombre' => $this->request->getPost('nombre'),
-            'estado' => $this->request->getPost('estado')
+            'nombre'      => $this->request->getPost('nombre'),
+            'descripcion' => $this->request->getPost('descripcion'),
+            'estado'      => $this->request->getPost('estado'),
         ]);
 
         return redirect()->to(base_url('categoria'));

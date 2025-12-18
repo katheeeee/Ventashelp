@@ -6,8 +6,13 @@ use CodeIgniter\Model;
 
 class mcategoria extends Model
 {
-    protected $table = 'categoria';
-    protected $primaryKey = 'id'; // cambia si tu pk es otro
-    protected $allowedFields = ['nombre', 'estado'];
+    protected $table      = 'categoria';
+    protected $primaryKey = 'idcategoria';
+
     protected $returnType = 'array';
+    protected $allowedFields = [
+        'nombre',
+        'descripcion',
+        'estado'
+    ];
 }
