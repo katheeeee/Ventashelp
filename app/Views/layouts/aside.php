@@ -60,6 +60,14 @@ $subactive = $subactive ?? '';
           </ul>
         </li>
 
+        <li class="nav-item">
+  <a href="<?= base_url('tipo_documento') ?>"
+     class="nav-link <?= ($subactive=='tipo_documento')?'active':'' ?>">
+    <i class="far fa-circle nav-icon"></i>
+    <p>Tipo documento</p>
+  </a>
+</li>
+
         <!-- MOVIMIENTOS -->
         <li class="nav-item has-treeview <?= ($active=='movimientos')?'menu-open':'' ?>">
           <a href="#" class="nav-link <?= ($active=='movimientos')?'active':'' ?>">

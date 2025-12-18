@@ -28,4 +28,13 @@ $routes->get('categoria/edit/(:num)', 'mantenimiento\ccategoria::edit/$1');
 $routes->post('categoria/update/(:num)', 'mantenimiento\ccategoria::update/$1');
 $routes->get('categoria/delete/(:num)', 'mantenimiento\ccategoria::delete/$1');
 
+$routes->get('tipo_documento', 'mantenimiento\ctipo_documento::index');
+$routes->get('tipo_documento/add', 'mantenimiento\ctipo_documento::add');
+$routes->post('tipo_documento/store', 'mantenimiento\ctipo_documento::store');
+$routes->get('tipo_documento/edit/(:num)', 'mantenimiento\ctipo_documento::edit/$1');
+$routes->post('tipo_documento/update/(:num)', 'mantenimiento\ctipo_documento::update/$1');
+$routes->get('tipo_documento/view/(:num)', 'mantenimiento\ctipo_documento::view/$1');
+$routes->get('tipo_documento/delete/(:num)', 'mantenimiento\ctipo_documento::delete/$1');
+
+
 });
