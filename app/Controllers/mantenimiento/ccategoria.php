@@ -90,6 +90,24 @@ public function store()
         return view('admin/categoria/vedit', $data);
     }
 
+    public function view($id)
+{
+    if (!session()->get('login')) {
+        return redirect()->to(base_url('login'));
+    }
+
+    $model = new \App\Models\mcategoria();
+
+    $data = [
+        'active'    => 'mantenimiento',
+        'subactive' => 'categoria',
+        'cat'       => $model->find($id),
+    ];
+
+    return view('admin/categoria/vview', $data);
+}
+
+
 public function update($id)
 {
     if (!session()->get('login')) {

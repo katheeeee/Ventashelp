@@ -74,17 +74,26 @@
                 </td>
 
                 <td>
-                  <a class="btn btn-sm btn-warning"
-                     href="<?= base_url('categoria/edit/'.$c['idcategoria']) ?>">
-                    <i class="fa fa-pencil-alt"></i>
-                  </a>
+  <a class="btn btn-sm btn-info"
+     href="<?= base_url('categoria/view/'.$c['idcategoria']) ?>"
+     title="Ver">
+    <i class="fa fa-eye"></i>
+  </a>
 
-                  <a class="btn btn-sm btn-danger"
-                     href="<?= base_url('categoria/delete/'.$c['idcategoria']) ?>"
-                     onclick="return confirm('¿Eliminar categoría?')">
-                    <i class="fa fa-trash"></i>
-                  </a>
-                </td>
+  <a class="btn btn-sm btn-warning"
+     href="<?= base_url('categoria/edit/'.$c['idcategoria']) ?>"
+     title="Editar">
+    <i class="fa fa-pencil-alt"></i>
+  </a>
+
+  <a class="btn btn-sm btn-danger"
+     href="<?= base_url('categoria/delete/'.$c['idcategoria']) ?>"
+     onclick="return confirm('¿Eliminar categoría?')"
+     title="Eliminar">
+    <i class="fa fa-trash"></i>
+  </a>
+</td>
+
               </tr>
             <?php endforeach; ?>
           </tbody>

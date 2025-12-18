@@ -20,6 +20,7 @@ $routes->group('', ['filter' => 'auth'], function($routes){
     // aquí metes todas las rutas privadas:
     // $routes->get('productos', 'Producto::index');
     // $routes->get('ventas', 'Venta::index');
+    $routes->get('categoria/view/(:num)', 'mantenimiento\ccategoria::view/$1');
     $routes->get('categoria', 'mantenimiento\ccategoria::index');
 $routes->get('categoria/add', 'mantenimiento\ccategoria::add');
 $routes->post('categoria/store', 'mantenimiento\ccategoria::store');
