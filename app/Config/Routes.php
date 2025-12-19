@@ -38,6 +38,22 @@ $routes->group('', ['filter' => 'auth'], function($routes){
         $routes->get('tipo_documento/view/(:num)', 'mantenimiento\ctipo_documento::view/$1');
         $routes->get('tipo_documento/delete/(:num)', 'mantenimiento\ctipo_documento::delete/$1');
 
+        $routes->group('', ['filter' => 'auth'], function($routes){
+
+  $routes->group('movimientos', function($routes){
+
+    // imprimir (html)
+    $routes->get('boleta/(:num)', 'movimientos\cdocumento::boleta/$1');
+    $routes->get('factura/(:num)', 'movimientos\cdocumento::factura/$1');
+
+    // pdf
+    $routes->get('boleta_pdf/(:num)', 'movimientos\cdocumento::boleta_pdf/$1');
+    $routes->get('factura_pdf/(:num)', 'movimientos\cdocumento::factura_pdf/$1');
+
+  });
+
+});
+    
     });
 
 });
