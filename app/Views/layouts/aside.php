@@ -72,12 +72,7 @@ $subactive = $subactive ?? '';
       
 
         <!-- MOVIMIENTOS -->
-        <li class="nav-item has-treeview <?= ($active=='movimientos')?'menu-open':'' ?>">
-          <a href="#" class="nav-link <?= ($active=='movimientos')?'active':'' ?>">
-            <i class="nav-icon fas fa-exchange-alt"></i>
-            <p>
-              Movimientos
-              <i class="right fas fa-angle-left"></i>
+  
               <li class="nav-item has-treeview <?= ($active=='movimientos')?'menu-open':'' ?>">
   <a href="#" class="nav-link <?= ($active=='movimientos')?'active':'' ?>">
     <i class="nav-icon fas fa-exchange-alt"></i>
