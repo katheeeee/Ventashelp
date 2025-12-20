@@ -50,7 +50,7 @@
     </a>
 
     <a class="btn btn-danger btn-sm"
-       href="<?= base_url('color/delete/'.$c['idcolor']) ?>"
+       href="<?= base_url('mantenimiento/color/delete/'.$c['idcolor']) ?>"
        onclick="return confirm('¿Eliminar color?')">
        <i class="fa fa-trash"></i>
     </a>
