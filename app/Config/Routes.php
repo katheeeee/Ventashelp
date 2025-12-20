@@ -83,14 +83,14 @@ $routes->post('mantenimiento/tipo_material/update/(:num)', 'mantenimiento\ctipo_
 $routes->get('mantenimiento/tipo_material/view/(:num)', 'mantenimiento\ctipo_material::view/$1');
 $routes->get('mantenimiento/tipo_material/delete/(:num)', 'mantenimiento\ctipo_material::delete/$1');
 
-// ===== MANTENIMIENTO: UNIDAD MEDIDA =====
-$routes->get('mantenimiento/unidad_medida', 'mantenimiento\cunimedida::index');
-$routes->get('mantenimiento/unidad_medida/add', 'mantenimiento\cunimedida::add');
-$routes->post('mantenimiento/unidad_medida/store', 'mantenimiento\cunimedida::store');
-$routes->get('mantenimiento/unidad_medida/edit/(:num)', 'mantenimiento\cunimedida::edit/$1');
-$routes->post('mantenimiento/unidad_medida/update/(:num)', 'mantenimiento\cunimedida::update/$1');
-$routes->get('mantenimiento/unidad_medida/view/(:num)', 'mantenimiento\cunimedida::view/$1');
-$routes->get('mantenimiento/unidad_medida/delete/(:num)', 'mantenimiento\cunimedida::delete/$1');
+$routes->get('mantenimiento/unmedida', 'mantenimiento\cunmedida::index');
+$routes->get('mantenimiento/unmedida/add', 'mantenimiento\cunmedida::add');
+$routes->post('mantenimiento/unmedida/store', 'mantenimiento\cunmedida::store');
+$routes->get('mantenimiento/unmedida/edit/(:num)', 'mantenimiento\cunmedida::edit/$1');
+$routes->post('mantenimiento/unmedida/update/(:num)', 'mantenimiento\cunmedida::update/$1');
+$routes->get('mantenimiento/unmedida/view/(:num)', 'mantenimiento\cunmedida::view/$1');
+$routes->get('mantenimiento/unmedida/delete/(:num)', 'mantenimiento\cunmedida::delete/$1');
+
 
 // ===== MANTENIMIENTO: TIPO CLIENTE =====
 $routes->get('mantenimiento/tipo_cliente', 'mantenimiento\ctipo_cliente::index');
