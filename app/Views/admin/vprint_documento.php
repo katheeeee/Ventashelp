@@ -7,7 +7,6 @@
   <style>
     body{ font-family: Arial, sans-serif; margin:20px; }
     .box{ max-width: 800px; margin:auto; }
-    .top{ display:flex; justify-content:space-between; align-items:flex-start; }
     table{ width:100%; border-collapse: collapse; margin-top:10px; }
     th,td{ border:1px solid #333; padding:6px; font-size:14px; }
     th{ text-align:left; }
@@ -21,20 +20,16 @@
 
   <div class="actions">
     <button onclick="window.print()">Imprimir</button>
-    <?php if ($tipo == 'BOLETA'): ?>
+
+    <?php if ($tipo === 'BOLETA'): ?>
       <a href="<?= base_url('movimientos/boleta_pdf/'.$idventa) ?>" target="_blank">PDF</a>
     <?php else: ?>
       <a href="<?= base_url('movimientos/factura_pdf/'.$idventa) ?>" target="_blank">PDF</a>
     <?php endif; ?>
   </div>
 
-  <div class="top">
-    <div>
-      <h2><?= esc($tipo) ?> - N° <?= esc($idventa) ?></h2>
-      <div>Fecha: <?= esc($fecha) ?></div>
-    </div>
-  </div>
-
+  <h2><?= esc($tipo) ?> - N° <?= esc($idventa) ?></h2>
+  <div><b>Fecha:</b> <?= esc($fecha) ?></div>
   <hr>
 
   <div>
@@ -54,12 +49,12 @@
     </thead>
     <tbody>
       <?php $total=0; foreach($items as $it): $imp=$it['cant']*$it['precio']; $total+=$imp; ?>
-        <tr>
-          <td><?= esc($it['descripcion']) ?></td>
-          <td class="right"><?= esc($it['cant']) ?></td>
-          <td class="right"><?= number_format($it['precio'],2) ?></td>
-          <td class="right"><?= number_format($imp,2) ?></td>
-        </tr>
+      <tr>
+        <td><?= esc($it['descripcion']) ?></td>
+        <td class="right"><?= esc($it['cant']) ?></td>
+        <td class="right"><?= number_format($it['precio'],2) ?></td>
+        <td class="right"><?= number_format($imp,2) ?></td>
+      </tr>
       <?php endforeach; ?>
     </tbody>
     <tfoot>

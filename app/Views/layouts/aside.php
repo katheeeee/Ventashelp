@@ -73,25 +73,13 @@ $subactive = $subactive ?? '';
 
         <!-- MOVIMIENTOS -->
   
-              <li class="nav-item has-treeview <?= ($active=='movimientos')?'menu-open':'' ?>">
-  <a href="#" class="nav-link <?= ($active=='movimientos')?'active':'' ?>">
-    <i class="nav-icon fas fa-exchange-alt"></i>
-    <p>Movimientos <i class="right fas fa-angle-left"></i></p>
-  </a>
+<a href="<?= base_url('movimientos/boleta/1') ?>" class="nav-link">
+  <i class="far fa-circle nav-icon"></i><p>Generar boleta</p>
+</a>
 
-  <ul class="nav nav-treeview">
-    <li class="nav-item">
-      <a href="<?= base_url('movimientos/boleta/1') ?>" class="nav-link">
-        <i class="far fa-circle nav-icon"></i><p>Generar boleta</p>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a href="<?= base_url('movimientos/factura/1') ?>" class="nav-link">
-        <i class="far fa-circle nav-icon"></i><p>Generar factura</p>
-      </a>
-    </li>
-  </ul>
-</li>
+<a href="<?= base_url('movimientos/factura/1') ?>" class="nav-link">
+  <i class="far fa-circle nav-icon"></i><p>Generar factura</p>
+</a>
 
             </p>
           </a>
