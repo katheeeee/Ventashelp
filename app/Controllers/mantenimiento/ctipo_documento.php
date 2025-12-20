@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers\movimientos;
+namespace App\Controllers\mantenimiento;
 
 use App\Controllers\BaseController;
 

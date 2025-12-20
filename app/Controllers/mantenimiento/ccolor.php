@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\mantenimiento;
 use App\Models\mcolor;
 
 class ccolor extends BaseController
