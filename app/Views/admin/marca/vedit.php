@@ -4,51 +4,38 @@
   <div class="container-fluid">
 
     <div class="card">
-      <div class="card-header"><h3 class="card-title">Editar categoría</h3></div>
       <div class="card-body">
+
+        <h4>Nueva Marca</h4>
 
         <?php if (session()->getFlashdata('error')): ?>
           <div class="alert alert-danger">
-            <?php foreach (session()->getFlashdata('error') as $err): ?>
-              <div><?= esc($err) ?></div>
+            <?php foreach (session()->getFlashdata('error') as $e): ?>
+              <div><?= esc($e) ?></div>
             <?php endforeach; ?>
           </div>
         <?php endif; ?>
 
-        <form method="post" action="<?= base_url('categoria/update/'.$cat['idcategoria']) ?>">
+        <form action="<?= base_url('mantenimiento/marca/store') ?>" method="post">
           <?= csrf_field() ?>
 
           <div class="form-group">
-            <label>Código</label>
-            <input type="text" name="codigo" class="form-control"
-                   value="<?= old('codigo', $cat['codigo']) ?>" required>
-          </div>
-
-          <div class="form-group">
             <label>Nombre</label>
-            <input type="text" name="nombre" class="form-control"
-                   value="<?= old('nombre', $cat['nombre']) ?>" required>
+            <input type="text" name="nombre" class="form-control" value="<?= old('nombre') ?>" required>
           </div>
 
           <div class="form-group">
             <label>Descripción</label>
-            <input type="text" name="descripcion" class="form-control"
-                   value="<?= old('descripcion', $cat['descripcion']) ?>" required>
+            <input type="text" name="descripcion" class="form-control" value="<?= old('descripcion') ?>" required>
           </div>
 
-          <div class="form-group">
-            <label>Estado</label>
-            <select name="estado" class="form-control">
-              <option value="1" <?= old('estado', $cat['estado']) == 1 ? 'selected' : '' ?>>Activo</option>
-              <option value="0" <?= old('estado', $cat['estado']) == 0 ? 'selected' : '' ?>>Inactivo</option>
-            </select>
-          </div>
-
-          <button type="submit" class="btn btn-primary">
-            <i class="fa fa-save"></i> Actualizar
+          <button type="submit" class="btn btn-success">
+            <i class="fa fa-save"></i> Guardar
           </button>
 
-          <a class="btn btn-secondary" href="<?= base_url('categoria') ?>">Volver</a>
+          <a href="<?= base_url('mantenimiento/marca') ?>" class="btn btn-secondary">
+            Volver
+          </a>
         </form>
 
       </div>

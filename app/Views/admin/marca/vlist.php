@@ -27,42 +27,53 @@
           </div>
         <?php endif; ?>
 
-        <table id="tablaCategorias" class="table table-bordered table-striped">
+        <table id="tablaMarca" class="table table-bordered table-striped">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Código</th>
               <th>Nombre</th>
               <th>Descripción</th>
               <th>Estado</th>
-              <th width="140">Acciones</th>
+              <th style="width:120px;">Acciones</th>
             </tr>
           </thead>
+
           <tbody>
-            <?php foreach (($registros ?? []) as $r): ?>
+            <?php foreach ($marcas as $m): ?>
               <tr>
-                <td><?= esc($r['idmarca']) ?></td>
-                <td><?= esc($r['codigo']) ?></td>
-                <td><?= esc($r['nombre']) ?></td>
-                <td><?= esc($r['descripcion']) ?></td>
+                <td><?= esc($m['idmarca']) ?></td>
+                <td><?= esc($m['nombre']) ?></td>
+                <td><?= esc($m['descripcion']) ?></td>
+
                 <td>
-                  <?= ($r['estado']==1)
-                    ? '<span class="badge badge-success">Activo</span>'
-                    : '<span class="badge badge-danger">Inactivo</span>' ?>
+                  <?php if ($m['estado'] == 1): ?>
+                    <span class="badge badge-success">Activo</span>
+                  <?php else: ?>
+                    <span class="badge badge-danger">Inactivo</span>
+                  <?php endif; ?>
                 </td>
+
                 <td>
-                  <a class="btn btn-info btn-sm" href="<?= base_url('mantenimiento/marca/view/'.$r['idmarca']) ?>">
+                  <a class="btn btn-sm btn-info"
+                     href="<?= base_url('mantenimiento/marca/view/'.$m['idmarca']) ?>"
+                     title="Ver">
                     <i class="fa fa-eye"></i>
                   </a>
-                  <a class="btn btn-warning btn-sm" href="<?= base_url('mantenimiento/marca/edit/'.$r['idmarca']) ?>">
-                    <i class="fa fa-edit"></i>
+
+                  <a class="btn btn-sm btn-warning"
+                     href="<?= base_url('mantenimiento/marca/edit/'.$m['idmarca']) ?>"
+                     title="Editar">
+                    <i class="fa fa-pencil-alt"></i>
                   </a>
-                  <a class="btn btn-danger btn-sm"
-                     href="<?= base_url('mantenimiento/marca/delete/'.$r['idmarca']) ?>"
-                     onclick="return confirm('¿Eliminar?')">
+
+                  <a class="btn btn-sm btn-danger"
+                     href="<?= base_url('mantenimiento/marca/delete/'.$m['idmarca']) ?>"
+                     onclick="return confirm('¿Eliminar marca?')"
+                     title="Eliminar">
                     <i class="fa fa-trash"></i>
                   </a>
                 </td>
+
               </tr>
             <?php endforeach; ?>
           </tbody>

@@ -4,39 +4,37 @@
   <div class="container-fluid">
 
     <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Detalle de categoría</h3>
-      </div>
-
       <div class="card-body">
 
-        <div class="form-group">
-          <label>Código</label>
-          <input type="text" class="form-control"
-                 value="<?= esc($cat['codigo']) ?>" disabled>
-        </div>
+        <h4>Detalle Marca</h4>
 
-        <div class="form-group">
-          <label>Nombre</label>
-          <input type="text" class="form-control"
-                 value="<?= esc($cat['nombre']) ?>" disabled>
-        </div>
+        <table class="table table-bordered">
+          <tr>
+            <th style="width:180px;">ID</th>
+            <td><?= esc($mar['idmarca']) ?></td>
+          </tr>
+          <tr>
+            <th>Nombre</th>
+            <td><?= esc($mar['nombre']) ?></td>
+          </tr>
+          <tr>
+            <th>Descripción</th>
+            <td><?= esc($mar['descripcion']) ?></td>
+          </tr>
+          <tr>
+            <th>Estado</th>
+            <td>
+              <?php if ((int)$mar['estado'] === 1): ?>
+                <span class="badge badge-success">Activo</span>
+              <?php else: ?>
+                <span class="badge badge-danger">Inactivo</span>
+              <?php endif; ?>
+            </td>
+          </tr>
+        </table>
 
-        <div class="form-group">
-          <label>Descripción</label>
-          <input type="text" class="form-control"
-                 value="<?= esc($cat['descripcion']) ?>" disabled>
-        </div>
-
-        <div class="form-group">
-          <label>Estado</label>
-          <input type="text" class="form-control"
-                 value="<?= $cat['estado'] == 1 ? 'Activo' : 'Inactivo' ?>" disabled>
-        </div>
-
-        <a href="<?= base_url('categoria') ?>" class="btn btn-secondary">
-          Volver
-        </a>
+        <a href="<?= base_url('mantenimiento/marca') ?>" class="btn btn-secondary">Volver</a>
+        <a href="<?= base_url('mantenimiento/marca/edit/'.$mar['idmarca']) ?>" class="btn btn-warning">Editar</a>
 
       </div>
     </div>

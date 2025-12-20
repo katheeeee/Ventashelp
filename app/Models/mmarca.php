@@ -9,7 +9,9 @@ class mmarca extends Model
     protected $table      = 'marca';
     protected $primaryKey = 'idmarca';
 
-    protected $allowedFields = ['codigo', 'nombre', 'descripcion', 'estado'];
-
-    protected $returnType = 'array';
+    protected $allowedFields = [
+        'nombre',
+        'descripcion',
+        'estado'
+    ];
 }
