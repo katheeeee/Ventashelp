@@ -6,7 +6,7 @@
     <div class="card">
       <div class="card-body">
 
-        <h4>Nueva Marca</h4>
+        <h4>Editar Marca</h4>
 
         <?php if (session()->getFlashdata('error')): ?>
           <div class="alert alert-danger">
@@ -16,21 +16,31 @@
           </div>
         <?php endif; ?>
 
-        <form action="<?= base_url('mantenimiento/marca/store') ?>" method="post">
+        <form action="<?= base_url('mantenimiento/marca/update/'.$mar['idmarca']) ?>" method="post">
           <?= csrf_field() ?>
 
           <div class="form-group">
             <label>Nombre</label>
-            <input type="text" name="nombre" class="form-control" value="<?= old('nombre') ?>" required>
+            <input type="text" name="nombre" class="form-control"
+                   value="<?= old('nombre', $mar['nombre']) ?>" required>
           </div>
 
           <div class="form-group">
             <label>Descripción</label>
-            <input type="text" name="descripcion" class="form-control" value="<?= old('descripcion') ?>" required>
+            <input type="text" name="descripcion" class="form-control"
+                   value="<?= old('descripcion', $mar['descripcion']) ?>" required>
           </div>
 
-          <button type="submit" class="btn btn-success">
-            <i class="fa fa-save"></i> Guardar
+          <div class="form-group">
+            <label>Estado</label>
+            <select name="estado" class="form-control">
+              <option value="1" <?= ((int)$mar['estado'] === 1) ? 'selected' : '' ?>>Activo</option>
+              <option value="0" <?= ((int)$mar['estado'] === 0) ? 'selected' : '' ?>>Inactivo</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-warning">
+            <i class="fa fa-edit"></i> Actualizar
           </button>
 
           <a href="<?= base_url('mantenimiento/marca') ?>" class="btn btn-secondary">
