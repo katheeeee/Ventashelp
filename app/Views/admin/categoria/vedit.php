@@ -1,10 +1,30 @@
 <?= $this->include('layouts/header') ?>
 
-<section class="content pt-3">
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Editar Color</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item">
+            <a href="<?= base_url('dashboard') ?>">Home</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a href="<?= base_url('mantenimiento/color') ?>">Colores</a>
+          </li>
+          <li class="breadcrumb-item active">Editar</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content">
   <div class="container-fluid">
 
     <div class="card">
-      <div class="card-header"><h3 class="card-title">Editar categoría</h3></div>
       <div class="card-body">
 
         <?php if (session()->getFlashdata('error')): ?>
@@ -15,40 +35,42 @@
           </div>
         <?php endif; ?>
 
-        <form method="post" action="<?= base_url('categoria/update/'.$cat['idcategoria']) ?>">
+        <form action="<?= base_url('mantenimiento/color/update/'.$col['idcolor']) ?>" method="post">
           <?= csrf_field() ?>
 
           <div class="form-group">
             <label>Código</label>
             <input type="text" name="codigo" class="form-control"
-                   value="<?= old('codigo', $cat['codigo']) ?>" required>
+                   value="<?= old('codigo', $col['codigo']) ?>" required>
           </div>
 
           <div class="form-group">
             <label>Nombre</label>
             <input type="text" name="nombre" class="form-control"
-                   value="<?= old('nombre', $cat['nombre']) ?>" required>
+                   value="<?= old('nombre', $col['nombre']) ?>" required>
           </div>
 
           <div class="form-group">
             <label>Descripción</label>
             <input type="text" name="descripcion" class="form-control"
-                   value="<?= old('descripcion', $cat['descripcion']) ?>" required>
+                   value="<?= old('descripcion', $col['descripcion']) ?>" required>
           </div>
 
           <div class="form-group">
             <label>Estado</label>
             <select name="estado" class="form-control">
-              <option value="1" <?= old('estado', $cat['estado']) == 1 ? 'selected' : '' ?>>Activo</option>
-              <option value="0" <?= old('estado', $cat['estado']) == 0 ? 'selected' : '' ?>>Inactivo</option>
+              <option value="1" <?= ((int)$col['estado'] === 1) ? 'selected' : '' ?>>Activo</option>
+              <option value="0" <?= ((int)$col['estado'] === 0) ? 'selected' : '' ?>>Inactivo</option>
             </select>
           </div>
 
-          <button type="submit" class="btn btn-primary">
-            <i class="fa fa-save"></i> Actualizar
+          <button type="submit" class="btn btn-warning">
+            <i class="fa fa-edit"></i> Actualizar
           </button>
 
-          <a class="btn btn-secondary" href="<?= base_url('categoria') ?>">Volver</a>
+          <a href="<?= base_url('mantenimiento/color') ?>" class="btn btn-secondary">
+            Volver
+          </a>
         </form>
 
       </div>

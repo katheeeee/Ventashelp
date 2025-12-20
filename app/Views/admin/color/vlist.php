@@ -1,80 +1,109 @@
-<?= $this->extend('admin/dashboard') ?>
-<?= $this->section('content') ?>
+<?= $this->include('layouts/header') ?>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h4 class="mb-0">Color</h4>
-  <a href="<?= base_url('color/add') ?>" class="btn btn-primary btn-sm">
-    + Agregar
-  </a>
-</div>
-
-<?php if (session()->getFlashdata('success')): ?>
-  <div class="alert alert-success">
-    <?= session()->getFlashdata('success') ?>
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Colores</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item">
+            <a href="<?= base_url('dashboard') ?>">Home</a>
+          </li>
+          <li class="breadcrumb-item active">Colores</li>
+        </ol>
+      </div>
+    </div>
   </div>
-<?php endif; ?>
+</section>
 
-<?php if (session()->getFlashdata('error')): ?>
-  <div class="alert alert-danger">
-    <?php 
-      $errors = session()->getFlashdata('error');
-      if (is_array($errors)) {
-        echo '<ul class="mb-0">';
-        foreach ($errors as $e) echo "<li>{$e}</li>";
-        echo '</ul>';
-      } else {
-        echo $errors;
-      }
-    ?>
-  </div>
-<?php endif; ?>
+<section class="content">
+  <div class="container-fluid">
 
-<div class="card">
-  <div class="card-body table-responsive">
-    <table class="table table-bordered table-striped">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Código</th>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th>Estado</th>
-          <th style="width: 140px;">Opciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php if (!empty($colores)): ?>
-          <?php foreach ($colores as $r): ?>
-            <tr>
-              <td><?= esc($r['idcolor']) ?></td>
-              <td><?= esc($r['codigo']) ?></td>
-              <td><?= esc($r['nombre']) ?></td>
-              <td><?= esc($r['descripcion']) ?></td>
-              <td>
-                <?php if ((int)$r['estado'] === 1): ?>
-                  <span class="badge bg-success">Activo</span>
-                <?php else: ?>
-                  <span class="badge bg-danger">Inactivo</span>
-                <?php endif; ?>
-              </td>
-              <td>
-                <a href="<?= base_url('color/view/'.$r['idcolor']) ?>" class="btn btn-info btn-sm">Ver</a>
-                <a href="<?= base_url('color/edit/'.$r['idcolor']) ?>" class="btn btn-warning btn-sm">Editar</a>
-                <a href="<?= base_url('color/delete/'.$r['idcolor']) ?>" class="btn btn-danger btn-sm"
-                   onclick="return confirm('¿Seguro que deseas eliminar este color?')">
-                  Eliminar
-                </a>
-              </td>
-            </tr>
-          <?php endforeach; ?>
-        <?php else: ?>
-          <tr>
-            <td colspan="6" class="text-center">No hay registros</td>
-          </tr>
+    <div class="card">
+
+      <div class="card-header">
+        <a href="<?= base_url('mantenimiento/color/add') ?>" class="btn btn-primary btn-sm">
+          <i class="fa fa-plus"></i> Nuevo
+        </a>
+      </div>
+
+      <div class="card-body">
+
+        <!-- MENSAJES -->
+        <?php if (session()->getFlashdata('success')): ?>
+          <div class="alert alert-success alert-dismissible fade show">
+            <?= session()->getFlashdata('success') ?>
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+          </div>
         <?php endif; ?>
-      </tbody>
-    </table>
-  </div>
-</div>
 
-<?= $this->endSection() ?>
+        <?php if (session()->getFlashdata('error')): ?>
+          <div class="alert alert-danger">
+            <?php foreach (session()->getFlashdata('error') as $err): ?>
+              <div><?= esc($err) ?></div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+
+        <table id="tablaColor" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Estado</th>
+              <th style="width:120px;">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <?php foreach ($colores as $c): ?>
+              <tr>
+                <td><?= esc($c['idcolor']) ?></td>
+                <td><?= esc($c['codigo']) ?></td>
+                <td><?= esc($c['nombre']) ?></td>
+                <td><?= esc($c['descripcion']) ?></td>
+
+                <td>
+                  <?php if ($c['estado'] == 1): ?>
+                    <span class="badge badge-success">Activo</span>
+                  <?php else: ?>
+                    <span class="badge badge-danger">Inactivo</span>
+                  <?php endif; ?>
+                </td>
+
+                <td>
+                  <a class="btn btn-sm btn-info"
+                     href="<?= base_url('mantenimiento/color/view/'.$c['idcolor']) ?>"
+                     title="Ver">
+                    <i class="fa fa-eye"></i>
+                  </a>
+
+                  <a class="btn btn-sm btn-warning"
+                     href="<?= base_url('mantenimiento/color/edit/'.$c['idcolor']) ?>"
+                     title="Editar">
+                    <i class="fa fa-pencil-alt"></i>
+                  </a>
+
+                  <a class="btn btn-sm btn-danger"
+                     href="<?= base_url('color/delete/'.$c['idcolor']) ?>"
+                     onclick="return confirm('¿Eliminar color?')"
+                     title="Eliminar">
+                    <i class="fa fa-trash"></i>
+                  </a>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<?= $this->include('layouts/footer') ?>
