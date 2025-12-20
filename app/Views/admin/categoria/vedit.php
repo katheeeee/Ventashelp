@@ -15,7 +15,7 @@
           </div>
         <?php endif; ?>
 
-        <form method="post" action="<?= base_url('categoria/update/'.$cat['idcategoria']) ?>">
+        <form method="post" action="<?= base_url('mantenimiento/categoria/update/'.$cat['idcategoria']) ?>">
           <?= csrf_field() ?>
 
           <div class="form-group">
