@@ -1,21 +1,58 @@
 <?= $this->extend('admin/dashboard') ?>
 <?= $this->section('content') ?>
 
-<h4>Editar Color</h4>
+<h4 class="mb-3">Editar Color</h4>
 
-<form action="<?= base_url('ccolor/update/'.$registro['idcolor']) ?>" method="post">
-    <div class="mb-2">
-        <label>Nombre</label>
-        <input type="text" name="nombre" value="<?= $registro['nombre'] ?>" class="form-control">
-    </div>
+<?php if (session()->getFlashdata('error')): ?>
+  <div class="alert alert-danger">
+    <?php 
+      $errors = session()->getFlashdata('error');
+      if (is_array($errors)) {
+        echo '<ul class="mb-0">';
+        foreach ($errors as $e) echo "<li>{$e}</li>";
+        echo '</ul>';
+      } else {
+        echo $errors;
+      }
+    ?>
+  </div>
+<?php endif; ?>
 
-    <div class="mb-2">
-        <label>Descripción</label>
-        <input type="text" name="descripcion" value="<?= $registro['descripcion'] ?>" class="form-control">
-    </div>
+<div class="card">
+  <div class="card-body">
+    <form action="<?= base_url('color/update/'.$col['idcolor']) ?>" method="post">
+      <?= csrf_field() ?>
 
-    <button class="btn btn-warning">Actualizar</button>
-    <a href="<?= base_url('color') ?>" class="btn btn-secondary">Volver</a>
-</form>
+      <div class="mb-3">
+        <label class="form-label">Código</label>
+        <input type="text" name="codigo" class="form-control"
+               value="<?= old('codigo', $col['codigo']) ?>" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input type="text" name="nombre" class="form-control"
+               value="<?= old('nombre', $col['nombre']) ?>" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Descripción</label>
+        <input type="text" name="descripcion" class="form-control"
+               value="<?= old('descripcion', $col['descripcion']) ?>" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Estado</label>
+        <select name="estado" class="form-control">
+          <option value="1" <?= ((int)$col['estado'] === 1) ? 'selected' : '' ?>>Activo</option>
+          <option value="0" <?= ((int)$col['estado'] === 0) ? 'selected' : '' ?>>Inactivo</option>
+        </select>
+      </div>
+
+      <button class="btn btn-warning">Actualizar</button>
+      <a href="<?= base_url('color') ?>" class="btn btn-secondary">Volver</a>
+    </form>
+  </div>
+</div>
 
 <?= $this->endSection() ?>
