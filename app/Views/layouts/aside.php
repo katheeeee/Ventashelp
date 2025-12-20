@@ -69,8 +69,8 @@
             </li>
 
             <li class="nav-item">
-              <a href="<?= base_url('mantenimiento/unidad_medida') ?>"
-                 class="nav-link <?= ($subactive=='unidad_medida')?'active':'' ?>">
+              <a href="<?= base_url('mantenimiento/unmedida') ?>"
+                 class="nav-link <?= ($subactive=='unmedida')?'active':'' ?>">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Unidad Medida</p>
               </a>

@@ -65,7 +65,7 @@
               </a>
 
               <a class="btn btn-danger btn-sm"
-                 href="<?= base_url('unmedida/delete/'.$u['idunmedida']) ?>"
+                 href="<?= base_url('mantenimiento/unmedida/delete/'.$u['idunmedida']) ?>"
                  onclick="return confirm('¿Eliminar unidad de medida?')"
                  title="Eliminar">
                  <i class="fa fa-trash"></i>
