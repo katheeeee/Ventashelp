@@ -1,63 +1,91 @@
 <?= $this->include('layouts/header') ?>
 
 <section class="content pt-3">
-<div class="container-fluid">
+  <div class="container-fluid">
 
-<div class="card">
-<div class="card-header">
-  <a href="<?= base_url('mantenimiento/categoria/add') ?>" class="btn btn-primary btn-sm">
-    <i class="fa fa-plus"></i> Nuevo
-  </a>
-</div>
+    <div class="card">
+      <div class="card-header">
+        <a href="<?= base_url('mantenimiento/categoria/add') ?>" class="btn btn-primary btn-sm">
+          <i class="fa fa-plus"></i> Nuevo
+        </a>
+      </div>
 
-<div class="card-body">
-<table id="tablaCategorias" class="table table-bordered table-striped">
-<thead>
-<tr>
-  <th>ID</th>
-  <th>Código</th>
-  <th>Nombre</th>
-  <th>Estado</th>
-  <th width="120">Acciones</th>
-</tr>
-</thead>
+      <div class="card-body">
 
-<tbody>
-<?php foreach ($registros as $r): ?>
-<tr>
-  <td><?= $r['idtipo_documento'] ?></td>
-  <td><?= esc($r['codigo']) ?></td>
-  <td><?= esc($r['nombre']) ?></td>
-  <td>
-    <?= $r['estado'] == 1
-      ? '<span class="badge badge-success">Activo</span>'
-      : '<span class="badge badge-danger">Inactivo</span>' ?>
-  </td>
-  <td>
-    <a class="btn btn-info btn-sm"
-       href="<?= base_url('mantenimiento/categoria/view/'.$r['idcategoria']) ?>">
-       <i class="fa fa-eye"></i>
-    </a>
+        <!-- MENSAJES -->
+        <?php if (session()->getFlashdata('success')): ?>
+          <div class="alert alert-success alert-dismissible fade show">
+            <?= session()->getFlashdata('success') ?>
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+          </div>
+        <?php endif; ?>
 
-    <a class="btn btn-warning btn-sm"
-       href="<?= base_url('mantenimiento/categoria/edit/'.$r['idcategoria']) ?>">
-       <i class="fa fa-edit"></i>
-    </a>
+        <?php if (session()->getFlashdata('error')): ?>
+          <div class="alert alert-danger">
+            <?php foreach (session()->getFlashdata('error') as $err): ?>
+              <div><?= esc($err) ?></div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
 
-    <a class="btn btn-danger btn-sm"
-       href="<?= base_url('mantenimiento/categoria/delete/'.$r['idcategoria']) ?>"
-       onclick="return confirm('¿Eliminar?')">
-       <i class="fa fa-trash"></i>
-    </a>
-  </td>
-</tr>
-<?php endforeach; ?>
-</tbody>
-</table>
-</div>
-</div>
+        <table id="tablaCategorias" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Estado</th>
+              <th style="width:120px;">Acciones</th>
+            </tr>
+          </thead>
 
-</div>
+          <tbody>
+            <?php foreach ($categorias as $c): ?>
+              <tr>
+                <td><?= esc($c['idcategoria']) ?></td>
+                <td><?= esc($c['codigo']) ?></td>
+                <td><?= esc($c['nombre']) ?></td>
+                <td><?= esc($c['descripcion']) ?></td>
+
+                <td>
+                  <?php if ($c['estado'] == 1): ?>
+                    <span class="badge badge-success">Activo</span>
+                  <?php else: ?>
+                    <span class="badge badge-danger">Inactivo</span>
+                  <?php endif; ?>
+                </td>
+
+                <td>
+                  <a class="btn btn-sm btn-info"
+                     href="<?= base_url('mantenimiento/categoria/view/'.$c['idcategoria']) ?>"
+                     title="Ver">
+                    <i class="fa fa-eye"></i>
+                  </a>
+
+                  <a class="btn btn-sm btn-warning"
+                     href="<?= base_url('mantenimiento/categoria/edit/'.$c['idcategoria']) ?>"
+                     title="Editar">
+                    <i class="fa fa-pencil-alt"></i>
+                  </a>
+
+                  <!-- ✅ Delete según tu patrón -->
+                  <a class="btn btn-sm btn-danger"
+                     href="<?= base_url('categoria/delete/'.$c['idcategoria']) ?>"
+                     onclick="return confirm('¿Eliminar categoría?')"
+                     title="Eliminar">
+                    <i class="fa fa-trash"></i>
+                  </a>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+  </div>
 </section>
 
 <?= $this->include('layouts/footer') ?>
