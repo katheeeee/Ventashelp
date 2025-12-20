@@ -1,5 +1,7 @@
 <?= $this->include('layouts/header') ?>
 
+<?php $categorias = $categorias ?? []; ?>
+
 <section class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
@@ -8,9 +10,7 @@
       </div>
       <div class="col-sm-6">
         <ol class="breadcrumb float-sm-right">
-          <li class="breadcrumb-item">
-            <a href="<?= base_url('dashboard') ?>">Home</a>
-          </li>
+          <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">Home</a></li>
           <li class="breadcrumb-item active">Categorías</li>
         </ol>
       </div>
@@ -24,14 +24,14 @@
     <div class="card">
 
       <div class="card-header">
-        <a href="<?= base_url('categoria/add') ?>" class="btn btn-primary btn-sm">
+        <!-- ✅ AQUI ESTÁ EL CAMBIO -->
+        <a href="<?= base_url('mantenimiento/categoria/add') ?>" class="btn btn-primary btn-sm">
           <i class="fa fa-plus"></i> Nuevo
         </a>
       </div>
 
       <div class="card-body">
 
-        <!-- MENSAJES -->
         <?php if (session()->getFlashdata('success')): ?>
           <div class="alert alert-success alert-dismissible fade show">
             <?= session()->getFlashdata('success') ?>
@@ -41,7 +41,7 @@
 
         <?php if (session()->getFlashdata('error')): ?>
           <div class="alert alert-danger">
-            <?php foreach (session()->getFlashdata('error') as $err): ?>
+            <?php foreach ((array) session()->getFlashdata('error') as $err): ?>
               <div><?= esc($err) ?></div>
             <?php endforeach; ?>
           </div>
@@ -55,7 +55,7 @@
               <th>Nombre</th>
               <th>Descripción</th>
               <th>Estado</th>
-              <th style="width:120px;">Acciones</th>
+              <th style="width:140px;">Acciones</th>
             </tr>
           </thead>
 
@@ -68,36 +68,37 @@
                 <td><?= esc($c['descripcion']) ?></td>
 
                 <td>
-                  <?php if ($c['estado'] == 1): ?>
-                    <span class="badge badge-success">Activo</span>
-                  <?php else: ?>
-                    <span class="badge badge-danger">Inactivo</span>
-                  <?php endif; ?>
+                  <?= ($c['estado'] == 1)
+                    ? '<span class="badge badge-success">Activo</span>'
+                    : '<span class="badge badge-danger">Inactivo</span>' ?>
                 </td>
 
                 <td>
+                  <!-- ✅ CAMBIOS EN TODOS LOS BOTONES -->
                   <a class="btn btn-sm btn-info"
-                     href="<?= base_url('categoria/view/'.$c['idcategoria']) ?>"
+                     href="<?= base_url('mantenimiento/categoria/view/'.$c['idcategoria']) ?>"
                      title="Ver">
                     <i class="fa fa-eye"></i>
                   </a>
 
                   <a class="btn btn-sm btn-warning"
-                     href="<?= base_url('categoria/edit/'.$c['idcategoria']) ?>"
+                     href="<?= base_url('mantenimiento/categoria/edit/'.$c['idcategoria']) ?>"
                      title="Editar">
                     <i class="fa fa-pencil-alt"></i>
                   </a>
 
                   <a class="btn btn-sm btn-danger"
-                     href="<?= base_url('categoria/delete/'.$c['idcategoria']) ?>"
+                     href="<?= base_url('mantenimiento/categoria/delete/'.$c['idcategoria']) ?>"
                      onclick="return confirm('¿Eliminar categoría?')"
                      title="Eliminar">
                     <i class="fa fa-trash"></i>
                   </a>
                 </td>
+
               </tr>
             <?php endforeach; ?>
           </tbody>
+
         </table>
 
       </div>
