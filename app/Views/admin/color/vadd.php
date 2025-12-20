@@ -18,7 +18,7 @@
           </div>
         <?php endif; ?>
 
-        <form method="post" action="<?= base_url('color/store') ?>">
+        <form method="post" action="<?= base_url('mantenimiento/color/store') ?>">
           <?= csrf_field() ?>
 
           <div class="form-group">
