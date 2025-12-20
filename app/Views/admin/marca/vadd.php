@@ -4,9 +4,7 @@
   <div class="container-fluid">
 
     <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Nueva categoría</h3>
-      </div>
+      <div class="card-header"><h3 class="card-title">Nueva marca</h3></div>
 
       <div class="card-body">
 
@@ -18,35 +16,31 @@
           </div>
         <?php endif; ?>
 
-        <form method="post" action="<?= base_url('categoria/store') ?>">
+        <form method="post" action="<?= base_url('mantenimiento/marca/store') ?>">
           <?= csrf_field() ?>
 
           <div class="form-group">
             <label>Código</label>
-            <input type="text" name="codigo" class="form-control"
-                   value="<?= old('codigo') ?>" required>
+            <input type="text" name="codigo" class="form-control" value="<?= old('codigo') ?>" required>
           </div>
 
           <div class="form-group">
             <label>Nombre</label>
-            <input type="text" name="nombre" class="form-control"
-                   value="<?= old('nombre') ?>" required>
+            <input type="text" name="nombre" class="form-control" value="<?= old('nombre') ?>" required>
           </div>
 
           <div class="form-group">
             <label>Descripción</label>
-            <input type="text" name="descripcion" class="form-control"
-                   value="<?= old('descripcion') ?>" required>
+            <input type="text" name="descripcion" class="form-control" value="<?= old('descripcion') ?>" required>
           </div>
 
           <button type="submit" class="btn btn-primary">
             <i class="fa fa-save"></i> Guardar
           </button>
 
-          <a class="btn btn-secondary" href="<?= base_url('categoria') ?>">
-            Volver
-          </a>
+          <a href="<?= base_url('mantenimiento/marca') ?>" class="btn btn-secondary">Volver</a>
         </form>
+
       </div>
     </div>
 

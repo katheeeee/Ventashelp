@@ -50,10 +50,56 @@ $routes->group('', ['filter' => 'auth'], function($routes){
     $routes->get('boleta_pdf/(:num)', 'movimientos\cdocumento::boleta_pdf/$1');
     $routes->get('factura_pdf/(:num)', 'movimientos\cdocumento::factura_pdf/$1');
 
+  
   });
 
 });
     
     });
+    // ===== MANTENIMIENTO: COLOR =====
+$routes->get('mantenimiento/color', 'mantenimiento\ccolor::index');
+$routes->get('mantenimiento/color/add', 'mantenimiento\ccolor::add');
+$routes->post('mantenimiento/color/store', 'mantenimiento\ccolor::store');
+$routes->get('mantenimiento/color/edit/(:num)', 'mantenimiento\ccolor::edit/$1');
+$routes->post('mantenimiento/color/update/(:num)', 'mantenimiento\ccolor::update/$1');
+$routes->get('mantenimiento/color/view/(:num)', 'mantenimiento\ccolor::view/$1');
+$routes->get('mantenimiento/color/delete/(:num)', 'mantenimiento\ccolor::delete/$1');
+
+// ===== MANTENIMIENTO: MARCA =====
+$routes->get('mantenimiento/marca', 'mantenimiento\cmarca::index');
+$routes->get('mantenimiento/marca/add', 'mantenimiento\cmarca::add');
+$routes->post('mantenimiento/marca/store', 'mantenimiento\cmarca::store');
+$routes->get('mantenimiento/marca/edit/(:num)', 'mantenimiento\cmarca::edit/$1');
+$routes->post('mantenimiento/marca/update/(:num)', 'mantenimiento\cmarca::update/$1');
+$routes->get('mantenimiento/marca/view/(:num)', 'mantenimiento\cmarca::view/$1');
+$routes->get('mantenimiento/marca/delete/(:num)', 'mantenimiento\cmarca::delete/$1');
+
+// ===== MANTENIMIENTO: TIPO MATERIAL =====
+$routes->get('mantenimiento/tipo_material', 'mantenimiento\ctipo_material::index');
+$routes->get('mantenimiento/tipo_material/add', 'mantenimiento\ctipo_material::add');
+$routes->post('mantenimiento/tipo_material/store', 'mantenimiento\ctipo_material::store');
+$routes->get('mantenimiento/tipo_material/edit/(:num)', 'mantenimiento\ctipo_material::edit/$1');
+$routes->post('mantenimiento/tipo_material/update/(:num)', 'mantenimiento\ctipo_material::update/$1');
+$routes->get('mantenimiento/tipo_material/view/(:num)', 'mantenimiento\ctipo_material::view/$1');
+$routes->get('mantenimiento/tipo_material/delete/(:num)', 'mantenimiento\ctipo_material::delete/$1');
+
+// ===== MANTENIMIENTO: UNIDAD MEDIDA =====
+$routes->get('mantenimiento/unidad_medida', 'mantenimiento\cunimedida::index');
+$routes->get('mantenimiento/unidad_medida/add', 'mantenimiento\cunimedida::add');
+$routes->post('mantenimiento/unidad_medida/store', 'mantenimiento\cunimedida::store');
+$routes->get('mantenimiento/unidad_medida/edit/(:num)', 'mantenimiento\cunimedida::edit/$1');
+$routes->post('mantenimiento/unidad_medida/update/(:num)', 'mantenimiento\cunimedida::update/$1');
+$routes->get('mantenimiento/unidad_medida/view/(:num)', 'mantenimiento\cunimedida::view/$1');
+$routes->get('mantenimiento/unidad_medida/delete/(:num)', 'mantenimiento\cunimedida::delete/$1');
+
+// ===== MANTENIMIENTO: TIPO CLIENTE =====
+$routes->get('mantenimiento/tipo_cliente', 'mantenimiento\ctipo_cliente::index');
+$routes->get('mantenimiento/tipo_cliente/add', 'mantenimiento\ctipo_cliente::add');
+$routes->post('mantenimiento/tipo_cliente/store', 'mantenimiento\ctipo_cliente::store');
+$routes->get('mantenimiento/tipo_cliente/edit/(:num)', 'mantenimiento\ctipo_cliente::edit/$1');
+$routes->post('mantenimiento/tipo_cliente/update/(:num)', 'mantenimiento\ctipo_cliente::update/$1');
+$routes->get('mantenimiento/tipo_cliente/view/(:num)', 'mantenimiento\ctipo_cliente::view/$1');
+$routes->get('mantenimiento/tipo_cliente/delete/(:num)', 'mantenimiento\ctipo_cliente::delete/$1');
+
 
 });
