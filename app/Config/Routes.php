@@ -86,6 +86,16 @@ $routes->group('', ['filter' => 'auth'], function($routes){
         $routes->get('tipo_cliente/view/(:num)', 'mantenimiento\ctipo_cliente::view/$1');
         $routes->get('tipo_cliente/delete/(:num)', 'mantenimiento\ctipo_cliente::delete/$1');
 
+        $routes->get('mantenimiento/cliente', 'mantenimiento\ccliente::index');
+$routes->get('mantenimiento/cliente/add', 'mantenimiento\ccliente::add');
+$routes->post('mantenimiento/cliente/store', 'mantenimiento\ccliente::store');
+$routes->get('mantenimiento/cliente/edit/(:num)', 'mantenimiento\ccliente::edit/$1');
+$routes->post('mantenimiento/cliente/update/(:num)', 'mantenimiento\ccliente::update/$1');
+$routes->get('mantenimiento/cliente/view/(:num)', 'mantenimiento\ccliente::view/$1');
+
+$routes->get('cliente/delete/(:num)', 'mantenimiento\ccliente::delete/$1');
+
+
     });
 
     // =========================
@@ -102,5 +112,7 @@ $routes->group('', ['filter' => 'auth'], function($routes){
         $routes->get('factura_pdf/(:num)', 'movimientos\cdocumento::factura_pdf/$1');
 
     });
+
+
 
 });
