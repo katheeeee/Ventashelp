@@ -6,15 +6,12 @@ use CodeIgniter\Model;
 
 class munmedida extends Model
 {
-    protected $table      = 'unmedida';
-    protected $primaryKey = 'idunmedida';
+    protected $table      = 'unmedida';      // ⚠️ si tu tabla se llama distinto, cambia aquí
+    protected $primaryKey = 'idunmedida';    // ⚠️ si tu PK se llama distinto, cambia aquí
 
     protected $allowedFields = [
-        'codigo',
         'nombre',
         'descripcion',
         'estado'
     ];
-
-    protected $returnType = 'array';
 }
