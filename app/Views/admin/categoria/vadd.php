@@ -43,7 +43,7 @@
             <i class="fa fa-save"></i> Guardar
           </button>
 
-          <a class="btn btn-secondary" href="<?= base_url('categoria') ?>">
+          <a class="btn btn-secondary" href="<?= base_url('mantenimiento/categoria') ?>">
             Volver
           </a>
         </form>

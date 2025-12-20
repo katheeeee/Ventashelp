@@ -34,7 +34,7 @@
                  value="<?= $cat['estado'] == 1 ? 'Activo' : 'Inactivo' ?>" disabled>
         </div>
 
-        <a href="<?= base_url('categoria') ?>" class="btn btn-secondary">
+        <a href="<?= base_url('mantenimiento/categoria') ?>" class="btn btn-secondary">
           Volver
         </a>
 

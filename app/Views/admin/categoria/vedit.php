@@ -48,7 +48,7 @@
             <i class="fa fa-save"></i> Actualizar
           </button>
 
-          <a class="btn btn-secondary" href="<?= base_url('categoria') ?>">Volver</a>
+          <a class="btn btn-secondary" href="<?= base_url('mantenimiento/categoria') ?>">Volver</a>
         </form>
 
       </div>
