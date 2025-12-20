@@ -1,58 +1,67 @@
-<?= $this->extend('admin/dashboard') ?>
-<?= $this->section('content') ?>
+<?= $this->include('layouts/header') ?>
 
-<h4 class="mb-3">Editar Color</h4>
+<section class="content pt-3">
+  <div class="container-fluid">
 
-<?php if (session()->getFlashdata('error')): ?>
-  <div class="alert alert-danger">
-    <?php 
-      $errors = session()->getFlashdata('error');
-      if (is_array($errors)) {
-        echo '<ul class="mb-0">';
-        foreach ($errors as $e) echo "<li>{$e}</li>";
-        echo '</ul>';
-      } else {
-        echo $errors;
-      }
-    ?>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Editar color</h3>
+      </div>
+
+      <div class="card-body">
+
+        <?php if (session()->getFlashdata('error')): ?>
+          <div class="alert alert-danger">
+            <?php foreach (session()->getFlashdata('error') as $err): ?>
+              <div><?= esc($err) ?></div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+
+        <form method="post"
+              action="<?= base_url('mantenimiento/tipo_documento/update/'.$row['idtipo_documento']) ?>">
+          <?= csrf_field() ?>
+
+          <div class="form-group">
+            <label>Código</label>
+            <input type="text" name="codigo" class="form-control"
+                   value="<?= old('codigo', $row['codigo']) ?>" required>
+          </div>
+
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" name="nombre" class="form-control"
+                   value="<?= old('nombre', $row['nombre']) ?>" required>
+          </div>
+
+          <div class="form-group">
+            <label>Descripción</label>
+            <input type="text" name="descripcion" class="form-control"
+                   value="<?= old('descripcion', $row['descripcion']) ?>" required>
+          </div>
+
+          <div class="form-group">
+            <label>Estado</label>
+            <select name="estado" class="form-control">
+              <option value="1" <?= old('estado', $row['estado']) == 1 ? 'selected' : '' ?>>Activo</option>
+              <option value="0" <?= old('estado', $row['estado']) == 0 ? 'selected' : '' ?>>Inactivo</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="fa fa-save"></i> Actualizar
+          </button>
+
+          <a href="<?= base_url('mantenimiento/color') ?>" class="btn btn-secondary">
+            Volver
+          </a>
+
+        </form>
+
+      </div>
+    </div>
+
   </div>
-<?php endif; ?>
+</section>
 
-<div class="card">
-  <div class="card-body">
-    <form action="<?= base_url('color/update/'.$col['idcolor']) ?>" method="post">
-      <?= csrf_field() ?>
-
-      <div class="mb-3">
-        <label class="form-label">Código</label>
-        <input type="text" name="codigo" class="form-control"
-               value="<?= old('codigo', $col['codigo']) ?>" required>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Nombre</label>
-        <input type="text" name="nombre" class="form-control"
-               value="<?= old('nombre', $col['nombre']) ?>" required>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Descripción</label>
-        <input type="text" name="descripcion" class="form-control"
-               value="<?= old('descripcion', $col['descripcion']) ?>" required>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Estado</label>
-        <select name="estado" class="form-control">
-          <option value="1" <?= ((int)$col['estado'] === 1) ? 'selected' : '' ?>>Activo</option>
-          <option value="0" <?= ((int)$col['estado'] === 0) ? 'selected' : '' ?>>Inactivo</option>
-        </select>
-      </div>
-
-      <button class="btn btn-warning">Actualizar</button>
-      <a href="<?= base_url('color') ?>" class="btn btn-secondary">Volver</a>
-    </form>
-  </div>
-</div>
-
-<?= $this->endSection() ?>
+<?= $this->include('layouts/footer') ?>

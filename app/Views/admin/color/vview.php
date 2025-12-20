@@ -1,42 +1,47 @@
-<?= $this->extend('admin/dashboard') ?>
-<?= $this->section('content') ?>
+<?= $this->include('layouts/header') ?>
 
-<h4 class="mb-3">Detalle Color</h4>
+<section class="content pt-3">
+  <div class="container-fluid">
 
-<div class="card">
-  <div class="card-body">
-    <table class="table table-bordered">
-      <tr>
-        <th style="width: 180px;">ID</th>
-        <td><?= esc($col['idcolor']) ?></td>
-      </tr>
-      <tr>
-        <th>Código</th>
-        <td><?= esc($col['codigo']) ?></td>
-      </tr>
-      <tr>
-        <th>Nombre</th>
-        <td><?= esc($col['nombre']) ?></td>
-      </tr>
-      <tr>
-        <th>Descripción</th>
-        <td><?= esc($col['descripcion']) ?></td>
-      </tr>
-      <tr>
-        <th>Estado</th>
-        <td>
-          <?php if ((int)$col['estado'] === 1): ?>
-            <span class="badge bg-success">Activo</span>
-          <?php else: ?>
-            <span class="badge bg-danger">Inactivo</span>
-          <?php endif; ?>
-        </td>
-      </tr>
-    </table>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Detalle de color</h3>
+      </div>
 
-    <a href="<?= base_url('color') ?>" class="btn btn-secondary">Volver</a>
-    <a href="<?= base_url('color/edit/'.$col['idcolor']) ?>" class="btn btn-warning">Editar</a>
+      <div class="card-body">
+
+        <div class="form-group">
+          <label>Código</label>
+          <input type="text" class="form-control"
+                 value="<?= esc($row['codigo']) ?>" disabled>
+        </div>
+
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" class="form-control"
+                 value="<?= esc($row['nombre']) ?>" disabled>
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <input type="text" class="form-control"
+                 value="<?= esc($row['descripcion']) ?>" disabled>
+        </div>
+
+        <div class="form-group">
+          <label>Estado</label>
+          <input type="text" class="form-control"
+                 value="<?= ($row['estado'] == 1) ? 'Activo' : 'Inactivo' ?>" disabled>
+        </div>
+
+        <a href="<?= base_url('mantenimiento/color') ?>" class="btn btn-secondary">
+          Volver
+        </a>
+
+      </div>
+    </div>
+
   </div>
-</div>
+</section>
 
-<?= $this->endSection() ?>
+<?= $this->include('layouts/footer') ?>

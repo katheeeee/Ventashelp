@@ -5,7 +5,7 @@
 
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Nueva categoría</h3>
+        <h3 class="card-title">Nueva categoria</h3>
       </div>
 
       <div class="card-body">
@@ -43,10 +43,11 @@
             <i class="fa fa-save"></i> Guardar
           </button>
 
-          <a class="btn btn-secondary" href="<?= base_url('categoria') ?>">
+          <a href="<?= base_url('mantenimiento/categoria') ?>" class="btn btn-secondary">
             Volver
           </a>
         </form>
+
       </div>
     </div>
 
