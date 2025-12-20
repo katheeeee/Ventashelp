@@ -1,21 +1,24 @@
+<?php
+  // evita "Undefined variable"
+  $active    = $active    ?? '';
+  $subactive = $subactive ?? '';
+?>
+
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
 
   <a href="<?= base_url('dashboard') ?>" class="brand-link">
     <span class="brand-text font-weight-bold">HELPNET</span>
   </a>
-<?php
-$active = $active ?? '';
-$subactive = $subactive ?? '';
-?>
 
   <div class="sidebar">
 
     <nav class="mt-2">
-      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
 
         <!-- DASHBOARD -->
         <li class="nav-item">
-          <a href="<?= base_url('dashboard') ?>" class="nav-link <?= ($active=='dashboard')?'active':'' ?>">
+          <a href="<?= base_url('dashboard') ?>"
+             class="nav-link <?= ($active=='dashboard')?'active':'' ?>">
             <i class="nav-icon fas fa-home"></i>
             <p>Dashboard</p>
           </a>
@@ -33,67 +36,82 @@ $subactive = $subactive ?? '';
 
           <ul class="nav nav-treeview">
 
-            <!-- CATEGORIA (YA FUNCIONA) -->
             <li class="nav-item">
-              <a href="<?= base_url('mantenimiento/categoria') ?>" class="nav-link <?= ($subactive=='categoria')?'active':'' ?>">
+              <a href="<?= base_url('mantenimiento/categoria') ?>"
+                 class="nav-link <?= ($subactive=='categoria')?'active':'' ?>">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Categorías</p>
               </a>
             </li>
 
-            <!-- CLIENTES (LO CREARÁS DESPUÉS) -->
             <li class="nav-item">
-              <a href="<?= base_url('mantenimiento/cliente') ?>" class="nav-link <?= ($subactive=='cliente')?'active':'' ?>">
+              <a href="<?= base_url('mantenimiento/color') ?>"
+                 class="nav-link <?= ($subactive=='color')?'active':'' ?>">
                 <i class="far fa-circle nav-icon"></i>
-                <p>Clientes</p>
-              </a>
-            </li>
-
-            
-            <!-- PRODUCTOS (LO CREARÁS DESPUÉS) -->
-            <li class="nav-item">
-              <a href="<?= base_url('mantenimiento/producto') ?>" class="nav-link <?= ($subactive=='producto')?'active':'' ?>">
-                <i class="far fa-circle nav-icon"></i>
-                <p>Productos</p>
+                <p>Color</p>
               </a>
             </li>
 
             <li class="nav-item">
-            <a href="<?= base_url('mantenimiento/tipo_documento') ?>"
-             class="nav-link <?= ($subactive=='tipo_documento')?'active':'' ?>">
+              <a href="<?= base_url('mantenimiento/marca') ?>"
+                 class="nav-link <?= ($subactive=='marca')?'active':'' ?>">
                 <i class="far fa-circle nav-icon"></i>
-                  <p>Tipo documento</p>
-                 </a>
-                </li>
+                <p>Marca</p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="<?= base_url('mantenimiento/tipo_material') ?>"
+                 class="nav-link <?= ($subactive=='tipo_material')?'active':'' ?>">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Tipo Material</p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="<?= base_url('mantenimiento/unidad_medida') ?>"
+                 class="nav-link <?= ($subactive=='unidad_medida')?'active':'' ?>">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Unidad Medida</p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="<?= base_url('mantenimiento/tipo_cliente') ?>"
+                 class="nav-link <?= ($subactive=='tipo_cliente')?'active':'' ?>">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Tipo Cliente</p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="<?= base_url('mantenimiento/tipo_documento') ?>"
+                 class="nav-link <?= ($subactive=='tipo_documento')?'active':'' ?>">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Tipo Documento</p>
+              </a>
+            </li>
 
           </ul>
         </li>
 
-      
-
         <!-- MOVIMIENTOS -->
-  
-              <li class="nav-item has-treeview <?= ($active=='movimientos')?'menu-open':'' ?>">
-  <a href="#" class="nav-link <?= ($active=='movimientos')?'active':'' ?>">
-    <i class="nav-icon fas fa-exchange-alt"></i>
-    <p>Movimientos <i class="right fas fa-angle-left"></i></p>
-  </a>
-
-  <ul class="nav nav-treeview">
-    <li class="nav-item">
-      <a href="<?= base_url('movimientos/boleta/1') ?>" class="nav-link">
-        <i class="far fa-circle nav-icon"></i><p>Generar boleta</p>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a href="<?= base_url('movimientos/factura/1') ?>" class="nav-link">
-        <i class="far fa-circle nav-icon"></i><p>Generar factura</p>
-      </a>
-    </li>
-  </ul>
-</li>
+        <li class="nav-item has-treeview <?= ($active=='movimientos')?'menu-open':'' ?>">
+          <a href="#" class="nav-link <?= ($active=='movimientos')?'active':'' ?>">
+            <i class="nav-icon fas fa-exchange-alt"></i>
+            <p>
+              Movimientos
+              <i class="right fas fa-angle-left"></i>
             </p>
           </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Ventas</p>
+              </a>
+            </li>
+          </ul>
         </li>
 
         <!-- REPORTES -->
@@ -107,7 +125,7 @@ $subactive = $subactive ?? '';
           </a>
         </li>
 
-        <!-- ADMIN -->
+        <!-- ADMINISTRADOR -->
         <li class="nav-item has-treeview <?= ($active=='admin')?'menu-open':'' ?>">
           <a href="#" class="nav-link <?= ($active=='admin')?'active':'' ?>">
             <i class="nav-icon fas fa-user-shield"></i>
