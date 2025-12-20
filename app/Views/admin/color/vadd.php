@@ -1,42 +1,56 @@
-<?= $this->extend('admin/dashboard') ?>
-<?= $this->section('content') ?>
+<?= $this->include('layouts/header') ?>
 
-<h4 class="mb-3">Nuevo Color</h4>
+<section class="content pt-3">
+  <div class="container-fluid">
 
-<?php if (session()->getFlashdata('error')): ?>
-  <div class="alert alert-danger">
-    <?php 
-      $errors = session()->getFlashdata('error');
-      if (is_array($errors)) {
-        echo '<ul class="mb-0">';
-        foreach ($errors as $e) echo "<li>{$e}</li>";
-        echo '</ul>';
-      } else {
-        echo $errors;
-      }
-    ?>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Nuevo color</h3>
+      </div>
+
+      <div class="card-body">
+
+        <?php if (session()->getFlashdata('error')): ?>
+          <div class="alert alert-danger">
+            <?php foreach (session()->getFlashdata('error') as $err): ?>
+              <div><?= esc($err) ?></div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+
+        <form method="post" action="<?= base_url('categoria/store') ?>">
+          <?= csrf_field() ?>
+
+          <div class="form-group">
+            <label>Código</label>
+            <input type="text" name="codigo" class="form-control"
+                   value="<?= old('codigo') ?>" required>
+          </div>
+
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" name="nombre" class="form-control"
+                   value="<?= old('nombre') ?>" required>
+          </div>
+
+          <div class="form-group">
+            <label>Descripción</label>
+            <input type="text" name="descripcion" class="form-control"
+                   value="<?= old('descripcion') ?>" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="fa fa-save"></i> Guardar
+          </button>
+
+          <a class="btn btn-secondary" href="<?= base_url('categoria') ?>">
+            Volver
+          </a>
+        </form>
+      </div>
+    </div>
+
   </div>
-<?php endif; ?>
+</section>
 
-<div class="card">
-  <div class="card-body">
-    <form action="<?= base_url('color/store') ?>" method="post">
-      <?= csrf_field() ?>
-
-      <div class="mb-3">
-        <label class="form-label">Código</label>
-        <input type="text" name="codigo" class="form-control" value="<?= old('codigo') ?>" required>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Nombre</label>
-        <input type="text" name="nombre" class="form-control" value="<?= old('nombre') ?>" required>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Descripción</label>
-        <input type="text" name="descripcion" class="form-control" value="<?= old('descripcion') ?>" required>
-      </div>
-
-      <button class="btn btn-success">Guardar</button>
-      <a href="<?= base_url('color') ?>" clas_
+<?= $this->include('layouts/footer') ?>
