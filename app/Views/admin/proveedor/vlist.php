@@ -1,70 +1,91 @@
 <?= $this->include('layouts/header') ?>
 
 <section class="content pt-3">
-<div class="container-fluid">
+  <div class="container-fluid">
 
-<div class="card">
-  <div class="card-header">
-    <a href="<?= base_url('mantenimiento/proveedor/add') ?>" class="btn btn-primary btn-sm">
-      <i class="fa fa-plus"></i> Nuevo
-    </a>
-  </div>
-
-  <div class="card-body">
-
-    <?php if (session()->getFlashdata('success')): ?>
-      <div class="alert alert-success">
-        <?= session()->getFlashdata('success') ?>
+    <div class="card">
+      <div class="card-header">
+        <a href="<?= base_url('mantenimiento/proveedor/add') ?>" class="btn btn-primary btn-sm">
+          <i class="fa fa-plus"></i> Nuevo
+        </a>
       </div>
-    <?php endif; ?>
 
-    <table class="table table-bordered table-striped">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Código</th>
-          <th>Nombre</th>
-          <th>Estado</th>
-          <th width="120">Acciones</th>
-        </tr>
-      </thead>
+      <div class="card-body">
 
-      <tbody>
-      <?php foreach ($registros as $r): ?>
-        <tr>
-          <td><?= $r['idproveedor'] ?></td>
-          <td><?= esc($r['codigo']) ?></td>
-          <td><?= esc($r['nombre']) ?></td>
-          <td>
-            <?= $r['estado']==1
-              ? '<span class="badge badge-success">Activo</span>'
-              : '<span class="badge badge-danger">Inactivo</span>' ?>
-          </td>
-          <td>
-            <a class="btn btn-info btn-sm"
-               href="<?= base_url('mantenimiento/proveedor/view/'.$r['idproveedor']) ?>">
-              <i class="fa fa-eye"></i>
-            </a>
+        <!-- MENSAJES -->
+        <?php if (session()->getFlashdata('success')): ?>
+          <div class="alert alert-success alert-dismissible fade show">
+            <?= session()->getFlashdata('success') ?>
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+          </div>
+        <?php endif; ?>
 
-            <a class="btn btn-warning btn-sm"
-               href="<?= base_url('mantenimiento/proveedor/edit/'.$r['idproveedor']) ?>">
-              <i class="fa fa-edit"></i>
-            </a>
+        <?php if (session()->getFlashdata('error')): ?>
+          <div class="alert alert-danger">
+            <?php foreach (session()->getFlashdata('error') as $err): ?>
+              <div><?= esc($err) ?></div>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
 
-                        <a class="btn btn-danger btn-sm"
-               href="<?= base_url('mantenimiento/proveedor/delete/'.$r['idproveedor']) ?>">
-              <i class="fa fa-trash"></i>
-            </a>
-          </td>
-        </tr>
-      <?php endforeach; ?>
-      </tbody>
-    </table>
+        <table id="tablaProveedor" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th>Estado</th>
+              <th width="120">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <?php foreach ($registros as $r): ?>
+              <tr>
+                <td><?= esc($r['idproveedor']) ?></td>
+                <td><?= esc($r['codigo']) ?></td>
+                <td><?= esc($r['nombre']) ?></td>
+                <td><?= esc($r['direccion']) ?></td>
+                <td><?= esc($r['telefono']) ?></td>
+
+                <td>
+                  <?= ($r['estado'] == 1)
+                    ? '<span class="badge badge-success">Activo</span>'
+                    : '<span class="badge badge-danger">Inactivo</span>' ?>
+                </td>
+
+                <td>
+                  <a class="btn btn-info btn-sm"
+                     href="<?= base_url('mantenimiento/proveedor/view/'.$r['idproveedor']) ?>"
+                     title="Ver">
+                    <i class="fa fa-eye"></i>
+                  </a>
+
+                  <a class="btn btn-warning btn-sm"
+                     href="<?= base_url('mantenimiento/proveedor/edit/'.$r['idproveedor']) ?>"
+                     title="Editar">
+                    <i class="fa fa-edit"></i>
+                  </a>
+
+                  <a class="btn btn-danger btn-sm"
+                     href="<?= base_url('mantenimiento/proveedor/delete/'.$r['idproveedor']) ?>"
+                     onclick="return confirm('¿Eliminar proveedor?')"
+                     title="Eliminar">
+                    <i class="fa fa-trash"></i>
+                  </a>
+                </td>
+
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
 
   </div>
-</div>
-
-</div>
 </section>
 
 <?= $this->include('layouts/footer') ?>
