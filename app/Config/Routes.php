@@ -6,24 +6,30 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-$routes->get('testenv', 'Testenv::index');
-
+// =========================
+// RUTAS PÚBLICAS
+// =========================
 $routes->get('/', 'clogin::index');
 $routes->get('login', 'clogin::index');
 $routes->post('clogeo', 'clogin::clogeo');
 $routes->get('logout', 'clogin::clogout');
 
-$routes->group('', ['filter' => 'auth'], function($routes){
+// =========================
+// RUTAS PROTEGIDAS (LOGIN)
+// =========================
+$routes->group('', ['filter' => 'auth'], function ($routes) {
 
-    // dashboard
+    // -------------------------
+    // DASHBOARD
+    // -------------------------
     $routes->get('dashboard', 'Home::index');
 
     // =========================
     // MANTENIMIENTO
     // =========================
-    $routes->group('mantenimiento', function($routes){
+    $routes->group('mantenimiento', function ($routes) {
 
-        // categoria
+        // -------- CATEGORIA --------
         $routes->get('categoria', 'mantenimiento\ccategoria::index');
         $routes->get('categoria/add', 'mantenimiento\ccategoria::add');
         $routes->post('categoria/store', 'mantenimiento\ccategoria::store');
@@ -32,7 +38,7 @@ $routes->group('', ['filter' => 'auth'], function($routes){
         $routes->get('categoria/view/(:num)', 'mantenimiento\ccategoria::view/$1');
         $routes->get('categoria/delete/(:num)', 'mantenimiento\ccategoria::delete/$1');
 
-        // tipo_documento
+        // -------- TIPO DOCUMENTO --------
         $routes->get('tipo_documento', 'mantenimiento\ctipo_documento::index');
         $routes->get('tipo_documento/add', 'mantenimiento\ctipo_documento::add');
         $routes->post('tipo_documento/store', 'mantenimiento\ctipo_documento::store');
@@ -41,7 +47,7 @@ $routes->group('', ['filter' => 'auth'], function($routes){
         $routes->get('tipo_documento/view/(:num)', 'mantenimiento\ctipo_documento::view/$1');
         $routes->get('tipo_documento/delete/(:num)', 'mantenimiento\ctipo_documento::delete/$1');
 
-        // color
+        // -------- COLOR --------
         $routes->get('color', 'mantenimiento\ccolor::index');
         $routes->get('color/add', 'mantenimiento\ccolor::add');
         $routes->post('color/store', 'mantenimiento\ccolor::store');
@@ -50,7 +56,7 @@ $routes->group('', ['filter' => 'auth'], function($routes){
         $routes->get('color/view/(:num)', 'mantenimiento\ccolor::view/$1');
         $routes->get('color/delete/(:num)', 'mantenimiento\ccolor::delete/$1');
 
-        // marca
+        // -------- MARCA --------
         $routes->get('marca', 'mantenimiento\cmarca::index');
         $routes->get('marca/add', 'mantenimiento\cmarca::add');
         $routes->post('marca/store', 'mantenimiento\cmarca::store');
@@ -59,7 +65,7 @@ $routes->group('', ['filter' => 'auth'], function($routes){
         $routes->get('marca/view/(:num)', 'mantenimiento\cmarca::view/$1');
         $routes->get('marca/delete/(:num)', 'mantenimiento\cmarca::delete/$1');
 
-        // tipo_material
+        // -------- TIPO MATERIAL --------
         $routes->get('tipo_material', 'mantenimiento\ctipo_material::index');
         $routes->get('tipo_material/add', 'mantenimiento\ctipo_material::add');
         $routes->post('tipo_material/store', 'mantenimiento\ctipo_material::store');
@@ -68,7 +74,7 @@ $routes->group('', ['filter' => 'auth'], function($routes){
         $routes->get('tipo_material/view/(:num)', 'mantenimiento\ctipo_material::view/$1');
         $routes->get('tipo_material/delete/(:num)', 'mantenimiento\ctipo_material::delete/$1');
 
-        // unmedida
+        // -------- UNIDAD MEDIDA --------
         $routes->get('unmedida', 'mantenimiento\cunmedida::index');
         $routes->get('unmedida/add', 'mantenimiento\cunmedida::add');
         $routes->post('unmedida/store', 'mantenimiento\cunmedida::store');
@@ -77,7 +83,7 @@ $routes->group('', ['filter' => 'auth'], function($routes){
         $routes->get('unmedida/view/(:num)', 'mantenimiento\cunmedida::view/$1');
         $routes->get('unmedida/delete/(:num)', 'mantenimiento\cunmedida::delete/$1');
 
-        // tipo_cliente
+        // -------- TIPO CLIENTE --------
         $routes->get('tipo_cliente', 'mantenimiento\ctipo_cliente::index');
         $routes->get('tipo_cliente/add', 'mantenimiento\ctipo_cliente::add');
         $routes->post('tipo_cliente/store', 'mantenimiento\ctipo_cliente::store');
@@ -86,33 +92,30 @@ $routes->group('', ['filter' => 'auth'], function($routes){
         $routes->get('tipo_cliente/view/(:num)', 'mantenimiento\ctipo_cliente::view/$1');
         $routes->get('tipo_cliente/delete/(:num)', 'mantenimiento\ctipo_cliente::delete/$1');
 
-        $routes->get('mantenimiento/cliente', 'mantenimiento\ccliente::index');
-$routes->get('mantenimiento/cliente/add', 'mantenimiento\ccliente::add');
-$routes->post('mantenimiento/cliente/store', 'mantenimiento\ccliente::store');
-$routes->get('mantenimiento/cliente/edit/(:num)', 'mantenimiento\ccliente::edit/$1');
-$routes->post('mantenimiento/cliente/update/(:num)', 'mantenimiento\ccliente::update/$1');
-$routes->get('mantenimiento/cliente/view/(:num)', 'mantenimiento\ccliente::view/$1');
-
-$routes->get('cliente/delete/(:num)', 'mantenimiento\ccliente::delete/$1');
-
+        // -------- CLIENTE (MAESTRO) --------
+        $routes->get('cliente', 'mantenimiento\ccliente::index');
+        $routes->get('cliente/add', 'mantenimiento\ccliente::add');
+        $routes->post('cliente/store', 'mantenimiento\ccliente::store');
+        $routes->get('cliente/edit/(:num)', 'mantenimiento\ccliente::edit/$1');
+        $routes->post('cliente/update/(:num)', 'mantenimiento\ccliente::update/$1');
+        $routes->get('cliente/view/(:num)', 'mantenimiento\ccliente::view/$1');
+        $routes->get('cliente/delete/(:num)', 'mantenimiento\ccliente::delete/$1');
 
     });
 
     // =========================
     // MOVIMIENTOS
     // =========================
-    $routes->group('movimientos', function($routes){
+    $routes->group('movimientos', function ($routes) {
 
-        // imprimir (html)
+        // documentos HTML
         $routes->get('boleta/(:num)', 'movimientos\cdocumento::boleta/$1');
         $routes->get('factura/(:num)', 'movimientos\cdocumento::factura/$1');
 
-        // pdf
+        // documentos PDF
         $routes->get('boleta_pdf/(:num)', 'movimientos\cdocumento::boleta_pdf/$1');
         $routes->get('factura_pdf/(:num)', 'movimientos\cdocumento::factura_pdf/$1');
 
     });
-
-
 
 });
