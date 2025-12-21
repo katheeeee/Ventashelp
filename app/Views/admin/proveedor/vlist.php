@@ -12,51 +12,53 @@
 
   <div class="card-body">
 
+    <?php if (session()->getFlashdata('success')): ?>
+      <div class="alert alert-success">
+        <?= session()->getFlashdata('success') ?>
+      </div>
+    <?php endif; ?>
+
     <table class="table table-bordered table-striped">
       <thead>
         <tr>
           <th>ID</th>
           <th>Código</th>
           <th>Nombre</th>
-          <th>Teléfono</th>
           <th>Estado</th>
           <th width="120">Acciones</th>
         </tr>
       </thead>
 
       <tbody>
-      <?php foreach ($proveedores as $p): ?>
+      <?php foreach ($registros as $r): ?>
         <tr>
-          <td><?= $p['idproveedor'] ?></td>
-          <td><?= esc($p['codigo']) ?></td>
-          <td><?= esc($p['nombre']) ?></td>
-          <td><?= esc($p['telefono']) ?></td>
+          <td><?= $r['idproveedor'] ?></td>
+          <td><?= esc($r['codigo']) ?></td>
+          <td><?= esc($r['nombre']) ?></td>
           <td>
-            <?= $p['estado']==1
+            <?= $r['estado']==1
               ? '<span class="badge badge-success">Activo</span>'
               : '<span class="badge badge-danger">Inactivo</span>' ?>
           </td>
           <td>
             <a class="btn btn-info btn-sm"
-               href="<?= base_url('mantenimiento/proveedor/view/'.$p['idproveedor']) ?>">
-               <i class="fa fa-eye"></i>
+               href="<?= base_url('mantenimiento/proveedor/view/'.$r['idproveedor']) ?>">
+              <i class="fa fa-eye"></i>
             </a>
 
             <a class="btn btn-warning btn-sm"
-               href="<?= base_url('mantenimiento/proveedor/edit/'.$p['idproveedor']) ?>">
-               <i class="fa fa-edit"></i>
+               href="<?= base_url('mantenimiento/proveedor/edit/'.$r['idproveedor']) ?>">
+              <i class="fa fa-edit"></i>
             </a>
 
-            <a class="btn btn-danger btn-sm"
-               href="<?= base_url('mantenimiento/proveedor/delete/'.$p['idproveedor']) ?>"
-               onclick="return confirm('¿Eliminar proveedor?')">
-               <i class="fa fa-trash"></i>
+                        <a class="btn btn-danger btn-sm"
+               href="<?= base_url('mantenimiento/proveedor/delete/'.$r['idproveedor']) ?>">
+              <i class="fa fa-trash"></i>
             </a>
           </td>
         </tr>
       <?php endforeach; ?>
       </tbody>
-
     </table>
 
   </div>
