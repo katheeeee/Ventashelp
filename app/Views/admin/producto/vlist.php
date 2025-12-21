@@ -44,29 +44,32 @@
       </thead>
 
       <tbody>
-        <td class="text-center">
-  <?php if (!empty($r['imagen'])): ?>
-    <a href="<?= base_url('uploads/productos/'.$r['imagen']) ?>"
-       data-toggle="lightbox"
-       data-title="<?= esc($r['nombre']) ?>">
-      <img src="<?= base_url('uploads/productos/'.$r['imagen']) ?>"
-           class="img-thumbnail"
-           style="max-width:60px; max-height:60px;">
-    </a>
-  <?php else: ?>
-    <span class="text-muted">Sin imagen</span>
-  <?php endif; ?>
-</td>
-
       <?php foreach ($registros as $r): ?>
         <tr>
           <td><?= esc($r['idproducto']) ?></td>
           <td><?= esc($r['codigo']) ?></td>
           <td><?= esc($r['nombre']) ?></td>
+
+          <!-- ✅ IMAGEN -->
+          <td class="text-center">
+            <?php if (!empty($r['imagen'])): ?>
+              <a href="<?= base_url('uploads/productos/'.$r['imagen']) ?>"
+                 data-toggle="lightbox"
+                 data-title="<?= esc($r['nombre']) ?>">
+                <img src="<?= base_url('uploads/productos/'.$r['imagen']) ?>"
+                     class="img-thumbnail"
+                     style="max-width:60px; max-height:60px;">
+              </a>
+            <?php else: ?>
+              <span class="text-muted">Sin imagen</span>
+            <?php endif; ?>
+          </td>
+
           <td><?= esc($r['categoria']) ?></td>
           <td><?= esc($r['marca']) ?></td>
           <td><?= esc($r['precio']) ?></td>
           <td><?= esc($r['stock']) ?></td>
+
           <td>
             <?= ((int)$r['estado'] === 1)
               ? '<span class="badge badge-success">Activo</span>'
