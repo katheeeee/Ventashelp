@@ -4,40 +4,23 @@
 <div class="container-fluid">
 
 <div class="card">
-<div class="card-header">
-  <h5>Detalle Proveedor</h5>
-</div>
+  <div class="card-header"><h5>Detalle Proveedor</h5></div>
 
-<div class="card-body">
+  <div class="card-body">
 
-<table class="table table-bordered">
-  <tr>
-    <th>Código</th>
-    <td><?= esc($p['codigo']) ?></td>
-  </tr>
-  <tr>
-    <th>Nombre</th>
-    <td><?= esc($p['nombre']) ?></td>
-  </tr>
-  <tr>
-    <th>Dirección</th>
-    <td><?= esc($p['direccion']) ?></td>
-  </tr>
-  <tr>
-    <th>Teléfono</th>
-    <td><?= esc($p['telefono']) ?></td>
-  </tr>
-  <tr>
-    <th>Estado</th>
-    <td><?= $p['estado']==1?'Activo':'Inactivo' ?></td>
-  </tr>
-</table>
+    <p><b>Código:</b> <?= esc($proveedor['codigo']) ?></p>
+    <p><b>Nombre:</b> <?= esc($proveedor['nombre']) ?></p>
+    <p><b>Dirección:</b> <?= esc($proveedor['direccion']) ?></p>
+    <p><b>Teléfono:</b> <?= esc($proveedor['telefono']) ?></p>
+    <p><b>Estado:</b>
+      <?= $proveedor['estado']==1 ? 'Activo' : 'Inactivo' ?>
+    </p>
 
-<a href="<?= base_url('mantenimiento/proveedor') ?>" class="btn btn-secondary">
-  Volver
-</a>
+  </div>
 
-</div>
+  <div class="card-footer">
+    <a href="<?= base_url('mantenimiento/proveedor') ?>" class="btn btn-secondary">Volver</a>
+  </div>
 </div>
 
 </div>
