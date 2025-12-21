@@ -12,6 +12,20 @@
       <tr><th>ID</th><td><?= esc($p['idproducto']) ?></td></tr>
       <tr><th>Código</th><td><?= esc($p['codigo']) ?></td></tr>
       <tr><th>Nombre</th><td><?= esc($p['nombre']) ?></td></tr>
+      <?php if (!empty($p['imagen'])): ?>
+  <div class="text-center mb-3">
+    <a href="<?= base_url('uploads/productos/'.$p['imagen']) ?>"
+       data-toggle="lightbox"
+       data-title="<?= esc($p['nombre']) ?>">
+      <img src="<?= base_url('uploads/productos/'.$p['imagen']) ?>"
+           class="img-fluid img-thumbnail"
+           style="max-height:300px;">
+    </a>
+  </div>
+<?php else: ?>
+  <div class="alert alert-secondary">Este producto no tiene imagen.</div>
+<?php endif; ?>
+
       <tr><th>Descripción</th><td><?= esc($p['descripcion']) ?></td></tr>
       <tr><th>Observación</th><td><?= esc($p['observacion']) ?></td></tr>
       <tr><th>Categoría</th><td><?= esc($p['categoria']) ?></td></tr>
