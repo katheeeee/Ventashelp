@@ -25,7 +25,6 @@ class cproducto extends BaseController
             return redirect()->to(base_url('login'));
         }
 
-        // listado con nombres (joins)
         $registros = $this->producto
             ->select('producto.*,
                       categoria.nombre AS categoria,
@@ -85,6 +84,9 @@ class cproducto extends BaseController
             'idtipo_material' => 'required|integer',
             'idmarca'         => 'required|integer',
             'idunmedida'      => 'required|integer',
+
+            // ✅ imagen opcional (valida si se envía)
+            'imagen'          => 'if_exist|uploaded[imagen]|max_size[imagen,2048]|is_image[imagen]',
         ];
 
         $messages = [
@@ -92,10 +94,33 @@ class cproducto extends BaseController
                 'required'  => 'El código es obligatorio',
                 'is_unique' => 'El código ya existe, intente con otro',
             ],
+            'imagen' => [
+                'uploaded'  => 'La imagen no se pudo subir',
+                'max_size'  => 'La imagen debe pesar máximo 2MB',
+                'is_image'  => 'El archivo debe ser una imagen',
+            ],
         ];
+
+        // Nota: si no subes imagen, `uploaded[imagen]` fallaría.
+        // Por eso usamos "if_exist|uploaded[imagen]" (CI4)
+        // Si tu CI4 no reconoce "if_exist", te digo al final alternativa.
+
+        // Ajuste: permitir que no suba imagen
+        // Si no viene file, quitamos esa regla.
+        $img = $this->request->getFile('imagen');
+        if (!$img || $img->getError() === UPLOAD_ERR_NO_FILE) {
+            unset($rules['imagen']);
+        }
 
         if (!$this->validate($rules, $messages)) {
             return redirect()->back()->withInput()->with('error', $this->validator->getErrors());
+        }
+
+        // ✅ Subida real
+        $nombreImagen = null;
+        if ($img && $img->isValid() && !$img->hasMoved()) {
+            $nombreImagen = $img->getRandomName();
+            $img->move(FCPATH . 'uploads/productos', $nombreImagen);
         }
 
         $this->producto->insert([
@@ -103,7 +128,7 @@ class cproducto extends BaseController
             'nombre'          => $this->request->getPost('nombre'),
             'descripcion'     => $this->request->getPost('descripcion'),
             'observacion'     => $this->request->getPost('observacion'),
-            'imagen'          => $img ? $img->getRandomName() : '',
+            'imagen'          => $nombreImagen, // ✅ guarda solo nombre o null
             'precio'          => $this->request->getPost('precio'),
             'stock'           => $this->request->getPost('stock'),
             'idcolor'         => $this->request->getPost('idcolor'),
@@ -156,10 +181,36 @@ class cproducto extends BaseController
             'idmarca'         => 'required|integer',
             'idunmedida'      => 'required|integer',
             'estado'          => 'required|in_list[0,1]',
+
+            // ✅ imagen opcional
+            'imagen'          => 'if_exist|uploaded[imagen]|max_size[imagen,2048]|is_image[imagen]',
         ];
+
+        $img = $this->request->getFile('imagen');
+        if (!$img || $img->getError() === UPLOAD_ERR_NO_FILE) {
+            unset($rules['imagen']);
+        }
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('error', $this->validator->getErrors());
+        }
+
+        // ✅ conservar imagen si no sube otra
+        $imagenActual = $this->request->getPost('imagen_actual') ?? null;
+        $nombreImagen = $imagenActual;
+
+        // ✅ si sube nueva, guardar y (opcional) borrar la anterior
+        if ($img && $img->isValid() && !$img->hasMoved()) {
+            $nombreImagen = $img->getRandomName();
+            $img->move(FCPATH . 'uploads/productos', $nombreImagen);
+
+            // (Opcional) borrar imagen antigua si existía
+            if (!empty($imagenActual)) {
+                $rutaVieja = FCPATH . 'uploads/productos/' . $imagenActual;
+                if (is_file($rutaVieja)) {
+                    @unlink($rutaVieja);
+                }
+            }
         }
 
         $this->producto->update($id, [
@@ -167,7 +218,7 @@ class cproducto extends BaseController
             'nombre'          => $this->request->getPost('nombre'),
             'descripcion'     => $this->request->getPost('descripcion'),
             'observacion'     => $this->request->getPost('observacion'),
-            'imagen'          => $this->request->getPost('imagen') ?? '',
+            'imagen'          => $nombreImagen,
             'precio'          => $this->request->getPost('precio'),
             'stock'           => $this->request->getPost('stock'),
             'idcolor'         => $this->request->getPost('idcolor'),
@@ -215,6 +266,15 @@ class cproducto extends BaseController
     {
         if (!session()->get('login')) {
             return redirect()->to(base_url('login'));
+        }
+
+        // ✅ borrar imagen física (opcional)
+        $p = $this->producto->find($id);
+        if ($p && !empty($p['imagen'])) {
+            $ruta = FCPATH . 'uploads/productos/' . $p['imagen'];
+            if (is_file($ruta)) {
+                @unlink($ruta);
+            }
         }
 
         $this->producto->delete($id);
