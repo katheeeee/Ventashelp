@@ -149,6 +149,15 @@
           </a>
         </li>
 
+        <li class="nav-item">
+  <a href="<?= base_url('mantenimiento/producto') ?>"
+     class="nav-link <?= ($subactive=='producto')?'active':'' ?>">
+    <i class="fas fa-box nav-icon"></i>
+    <p>Productos</p>
+  </a>
+</li>
+
+
         <!-- ===================== -->
         <!-- ADMINISTRADOR -->
         <!-- ===================== -->

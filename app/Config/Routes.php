@@ -111,6 +111,15 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('proveedor/view/(:num)', 'mantenimiento\cproveedor::view/$1');
         $routes->get('proveedor/delete/(:num)', 'mantenimiento\cproveedor::delete/$1');
 
+        // producto
+        $routes->get('producto', 'mantenimiento\cproducto::index');
+        $routes->get('producto/add', 'mantenimiento\cproducto::add');
+        $routes->post('producto/store', 'mantenimiento\cproducto::store');
+        $routes->get('producto/edit/(:num)', 'mantenimiento\cproducto::edit/$1');
+        $routes->post('producto/update/(:num)', 'mantenimiento\cproducto::update/$1');
+        $routes->get('producto/view/(:num)', 'mantenimiento\cproducto::view/$1');
+        $routes->get('producto/delete/(:num)', 'mantenimiento\cproducto::delete/$1');
+
     });
 
     // =========================

@@ -1,16 +1,19 @@
 <?php
 
 namespace App\Models;
+
 use CodeIgniter\Model;
 
-class mcolor extends Model
+class mproducto extends Model
 {
-    protected $table      = 'color';
-    protected $primaryKey = 'idcolor';
+    protected $table      = 'producto';
+    protected $primaryKey = 'idproducto';
 
     protected $allowedFields = [
-        'nombre',
-        'descripcion',
-        'estado'
+        'codigo','nombre','descripcion','estado','imagen',
+        'precio','stock','observacion',
+        'idcolor','idcategoria','idtipo_material','idmarca','idunmedida'
     ];
+
+    protected $useTimestamps = false;
 }

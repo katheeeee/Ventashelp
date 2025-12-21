@@ -74,15 +74,6 @@
     <a href="<?= base_url('mantenimiento/proveedor') ?>" class="btn btn-secondary">
       <i class="fa fa-arrow-left"></i> Volver
     </a>
-<a href="https://via.placeholder.com/900"
-   data-toggle="lightbox"
-   data-type="image"
-   data-title="Prueba Lightbox">
-
-  <img src="https://via.placeholder.com/180"
-       class="img-thumbnail">
-</a>
-
   </div>
 </div>
 
