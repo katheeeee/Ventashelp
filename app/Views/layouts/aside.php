@@ -101,6 +101,14 @@
       </a>
     </li>
 
+        <li class="nav-item">
+      <a href="<?= base_url('mantenimiento/proveedor') ?>"
+         class="nav-link <?= ($subactive=='proveedor')?'active':'' ?>">
+        <i class="far fa-circle nav-icon"></i>
+        <p>Proveedores</p>
+      </a>
+    </li>
+
   </ul>
 </li>
 

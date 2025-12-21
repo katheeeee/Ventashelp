@@ -100,6 +100,16 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->post('cliente/update/(:num)', 'mantenimiento\ccliente::update/$1');
         $routes->get('cliente/view/(:num)', 'mantenimiento\ccliente::view/$1');
         $routes->get('cliente/delete/(:num)', 'mantenimiento\ccliente::delete/$1');
+        
+
+        // proveedor
+        $routes->get('proveedor', 'mantenimiento\cproveedor::index');
+        $routes->get('proveedor/add', 'mantenimiento\cproveedor::add');
+        $routes->post('proveedor/store', 'mantenimiento\cproveedor::store');
+        $routes->get('proveedor/edit/(:num)', 'mantenimiento\cproveedor::edit/$1');
+        $routes->post('proveedor/update/(:num)', 'mantenimiento\cproveedor::update/$1');
+        $routes->get('proveedor/view/(:num)', 'mantenimiento\cproveedor::view/$1');
+        $routes->get('proveedor/delete/(:num)', 'mantenimiento\cproveedor::delete/$1');
 
     });
 
