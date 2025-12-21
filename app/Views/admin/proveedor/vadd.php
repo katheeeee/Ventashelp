@@ -1,11 +1,27 @@
 <?= $this->include('layouts/header') ?>
 
-<section class="content pt-3">
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Nuevo Proveedor</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">Home</a></li>
+          <li class="breadcrumb-item"><a href="<?= base_url('mantenimiento/proveedor') ?>">Proveedores</a></li>
+          <li class="breadcrumb-item active">Nuevo</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content">
   <div class="container-fluid">
 
     <div class="card">
       <div class="card-body">
-        <h5>Nuevo Proveedor</h5>
 
         <?php if (session()->getFlashdata('error')): ?>
           <div class="alert alert-danger">
@@ -40,9 +56,10 @@
 
           <div class="form-group">
             <label>Tipo Documento</label>
+            <!-- OJO: tu campo en proveedor es idtipo_documeto -->
             <select name="idtipo_documeto" class="form-control" required>
               <option value="">-- Seleccione --</option>
-              <?php foreach ($tipo_documento as $d): ?>
+              <?php foreach ($documentos as $d): ?>
                 <option value="<?= esc($d['idtipo_documento']) ?>"
                   <?= (old('idtipo_documeto') == $d['idtipo_documento']) ? 'selected' : '' ?>>
                   <?= esc($d['nombre']) ?>
@@ -55,7 +72,7 @@
             <label>Tipo Cliente</label>
             <select name="idtipo_cliente" class="form-control" required>
               <option value="">-- Seleccione --</option>
-              <?php foreach ($tipo_cliente as $t): ?>
+              <?php foreach ($tipos_cliente as $t): ?>
                 <option value="<?= esc($t['idtipo_cliente']) ?>"
                   <?= (old('idtipo_cliente') == $t['idtipo_cliente']) ? 'selected' : '' ?>>
                   <?= esc($t['nombre']) ?>
@@ -73,6 +90,7 @@
           </a>
 
         </form>
+
       </div>
     </div>
 

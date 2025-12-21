@@ -1,11 +1,27 @@
 <?= $this->include('layouts/header') ?>
 
-<section class="content pt-3">
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Detalle Proveedor</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">Home</a></li>
+          <li class="breadcrumb-item"><a href="<?= base_url('mantenimiento/proveedor') ?>">Proveedores</a></li>
+          <li class="breadcrumb-item active">Ver</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content">
   <div class="container-fluid">
 
     <div class="card">
       <div class="card-body">
-        <h5>Detalle Proveedor</h5>
 
         <table class="table table-bordered">
           <tr><th>ID</th><td><?= esc($row['idproveedor']) ?></td></tr>
