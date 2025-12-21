@@ -8,7 +8,7 @@
 
   <!-- LOGO -->
   <a href="<?= base_url('dashboard') ?>" class="brand-link">
-    <span class="brand-text font-weight-bold">HELPNET</span>
+    <span class="brand-text font-weight-bold">Katventas</span>
   </a>
 
   <div class="sidebar">
