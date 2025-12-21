@@ -28,6 +28,14 @@
     }
   });
 </script>
+<script src="<?= base_url('assets/template/plugins/ekko-lightbox/ekko-lightbox.min.js') ?>"></script>
+
+<script>
+  $(document).on('click', '[data-toggle="lightbox"]', function (event) {
+    event.preventDefault();
+    $(this).ekkoLightbox();
+  });
+</script>
 
 </body>
 </html>
