@@ -16,7 +16,9 @@
       </div>
     <?php endif; ?>
 
-    <form action="<?= base_url('mantenimiento/producto/update/'.$p['idproducto']) ?>" method="post">
+    <form action="<?= base_url('mantenimiento/producto/update/'.$p['idproducto']) ?>"
+          method="post"
+          enctype="multipart/form-data">
       <?= csrf_field() ?>
 
       <div class="form-group">
@@ -43,10 +45,28 @@
                value="<?= old('observacion', $p['observacion']) ?>">
       </div>
 
+      <!-- ✅ IMAGEN ACTUAL + SUBIR NUEVA -->
       <div class="form-group">
-        <label>Imagen (nombre archivo o ruta)</label>
-        <input type="text" name="imagen" class="form-control"
-               value="<?= old('imagen', $p['imagen']) ?>">
+        <label>Imagen actual</label><br>
+
+        <?php if (!empty($p['imagen'])): ?>
+          <a href="<?= base_url('uploads/productos/'.$p['imagen']) ?>"
+             data-toggle="lightbox"
+             data-title="<?= esc($p['nombre']) ?>">
+            <img src="<?= base_url('uploads/productos/'.$p['imagen']) ?>"
+                 class="img-thumbnail mb-2"
+                 style="max-height:120px;">
+          </a>
+        <?php else: ?>
+          <div class="text-muted mb-2">Sin imagen</div>
+        <?php endif; ?>
+
+        <!-- ✅ si no subes nueva, se conserva -->
+        <input type="hidden" name="imagen_actual" value="<?= esc($p['imagen']) ?>">
+
+        <label class="mt-2">Cambiar imagen (opcional)</label>
+        <input type="file" name="imagen" class="form-control" accept="image/*">
+        <small class="text-muted">Si no seleccionas una nueva, se mantiene la actual.</small>
       </div>
 
       <div class="row">
