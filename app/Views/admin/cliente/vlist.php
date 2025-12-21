@@ -50,9 +50,8 @@
             <td><?= esc($c['nombre']) ?></td>
             <td><?= esc($c['telefono']) ?></td>
             <td><?= esc($c['direccion']) ?></td>
-            <td><?= esc($c['tipo_doc'] ?? '') ?></td>
-            <td><?= esc($c['tipo_cliente'] ?? '') ?></td>
-
+<td><?= esc($c['tipo_doc'] ?? '') ?></td>
+<td><?= esc($c['tipo_cliente'] ?? '') ?></td>
 
             <td>
               <?= $c['estado']==1
