@@ -29,16 +29,24 @@ class cproveedor extends BaseController
 
 
     public function add()
-    {
-        $data = [
-            'active'    => 'mantenimiento',
-            'subactive' => 'proveedor',
-            'tipos_doc' => (new mtipo_documento())->findAll(),
-            'tipos_cli' => (new mtipo_cliente())->findAll(),
-        ];
-
-        return view('admin/proveedor/vadd', $data);
+{
+    if (!session()->get('login')) {
+        return redirect()->to(base_url('login'));
     }
+
+    $mTipoDocumento = new \App\Models\mtipo_documento();
+    $mTipoCliente   = new \App\Models\mtipo_cliente();
+
+    $data = [
+        'active'           => 'mantenimiento',
+        'subactive'        => 'proveedor',
+        'tipos_documento'  => $mTipoDocumento->findAll(),
+        'tipos_cliente'    => $mTipoCliente->findAll(),
+    ];
+
+    return view('admin/proveedor/vadd', $data);
+}
+
 
     public function store()
     {
@@ -56,18 +64,27 @@ class cproveedor extends BaseController
             ->with('success', 'Proveedor registrado');
     }
 
-    public function edit($id)
-    {
-        $data = [
-            'active'    => 'mantenimiento',
-            'subactive' => 'proveedor',
-            'p'         => $this->proveedor->find($id),
-            'tipos_doc' => (new mtipo_documento())->findAll(),
-            'tipos_cli' => (new mtipo_cliente())->findAll(),
-        ];
-
-        return view('admin/proveedor/vedit', $data);
+   public function edit($id)
+{
+    if (!session()->get('login')) {
+        return redirect()->to(base_url('login'));
     }
+
+    $data = [
+        'active'          => 'mantenimiento',
+        'subactive'       => 'proveedor',
+
+        // registro
+        'proveedor'       => $this->proveedor->find($id),
+
+        // combos
+        'tipos_documento' => (new \App\Models\mtipo_documento())->findAll(),
+        'tipos_cliente'   => (new \App\Models\mtipo_cliente())->findAll(),
+    ];
+
+    return view('admin/proveedor/vedit', $data);
+}
+
 
     public function update($id)
     {
