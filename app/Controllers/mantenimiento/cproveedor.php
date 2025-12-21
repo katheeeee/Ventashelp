@@ -103,15 +103,28 @@ class cproveedor extends BaseController
     }
 
     public function view($id)
-    {
-        $data = [
-            'active'    => 'mantenimiento',
-            'subactive' => 'proveedor',
-            'p'         => $this->proveedor->find($id),
-        ];
-
-        return view('admin/proveedor/vview', $data);
+{
+    if (!session()->get('login')) {
+        return redirect()->to(base_url('login'));
     }
+
+    $proveedor = $this->proveedor
+        ->select('proveedor.*,
+                  tipo_documento.nombre AS tipo_documento,
+                  tipo_cliente.nombre AS tipo_cliente')
+        ->join('tipo_documento', 'tipo_documento.idtipo_documento = proveedor.idtipo_documeto')
+        ->join('tipo_cliente', 'tipo_cliente.idtipo_cliente = proveedor.idtipo_cliente')
+        ->find($id);
+
+    $data = [
+        'active'    => 'mantenimiento',
+        'subactive' => 'proveedor',
+        'proveedor' => $proveedor
+    ];
+
+    return view('admin/proveedor/vview', $data);
+}
+
 
     public function delete($id)
     {

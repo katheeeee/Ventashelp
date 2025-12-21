@@ -1,47 +1,84 @@
 <?= $this->include('layouts/header') ?>
 
-<section class="content-header">
-  <div class="container-fluid">
-    <div class="row mb-2">
-      <div class="col-sm-6">
-        <h1>Detalle Proveedor</h1>
+<section class="content pt-3">
+<div class="container-fluid">
+
+<div class="card">
+  <div class="card-body">
+
+    <h4>Detalle Proveedor</h4>
+
+    <div class="row">
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Código</label>
+          <input type="text" class="form-control"
+                 value="<?= esc($proveedor['codigo']) ?>" disabled>
+        </div>
       </div>
-      <div class="col-sm-6">
-        <ol class="breadcrumb float-sm-right">
-          <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">Home</a></li>
-          <li class="breadcrumb-item"><a href="<?= base_url('mantenimiento/proveedor') ?>">Proveedores</a></li>
-          <li class="breadcrumb-item active">Ver</li>
-        </ol>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" class="form-control"
+                 value="<?= esc($proveedor['nombre']) ?>" disabled>
+        </div>
       </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Dirección</label>
+          <input type="text" class="form-control"
+                 value="<?= esc($proveedor['direccion']) ?>" disabled>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="text" class="form-control"
+                 value="<?= esc($proveedor['telefono']) ?>" disabled>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Tipo Documento</label>
+          <input type="text" class="form-control"
+                 value="<?= esc($proveedor['tipo_documento']) ?>" disabled>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Tipo Cliente</label>
+          <input type="text" class="form-control"
+                 value="<?= esc($proveedor['tipo_cliente']) ?>" disabled>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Estado</label><br>
+          <?php if ($proveedor['estado'] == 1): ?>
+            <span class="badge badge-success">Activo</span>
+          <?php else: ?>
+            <span class="badge badge-danger">Inactivo</span>
+          <?php endif; ?>
+        </div>
+      </div>
+
     </div>
-  </div>
-</section>
 
-<section class="content">
-  <div class="container-fluid">
-
-    <div class="card">
-      <div class="card-body">
-
-        <table class="table table-bordered">
-          <tr><th>ID</th><td><?= esc($row['idproveedor']) ?></td></tr>
-          <tr><th>Código</th><td><?= esc($row['codigo']) ?></td></tr>
-          <tr><th>Nombre</th><td><?= esc($row['nombre']) ?></td></tr>
-          <tr><th>Dirección</th><td><?= esc($row['direccion']) ?></td></tr>
-          <tr><th>Teléfono</th><td><?= esc($row['telefono']) ?></td></tr>
-          <tr><th>Tipo Documento (ID)</th><td><?= esc($row['idtipo_documeto']) ?></td></tr>
-          <tr><th>Tipo Cliente (ID)</th><td><?= esc($row['idtipo_cliente']) ?></td></tr>
-          <tr><th>Estado</th><td><?= ((int)$row['estado'] === 1) ? 'Activo' : 'Inactivo' ?></td></tr>
-        </table>
-
-        <a href="<?= base_url('mantenimiento/proveedor') ?>" class="btn btn-secondary">
-          Volver
-        </a>
-
-      </div>
-    </div>
+    <a href="<?= base_url('mantenimiento/proveedor') ?>" class="btn btn-secondary">
+      <i class="fa fa-arrow-left"></i> Volver
+    </a>
 
   </div>
+</div>
+
+</div>
 </section>
 
 <?= $this->include('layouts/footer') ?>
