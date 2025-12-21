@@ -76,7 +76,9 @@
     </a>
 <a href="https://via.placeholder.com/900"
    data-toggle="lightbox"
+   data-type="image"
    data-title="Prueba Lightbox">
+
   <img src="https://via.placeholder.com/180"
        class="img-thumbnail">
 </a>
