@@ -14,8 +14,8 @@
       <tr><th>Nombre</th><td><?= esc($cli['nombre']) ?></td></tr>
       <tr><th>Dirección</th><td><?= esc($cli['direccion']) ?></td></tr>
       <tr><th>Teléfono</th><td><?= esc($cli['telefono']) ?></td></tr>
-      <tr><th>Tipo Doc</th><td><?= esc($cli['idtipo_documento']) ?></td></tr>
-      <tr><th>Tipo Cliente</th><td><?= esc($cli['idtipo_cliente']) ?></td></tr>
+      <tr><th>Tipo Doc</th><td><?= esc($cli['tipo_doc'] ?? '') ?></td></tr>
+      <tr><th>Tipo Cliente</th><td><?= esc($cli['tipo_cliente'] ?? '') ?></td></tr>
       <tr><th>Estado</th><td><?= $cli['estado']==1?'Activo':'Inactivo' ?></td></tr>
     </table>
 

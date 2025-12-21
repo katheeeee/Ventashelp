@@ -18,4 +18,16 @@ class mcliente extends Model
         'idtipo_documento',
         'idtipo_cliente'
     ];
+
+    // 🔹 LISTADO CON NOMBRES
+    public function listarConTipos()
+    {
+        return $this->db->table('cliente c')
+            ->select('c.*, td.nombre AS tipo_doc, tc.nombre AS tipo_cliente')
+            ->join('tipo_documento td', 'td.idtipo_documento = c.idtipo_documento', 'left')
+            ->join('tipo_cliente tc', 'tc.idtipo_cliente = c.idtipo_cliente', 'left')
+            ->orderBy('c.idcliente', 'DESC')
+            ->get()
+            ->getResultArray();
+    }
 }

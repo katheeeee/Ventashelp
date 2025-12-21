@@ -17,15 +17,16 @@ class cproveedor extends BaseController
     }
 
     public function index()
-    {
-        $data = [
-            'active'     => 'mantenimiento',
-            'subactive'  => 'proveedor',
-            'registros'  => $this->proveedor->findAll()
-        ];
+{
+    $data = [
+        'active'    => 'mantenimiento',
+        'subactive' => 'proveedor',
+        'registros' => $this->proveedor->listarConTipos()
+    ];
 
-        return view('admin/proveedor/vlist', $data);
-    }
+    return view('admin/proveedor/vlist', $data);
+}
+
 
     public function add()
     {

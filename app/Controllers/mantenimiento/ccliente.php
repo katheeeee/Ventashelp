@@ -9,24 +9,19 @@ use App\Models\mtipo_cliente;
 
 class ccliente extends BaseController
 {
-    public function index()
-    {
-        if (!session()->get('login')) {
-            return redirect()->to(base_url('login'));
-        }
+public function index()
+{
+    $model = new \App\Models\mcliente();
 
-        $model = new mcliente();
+    $data = [
+        'active'    => 'mantenimiento',
+        'subactive' => 'cliente',
+        'clientes'  => $model->listarConTipos()
+    ];
 
-        // Listado simple (sin join). Mostramos IDs.
-        // Si luego quieres mostrar nombres de tipo_documento y tipo_cliente en el listado, lo hacemos con JOIN.
-        $data = [
-            'active'    => 'mantenimiento',
-            'subactive' => 'cliente',
-            'clientes'  => $model->orderBy('idcliente', 'DESC')->findAll(),
-        ];
+    return view('admin/cliente/vlist', $data);
+}
 
-        return view('admin/cliente/vlist', $data);
-    }
 
     public function add()
     {
