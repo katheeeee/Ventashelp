@@ -16,7 +16,7 @@
       </div>
     <?php endif; ?>
 
-    <form action="<?= base_url('mantenimiento/producto/store') ?>" method="post">
+    <form action="<?= base_url('mantenimiento/producto/store') ?>" method="post" enctype="multipart/form-data">
       <?= csrf_field() ?>
 
       <div class="form-group">
@@ -39,9 +39,11 @@
         <input type="text" name="observacion" class="form-control" value="<?= old('observacion') ?>">
       </div>
 
+      <!-- ✅ IMAGEN REAL (Seleccionar archivo) -->
       <div class="form-group">
-        <label>Imagen (nombre archivo o ruta)</label>
-        <input type="text" name="imagen" class="form-control" value="<?= old('imagen') ?>">
+        <label>Imagen</label>
+        <input type="file" name="imagen" class="form-control" accept="image/*">
+        <small class="text-muted">Formatos recomendados: JPG/PNG</small>
       </div>
 
       <div class="row">

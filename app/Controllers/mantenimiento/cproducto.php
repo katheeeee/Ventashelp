@@ -103,7 +103,7 @@ class cproducto extends BaseController
             'nombre'          => $this->request->getPost('nombre'),
             'descripcion'     => $this->request->getPost('descripcion'),
             'observacion'     => $this->request->getPost('observacion'),
-            'imagen'          => $this->request->getPost('imagen') ?? '',
+            'imagen'          => $img ? $img->getRandomName() : '',
             'precio'          => $this->request->getPost('precio'),
             'stock'           => $this->request->getPost('stock'),
             'idcolor'         => $this->request->getPost('idcolor'),
