@@ -59,7 +59,7 @@
             <!-- OJO: tu campo en proveedor es idtipo_documeto -->
             <select name="idtipo_documeto" class="form-control" required>
               <option value="">-- Seleccione --</option>
-              <?php foreach ($documentos as $d): ?>
+              <?php foreach ($tipo_documentos as $d): ?>
                 <option value="<?= esc($d['idtipo_documento']) ?>"
                   <?= (old('idtipo_documeto') == $d['idtipo_documento']) ? 'selected' : '' ?>>
                   <?= esc($d['nombre']) ?>
