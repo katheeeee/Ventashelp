@@ -8,7 +8,15 @@
   <!-- AdminLTE 3 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
- <link rel="stylesheet" href="<?= base_url('assets/template/plugins/ekko-lightbox/ekko-lightbox.css') ?>">
+
+  <!-- DataTables (CSS) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-bs4@1.13.8/css/dataTables.bootstrap4.min.css">
+
+  <!-- (opcional) OverlayScrollbars -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars/css/OverlayScrollbars.min.css">
+
+  <!-- Ekko Lightbox (CSS) -->
+  <link rel="stylesheet" href="<?= base_url('assets/template/plugins/ekko-lightbox/ekko-lightbox.css') ?>">
 
   <style>
     .main-header.navbar { background:#2f80c0; }
