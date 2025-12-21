@@ -4,46 +4,87 @@
 <div class="container-fluid">
 
 <div class="card">
-<div class="card-header">
-  <a href="<?= base_url('mantenimiento/proveedor/add') ?>" class="btn btn-primary btn-sm">
-    <i class="fa fa-plus"></i> Nuevo
-  </a>
-</div>
-
-<div class="card-body">
-<table class="table table-bordered table-striped">
-<thead>
-<tr>
-  <th>ID</th>
-  <th>Código</th>
-  <th>Nombre</th>
-  <th>Estado</th>
-  <th width="120">Acciones</th>
-</tr>
-</thead>
-
-<tbody>
-<?php foreach ($registros as $r): ?>
-<tr>
-  <td><?= $r['idproveedor'] ?></td>
-  <td><?= esc($r['codigo']) ?></td>
-  <td><?= esc($r['nombre']) ?></td>
-  <td><?= $r['estado']==1 ? 'Activo':'Inactivo' ?></td>
-  <td>
-    <a class="btn btn-info btn-sm"
-       href="<?= base_url('mantenimiento/proveedor/view/'.$r['idproveedor']) ?>">
-       <i class="fa fa-eye"></i>
+  <div class="card-header">
+    <a href="<?= base_url('mantenimiento/proveedor/add') ?>" class="btn btn-primary btn-sm">
+      <i class="fa fa-plus"></i> Nuevo
     </a>
-    <a class="btn btn-warning btn-sm"
-       href="<?= base_url('mantenimiento/proveedor/edit/'.$r['idproveedor']) ?>">
-       <i class="fa fa-edit"></i>
-    </a>
-  </td>
-</tr>
-<?php endforeach; ?>
-</tbody>
-</table>
-</div>
+  </div>
+
+  <div class="card-body">
+
+    <?php if (session()->getFlashdata('success')): ?>
+      <div class="alert alert-success alert-dismissible fade show">
+        <?= session()->getFlashdata('success') ?>
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('error')): ?>
+      <div class="alert alert-danger">
+        <?php foreach (session()->getFlashdata('error') as $err): ?>
+          <div><?= esc($err) ?></div>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+
+    <table id="tablaproveedor" class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Teléfono</th>
+          <th>Dirección</th>
+          <th>Tipo Doc</th>
+          <th>Tipo Cliente</th>
+          <th>Estado</th>
+          <th width="120">Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <?php foreach ($proveedores as $c): ?>
+          <tr>
+            <td><?= esc($c['idproveedor']) ?></td>
+            <td><?= esc($c['codigo']) ?></td>
+            <td><?= esc($c['nombre']) ?></td>
+            <td><?= esc($c['telefono']) ?></td>
+            <td><?= esc($c['direccion']) ?></td>
+            <td><?= esc($c['idtipo_documento']) ?></td>
+            <td><?= esc($c['idtipo_cliente']) ?></td>
+
+            <td>
+              <?= $c['estado']==1
+                ? '<span class="badge badge-success">Activo</span>'
+                : '<span class="badge badge-danger">Inactivo</span>' ?>
+            </td>
+
+            <td>
+              <a class="btn btn-info btn-sm"
+                 href="<?= base_url('mantenimiento/proveedor/view/'.$c['idproveedor']) ?>"
+                 title="Ver">
+                 <i class="fa fa-eye"></i>
+              </a>
+
+              <a class="btn btn-warning btn-sm"
+                 href="<?= base_url('mantenimiento/proveedor/edit/'.$c['idproveedor']) ?>"
+                 title="Editar">
+                 <i class="fa fa-edit"></i>
+              </a>
+
+              <a class="btn btn-danger btn-sm"
+                 href="<?= base_url('mantenimiento/proveedor/delete/'.$c['idproveedor']) ?>"
+                 onclick="return confirm('¿Eliminar proveedor?')"
+                 title="Eliminar">
+                 <i class="fa fa-trash"></i>
+              </a>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+
+  </div>
 </div>
 
 </div>

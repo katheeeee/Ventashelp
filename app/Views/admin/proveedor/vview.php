@@ -4,19 +4,26 @@
 <div class="container-fluid">
 
 <div class="card">
-<div class="card-body">
+  <div class="card-body">
 
-<table class="table table-bordered">
-<tr><th>ID</th><td><?= esc($tm['idtipo_material']) ?></td></tr>
-<tr><th>Nombre</th><td><?= esc($tm['nombre']) ?></td></tr>
-<tr><th>Descripción</th><td><?= esc($tm['descripcion']) ?></td></tr>
-<tr><th>Estado</th><td><?= $tm['estado']==1?'Activo':'Inactivo' ?></td></tr>
-</table>
+    <h4>Detalle Proveedor</h4>
 
-<a href="<?= base_url('mantenimiento/tipo_material') ?>" class="btn btn-secondary">Volver</a>
-<a href="<?= base_url('mantenimiento/tipo_material/edit/'.$tm['idtipo_material']) ?>" class="btn btn-warning">Editar</a>
+    <table class="table table-bordered">
+      <tr><th>ID</th><td><?= esc($cli['idcliente']) ?></td></tr>
+      <tr><th>Código</th><td><?= esc($cli['codigo']) ?></td></tr>
+      <tr><th>Nombre</th><td><?= esc($cli['nombre']) ?></td></tr>
+      <tr><th>Dirección</th><td><?= esc($cli['direccion']) ?></td></tr>
+      <tr><th>Teléfono</th><td><?= esc($cli['telefono']) ?></td></tr>
+      <tr><th>Tipo Doc</th><td><?= esc($cli['idtipo_documento']) ?></td></tr>
+      <tr><th>Tipo Cliente</th><td><?= esc($cli['idtipo_cliente']) ?></td></tr>
+      <tr><th>Estado</th><td><?= $cli['estado']==1?'Activo':'Inactivo' ?></td></tr>
+    </table>
 
-</div>
+    <a href="<?= base_url('mantenimiento/proveedor') ?>" class="btn btn-secondary">
+      Volver
+    </a>
+
+  </div>
 </div>
 
 </div>
