@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Controllers\ventas;
+namespace App\Controllers\movimientos;
 
 use App\Controllers\BaseController;
 use App\Models\mventa;
 use App\Models\mdetalle_venta;
 use App\Models\mcliente;
 use App\Models\mproducto;
-use App\Models\mtipo_comprobante;
+use App\Models\mtipo_documento;
 
 class cventa extends BaseController
 {
@@ -16,31 +16,8 @@ class cventa extends BaseController
 
     public function __construct()
     {
-        $this->venta   = new mventa();
-        $this->detalle = new mdetalle_venta();
-    }
-
-    public function index()
-    {
-        if (!session()->get('login')) {
-            return redirect()->to(base_url('login'));
-        }
-
-        // listado (cabecera)
-        $registros = $this->venta
-            ->select('venta.*, cliente.nombre AS cliente, tipo_comprobante.nombre AS comprobante')
-            ->join('cliente', 'cliente.idcliente = venta.idcliente')
-            ->join('tipo_comprobante', 'tipo_comprobante.idtipo_comprobante = venta.idtipo_comprobante')
-            ->orderBy('venta.idventa', 'DESC')
-            ->findAll();
-
-        $data = [
-            'active'    => 'ventas',
-            'subactive' => 'ventas_list',
-            'registros' => $registros,
-        ];
-
-        return view('admin/venta/vlist', $data);
+        $this->venta    = new mventa();
+        $this->detalle  = new mdetalle_venta();
     }
 
     public function add()
@@ -50,25 +27,31 @@ class cventa extends BaseController
         }
 
         // combos
+        $tipos_documento = (new mtipo_documento())
+            ->select('idtipo_documento, nombre')
+            ->where('estado', 1)
+            ->findAll();
+
+        $clientes = (new mcliente())
+            ->select('idcliente, nombre')
+            ->where('estado', 1)
+            ->orderBy('nombre', 'ASC')
+            ->findAll();
+
+        $productos = (new mproducto())
+            ->select('producto.idproducto, producto.codigo, producto.nombre, producto.precio, producto.stock, producto.imagen, unmedida.nombre AS unmedida')
+            ->join('unmedida', 'unmedida.idunmedida = producto.idunmedida')
+            ->where('producto.estado', 1)
+            ->orderBy('producto.nombre', 'ASC')
+            ->findAll();
+
         $data = [
-            'active'        => 'ventas',
-            'subactive'     => 'ventas_add',
-            'clientes'      => (new mcliente())->where('estado', 1)->findAll(),
-            'comprobantes'  => (new mtipo_comprobante())->where('estado', 1)->findAll(),
-            'productos'     => (new mproducto())
-                                ->select('producto.*,
-                                         categoria.nombre AS categoria,
-                                         marca.nombre AS marca,
-                                         color.nombre AS color,
-                                         tipo_material.nombre AS tipo_material,
-                                         unmedida.nombre AS unmedida')
-                                ->join('categoria', 'categoria.idcategoria = producto.idcategoria')
-                                ->join('marca', 'marca.idmarca = producto.idmarca')
-                                ->join('color', 'color.idcolor = producto.idcolor')
-                                ->join('tipo_material', 'tipo_material.idtipo_material = producto.idtipo_material')
-                                ->join('unmedida', 'unmedida.idunmedida = producto.idunmedida')
-                                ->where('producto.estado', 1)
-                                ->findAll(),
+            'active'         => 'ventas',      // para tu aside
+            'subactive'      => 'venta_add',    // para marcar "Agregar"
+            'tipos_documento'=> $tipos_documento,
+            'clientes'       => $clientes,
+            'productos'      => $productos,
+            'igv_rate'       => 0.18,
         ];
 
         return view('admin/venta/vadd', $data);
@@ -80,141 +63,99 @@ class cventa extends BaseController
             return redirect()->to(base_url('login'));
         }
 
-        // arrays del detalle
-        $idproducto = $this->request->getPost('idproducto') ?? [];
-        $precio     = $this->request->getPost('precio') ?? [];
-        $cantidad   = $this->request->getPost('cantidad') ?? [];
-        $importe    = $this->request->getPost('importe') ?? [];
-
-        if (count($idproducto) === 0) {
-            return redirect()->back()->withInput()->with('error', ['Agrega al menos 1 producto.']);
-        }
-
+        // ====== VALIDACIÓN BÁSICA ======
         $rules = [
-            'fecha'             => 'required',
-            'serie'             => 'required',
-            'idtipo_comprobante'=> 'required|integer',
-            'idcliente'         => 'required|integer',
-            'descuento'         => 'permit_empty|decimal',
+            'fecha'            => 'required',
+            'idtipo_documento' => 'required|integer',
+            'idcliente'        => 'required|integer',
+            'serie'            => 'permit_empty|max_length[30]',
+            'num_documento'    => 'permit_empty|max_length[15]',
+
+            // arrays del detalle
+            'idproducto'       => 'required',
+            'cantidad'         => 'required',
+            'precio'           => 'required',
         ];
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('error', $this->validator->getErrors());
         }
 
-        $db = \Config\Database::connect();
-        $db->transBegin();
+        // ====== DETALLE (arrays) ======
+        $ids       = (array) $this->request->getPost('idproducto');
+        $cantidades= (array) $this->request->getPost('cantidad');
+        $precios   = (array) $this->request->getPost('precio');
 
-        try {
-            $idCliente = (int)$this->request->getPost('idcliente');
-            $cliente   = (new mcliente())->find($idCliente);
+        if (count($ids) === 0) {
+            return redirect()->back()->withInput()->with('error', ['Agrega al menos un producto.']);
+        }
 
-            // Si tu venta tiene idtipo_documento NOT NULL, lo llenamos desde cliente
-            $idTipoDoc = $cliente['idtipo_documento'] ?? 0;
+        // recalcular en backend (no confiar en JS)
+        $subtotal = 0.0;
+        $items = [];
 
-            // totals (vienen del form)
-            $subtotal  = (float)$this->request->getPost('subtotal');
-            $igv       = (float)$this->request->getPost('igv');
-            $descuento = (float)($this->request->getPost('descuento') ?? 0);
-            $total     = (float)$this->request->getPost('total');
+        foreach ($ids as $i => $idprod) {
+            $idprod = (int)$idprod;
+            $cant   = (float)($cantidades[$i] ?? 0);
+            $prec   = (float)($precios[$i] ?? 0);
 
-            $idUsuario = session('idusuario') ?? session('id') ?? 1;
+            if ($idprod <= 0 || $cant <= 0 || $prec < 0) continue;
 
-            $this->venta->insert([
-                'fecha'             => $this->request->getPost('fecha'),
-                'serie'             => $this->request->getPost('serie'),
-                'subtotal'          => $subtotal,
-                'igv'               => $igv,
-                'descuento'         => $descuento,
-                'total'             => $total,
-                'estado'            => 1,
-                'idtipo_comprobante'=> (int)$this->request->getPost('idtipo_comprobante'),
-                'idusuario'         => (int)$idUsuario,
-                'idcliente'         => $idCliente,
-                'fecharegistro'     => date('Y-m-d H:i:s'),
-                'usuarioregistro'   => (int)$idUsuario,
-                'idtipo_documento'  => (int)$idTipoDoc,
+            $importe = $cant * $prec;
+            $subtotal += $importe;
+
+            $items[] = [
+                'idproducto' => $idprod,
+                'cantidad'   => $cant,
+                'precio'     => $prec,
+                'importe'    => $importe,
+            ];
+        }
+
+        if (count($items) === 0) {
+            return redirect()->back()->withInput()->with('error', ['Detalle inválido.']);
+        }
+
+        $igv_rate = 0.18;
+        $igv      = round($subtotal * $igv_rate, 2);
+        $descuento= (float)($this->request->getPost('descuento') ?? 0);
+        if ($descuento < 0) $descuento = 0;
+
+        $total    = round(($subtotal + $igv) - $descuento, 2);
+
+        // ====== INSERT CABECERA ======
+        $fecha = $this->request->getPost('fecha'); // si guardas como varchar(20) ok
+
+        $idventa = $this->venta->insert([
+            'fecha'            => $fecha,
+            'subtotal'         => round($subtotal, 2),
+            'igv'              => $igv,
+            'descuento'        => round($descuento, 2),
+            'total'            => $total,
+            'estado'           => 1,
+            'serie'            => $this->request->getPost('serie'),
+            'num_documento'    => $this->request->getPost('num_documento'),
+            'idtipo_documento' => (int)$this->request->getPost('idtipo_documento'),
+            'idcliente'        => (int)$this->request->getPost('idcliente'),
+            'idusuario'        => (int)(session('idusuario') ?? 1),
+            'fecharegistro'    => date('Y-m-d H:i:s'),
+            'usuarioregistro'  => (int)(session('idusuario') ?? 1),
+        ], true);
+
+        // ====== INSERT DETALLE ======
+        foreach ($items as $it) {
+            $this->detalle->insert([
+                'idventa'       => $idventa,
+                'idproducto'    => $it['idproducto'],
+                'precio'        => $it['precio'],
+                'cantidad'      => $it['cantidad'],
+                'importe'       => round($it['importe'], 2),
+                'estado'        => 1,
+                'fecharegistro' => date('Y-m-d H:i:s'),
             ]);
-
-            $idVenta = $this->venta->getInsertID();
-
-            // detalles + descuento de stock
-            $prodModel = new mproducto();
-
-            for ($i = 0; $i < count($idproducto); $i++) {
-                $pid = (int)$idproducto[$i];
-                $pre = (float)$precio[$i];
-                $can = (float)$cantidad[$i];
-                $imp = (float)$importe[$i];
-
-                $this->detalle->insert([
-                    'estado'       => 1,
-                    'precio'       => $pre,
-                    'cantidad'     => $can,
-                    'importe'      => $imp,
-                    'idproducto'   => $pid,
-                    'idventa'      => $idVenta,
-                    'fecharegistro'=> date('Y-m-d H:i:s'),
-                ]);
-
-                // baja stock: stock = stock - cantidad
-                $prodModel->set('stock', "stock - {$can}", false)
-                          ->where('idproducto', $pid)
-                          ->update();
-            }
-
-            if ($db->transStatus() === false) {
-                throw new \Exception('Transacción falló.');
-            }
-
-            $db->transCommit();
-            return redirect()->to(base_url('ventas'))->with('success', 'Venta registrada con éxito');
-
-        } catch (\Throwable $e) {
-            $db->transRollback();
-            return redirect()->back()->withInput()->with('error', [$e->getMessage()]);
-        }
-    }
-
-    public function view($id)
-    {
-        if (!session()->get('login')) {
-            return redirect()->to(base_url('login'));
         }
 
-        $cab = $this->venta
-            ->select('venta.*, cliente.nombre AS cliente, tipo_comprobante.nombre AS comprobante')
-            ->join('cliente', 'cliente.idcliente = venta.idcliente')
-            ->join('tipo_comprobante', 'tipo_comprobante.idtipo_comprobante = venta.idtipo_comprobante')
-            ->find($id);
-
-        $det = $this->detalle
-            ->select('detalle_venta.*, producto.codigo, producto.nombre, producto.imagen, unmedida.nombre AS unmedida')
-            ->join('producto', 'producto.idproducto = detalle_venta.idproducto')
-            ->join('unmedida', 'unmedida.idunmedida = producto.idunmedida')
-            ->where('detalle_venta.idventa', $id)
-            ->findAll();
-
-        $data = [
-            'active'    => 'ventas',
-            'subactive' => 'ventas_list',
-            'cab'       => $cab,
-            'det'       => $det,
-        ];
-
-        return view('admin/venta/vview', $data);
-    }
-
-    public function delete($id)
-    {
-        if (!session()->get('login')) {
-            return redirect()->to(base_url('login'));
-        }
-
-        // OJO: esto elimina cabecera; si quieres, primero elimina detalles.
-        (new mdetalle_venta())->where('idventa', $id)->delete();
-        $this->venta->delete($id);
-
-        return redirect()->to(base_url('ventas'))->with('success', 'Venta eliminada');
+        return redirect()->to(base_url('ventas/add'))
+            ->with('success', 'Venta registrada correctamente.');
     }
 }

@@ -3,357 +3,312 @@
 <section class="content pt-3">
 <div class="container-fluid">
 
-<div class="card">
-  <div class="card-body">
+  <div class="card">
+    <div class="card-body">
+      <h4>Ventas 🛒 <small class="text-muted">Nuevo</small></h4>
 
-    <div class="d-flex align-items-center mb-3">
-      <h4 class="mb-0 mr-2">Ventas</h4>
-      <span class="text-muted">Nuevo</span>
-    </div>
-
-    <?php if (session()->getFlashdata('error')): ?>
-      <div class="alert alert-danger">
-        <?php foreach (session()->getFlashdata('error') as $e): ?>
-          <div><?= esc($e) ?></div>
-        <?php endforeach; ?>
-      </div>
-    <?php endif; ?>
-
-    <form action="<?= base_url('ventas/store') ?>" method="post" id="formVenta">
-      <?= csrf_field() ?>
-
-      <!-- FILA 1: Comprobante - Serie - Número - Fecha -->
-      <div class="row">
-        <div class="col-md-4 form-group">
-          <label>Comprobante</label>
-          <select name="idtipo_comprobante" id="idtipo_comprobante" class="form-control" required>
-            <option value="">Seleccione...</option>
-            <?php foreach ($comprobantes as $c): ?>
-              <option value="<?= esc($c['idtipo_comprobante']) ?>">
-                <?= esc($c['nombre']) ?>
-              </option>
-            <?php endforeach; ?>
-          </select>
+      <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success alert-dismissible fade show">
+          <?= session()->getFlashdata('success') ?>
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
         </div>
+      <?php endif; ?>
 
-        <div class="col-md-3 form-group">
-          <label>Serie:</label>
-          <input type="text" name="serie" id="serie" class="form-control" value="<?= old('serie') ?>">
-        </div>
-
-        <div class="col-md-3 form-group">
-          <label>Número:</label>
-          <input type="text" name="numero" id="numero" class="form-control" value="<?= old('numero') ?>">
-        </div>
-
-        <div class="col-md-2 form-group">
-          <label>Fecha:</label>
-          <input type="text" name="fecha" id="fecha" class="form-control" value="<?= old('fecha', date('d/m/Y')) ?>" required>
-        </div>
-      </div>
-
-      <!-- FILA 2: Cliente (full) -->
-      <div class="form-group">
-        <label>Cliente:</label>
-        <select name="idcliente" id="idcliente" class="form-control" required>
-          <option value="">Seleccione...</option>
-          <?php foreach ($clientes as $cl): ?>
-            <option value="<?= esc($cl['idcliente']) ?>">
-              <?= esc($cl['nombre']) ?>
-            </option>
+      <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger">
+          <?php foreach (session()->getFlashdata('error') as $e): ?>
+            <div><?= esc($e) ?></div>
           <?php endforeach; ?>
-        </select>
-      </div>
-
-      <hr>
-
-      <!-- FILA 3: Producto + Botones -->
-      <div class="row">
-        <div class="col-md-8 form-group">
-          <label>Producto:</label>
-          <select id="selProducto" class="form-control">
-            <option value="">Seleccione...</option>
-            <?php foreach ($productos as $p): ?>
-              <?php
-                $img = $p['imagen'] ?: 'no.jpg';
-                $um  = $p['unmedida'] ?? '';
-              ?>
-              <option value="<?= esc($p['idproducto']) ?>"
-                data-codigo="<?= esc($p['codigo']) ?>"
-                data-nombre="<?= esc($p['nombre']) ?>"
-                data-precio="<?= esc($p['precio']) ?>"
-                data-stock="<?= esc($p['stock']) ?>"
-                data-imagen="<?= esc($img) ?>"
-                data-um="<?= esc($um) ?>">
-                <?= esc($p['nombre']) ?> (Stock: <?= esc($p['stock']) ?>)
-              </option>
-            <?php endforeach; ?>
-          </select>
         </div>
+      <?php endif; ?>
 
-        <div class="col-md-4 form-group d-flex align-items-end justify-content-end">
-          <button type="button" id="btnAgregar" class="btn btn-info mr-2" style="min-width:140px;">
-            <i class="fa fa-plus"></i> Agregar
-          </button>
+      <form action="<?= base_url('ventas/store') ?>" method="post" id="formVenta">
+        <?= csrf_field() ?>
 
-          <button type="button" id="btnBuscar" class="btn btn-primary" style="min-width:140px;">
-            <i class="fa fa-search"></i> Buscar
-          </button>
-        </div>
-      </div>
+        <!-- FILA 1 -->
+        <div class="row">
+          <div class="col-md-3 form-group">
+            <label>Tipo Documento</label>
+            <select name="idtipo_documento" id="idtipo_documento" class="form-control" required>
+              <option value="">Seleccione...</option>
+              <?php foreach ($tipos_documento as $d): ?>
+                <option value="<?= esc($d['idtipo_documento']) ?>">
+                  <?= esc($d['nombre']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
 
-      <!-- TABLA DETALLE (verde como captura) -->
-      <div class="table-responsive">
-        <table class="table table-bordered" id="tablaDetalle" style="min-width: 900px;">
-          <thead style="background:#0b8f62;color:#fff;">
-            <tr>
-              <th style="width:110px;">Código</th>
-              <th>Nombre</th>
-              <th style="width:110px;">Imagen</th>
-              <th style="width:80px;">UM</th>
-              <th style="width:120px;">Precio Venta</th>
-              <th style="width:90px;">Stock</th>
-              <th style="width:120px;">Cantidad</th>
-              <th style="width:120px;">Importe</th>
-              <th style="width:60px;">X</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+          <div class="col-md-3 form-group">
+            <label>Serie</label>
+            <input type="text" name="serie" id="serie" class="form-control" value="<?= old('serie') ?>">
+          </div>
 
-      <!-- TOTALES (igual a captura) -->
-      <div class="row mt-2">
-        <div class="col-md-4 form-group">
-          <div class="input-group">
-            <div class="input-group-prepend"><span class="input-group-text">Subtotal:</span></div>
-            <input type="text" name="subtotal" id="subtotal" class="form-control" readonly value="0.00">
+          <div class="col-md-3 form-group">
+            <label>Número</label>
+            <input type="text" name="num_documento" id="num_documento" class="form-control" value="<?= old('num_documento') ?>">
+          </div>
+
+          <div class="col-md-3 form-group">
+            <label>Fecha</label>
+            <input type="text" name="fecha" id="fecha" class="form-control"
+                   value="<?= old('fecha', date('d/m/Y')) ?>" required>
           </div>
         </div>
 
-        <div class="col-md-4 form-group">
-          <div class="input-group">
-            <div class="input-group-prepend"><span class="input-group-text">IGV:</span></div>
-            <input type="text" name="igv" id="igv" class="form-control" readonly value="0.00">
+        <!-- FILA 2 -->
+        <div class="row">
+          <div class="col-md-12 form-group">
+            <label>Cliente</label>
+            <select name="idcliente" id="idcliente" class="form-control" required>
+              <option value="">Seleccione...</option>
+              <?php foreach ($clientes as $c): ?>
+                <option value="<?= esc($c['idcliente']) ?>">
+                  <?= esc($c['nombre']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
           </div>
         </div>
 
-        <div class="col-md-4 form-group">
-          <div class="input-group">
-            <div class="input-group-prepend"><span class="input-group-text">Total:</span></div>
-            <input type="text" name="total" id="total" class="form-control" readonly value="0.00">
-          </div>
-        </div>
-      </div>
-
-      <!-- BOTÓN GUARDAR (verde como captura) -->
-      <button type="submit" class="btn btn-success" style="background:#0b8f62;border-color:#0b8f62;">
-        Guardar
-      </button>
-
-      <a href="<?= base_url('ventas') ?>" class="btn btn-secondary ml-2">
-        Volver
-      </a>
-
-    </form>
-
-  </div>
-</div>
-
-</div>
-</section>
-
-<!-- MODAL BUSCAR (simple, para que sea igual al botón Buscar) -->
-<div class="modal fade" id="modalBuscarProducto" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Buscar Producto</h5>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <input type="text" id="filtroProducto" class="form-control mb-2" placeholder="Escribe para filtrar...">
-        <div class="table-responsive">
-          <table class="table table-bordered table-striped" id="tablaBuscar">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Código</th>
-                <th>Nombre</th>
-                <th>Precio</th>
-                <th>Stock</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
+        <!-- FILA 3 -->
+        <div class="row align-items-end">
+          <div class="col-md-8 form-group">
+            <label>Producto</label>
+            <select id="selProducto" class="form-control">
+              <option value="">Seleccione...</option>
               <?php foreach ($productos as $p): ?>
-                <?php $img = $p['imagen'] ?: 'no.jpg'; ?>
-                <tr
-                  data-id="<?= esc($p['idproducto']) ?>"
+                <?php
+                  $img = !empty($p['imagen']) ? $p['imagen'] : 'no.jpg';
+                ?>
+                <option
+                  value="<?= esc($p['idproducto']) ?>"
                   data-codigo="<?= esc($p['codigo']) ?>"
                   data-nombre="<?= esc($p['nombre']) ?>"
                   data-precio="<?= esc($p['precio']) ?>"
                   data-stock="<?= esc($p['stock']) ?>"
-                  data-imagen="<?= esc($img) ?>"
-                  data-um="<?= esc($p['unmedida'] ?? '') ?>"
+                  data-um="<?= esc($p['unmedida']) ?>"
+                  data-img="<?= esc($img) ?>"
                 >
-                  <td><?= esc($p['idproducto']) ?></td>
-                  <td><?= esc($p['codigo']) ?></td>
-                  <td><?= esc($p['nombre']) ?></td>
-                  <td><?= esc($p['precio']) ?></td>
-                  <td><?= esc($p['stock']) ?></td>
-                  <td>
-                    <button type="button" class="btn btn-info btn-sm btnPick">Elegir</button>
-                  </td>
-                </tr>
+                  <?= esc($p['codigo']) ?> - <?= esc($p['nombre']) ?>
+                </option>
               <?php endforeach; ?>
-            </tbody>
+            </select>
+          </div>
+
+          <div class="col-md-2 form-group">
+            <button type="button" class="btn btn-primary btn-block" id="btnAgregar">
+              <i class="fa fa-plus"></i> Agregar
+            </button>
+          </div>
+
+          <div class="col-md-2 form-group">
+            <button type="button" class="btn btn-info btn-block" id="btnBuscar" disabled>
+              <i class="fa fa-search"></i> Buscar
+            </button>
+          </div>
+        </div>
+
+        <!-- TABLA DETALLE -->
+        <div class="table-responsive">
+          <table class="table table-bordered" id="tablaDetalle">
+            <thead class="bg-success">
+              <tr>
+                <th style="min-width:90px;">Código</th>
+                <th style="min-width:180px;">Nombre</th>
+                <th style="min-width:90px;">Imagen</th>
+                <th style="min-width:70px;">UM</th>
+                <th style="min-width:120px;">Precio Venta</th>
+                <th style="min-width:90px;">Stock</th>
+                <th style="min-width:120px;">Cantidad</th>
+                <th style="min-width:120px;">Importe</th>
+                <th style="width:50px;">X</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
           </table>
         </div>
-      </div>
+
+        <!-- TOTALES -->
+        <div class="row mt-3">
+          <div class="col-md-4">
+            <div class="form-group d-flex align-items-center">
+              <label class="mb-0 mr-2" style="min-width:80px;">Subtotal:</label>
+              <input type="text" class="form-control" id="subtotal" name="subtotal" value="0.00" readonly>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group d-flex align-items-center">
+              <label class="mb-0 mr-2" style="min-width:60px;">IGV:</label>
+              <input type="text" class="form-control" id="igv" name="igv" value="0.00" readonly>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group d-flex align-items-center">
+              <label class="mb-0 mr-2" style="min-width:60px;">Total:</label>
+              <input type="text" class="form-control" id="total" name="total" value="0.00" readonly>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group d-flex align-items-center">
+              <label class="mb-0 mr-2" style="min-width:90px;">Descuento:</label>
+              <input type="number" step="0.01" class="form-control" id="descuento" name="descuento" value="0.00">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-success" id="btnGuardar">
+          Guardar
+        </button>
+
+      </form>
+
     </div>
   </div>
+
 </div>
+</section>
 
 <script>
-function f2(n){ return (parseFloat(n||0)).toFixed(2); }
+(function(){
+  const IGV_RATE = <?= isset($igv_rate) ? (float)$igv_rate : 0.18 ?>;
 
-function recalcularTotales(){
-  let subtotal = 0;
-  $('#tablaDetalle tbody tr').each(function(){
-    subtotal += parseFloat($(this).find('.txtImporte').val() || 0);
-  });
-  let igv = subtotal * 0.18;
-  let total = subtotal + igv;
+  const selProducto = document.getElementById('selProducto');
+  const btnAgregar  = document.getElementById('btnAgregar');
+  const tbody       = document.querySelector('#tablaDetalle tbody');
 
-  $('#subtotal').val(f2(subtotal));
-  $('#igv').val(f2(igv));
-  $('#total').val(f2(total));
-}
+  const subtotalEl  = document.getElementById('subtotal');
+  const igvEl       = document.getElementById('igv');
+  const totalEl     = document.getElementById('total');
+  const descEl      = document.getElementById('descuento');
 
-function existeProducto(id){
-  return $('#tablaDetalle tbody input[name="idproducto[]"][value="'+id+'"]').length > 0;
-}
-
-function agregarFilaProducto(data){
-  if(!data.id) return;
-
-  if(existeProducto(data.id)){
-    alert('Ese producto ya fue agregado.');
-    return;
+  function money(n){
+    n = isNaN(n) ? 0 : n;
+    return n.toFixed(2);
   }
 
-  let cant = 1;
-  let imp = parseFloat(data.precio||0) * cant;
+  function recalcular(){
+    let subtotal = 0;
 
-  let row = `
-  <tr>
-    <td>
-      ${data.codigo}
-      <input type="hidden" name="idproducto[]" value="${data.id}">
-    </td>
+    tbody.querySelectorAll('tr').forEach(tr => {
+      const importe = parseFloat(tr.querySelector('.importe').textContent) || 0;
+      subtotal += importe;
+    });
 
-    <td>${data.nombre}</td>
+    const igv = subtotal * IGV_RATE;
+    let descuento = parseFloat(descEl.value) || 0;
+    if (descuento < 0) descuento = 0;
 
-    <td class="text-center">
-      <a href="<?= base_url('uploads/productos/') ?>/${data.imagen}"
-         data-toggle="lightbox" data-title="${data.nombre}">
-        <img src="<?= base_url('uploads/productos/') ?>/${data.imagen}"
-             class="img-thumbnail" style="max-width:70px;max-height:70px;">
-      </a>
-    </td>
+    const total = (subtotal + igv) - descuento;
 
-    <td>${data.um}</td>
+    subtotalEl.value = money(subtotal);
+    igvEl.value      = money(igv);
+    totalEl.value    = money(total);
+  }
 
-    <td>
-      ${f2(data.precio)}
-      <input type="hidden" name="precio[]" value="${f2(data.precio)}">
-    </td>
+  function existeProducto(id){
+    return !!tbody.querySelector('tr[data-id="'+id+'"]');
+  }
 
-    <td>${data.stock}</td>
+  function crearHidden(name, value){
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value;
+    return input;
+  }
 
-    <td>
-      <input type="number" min="1" step="1"
-        class="form-control txtCantidad" name="cantidad[]" value="${cant}">
-    </td>
+  function actualizarFila(tr){
+    const precio = parseFloat(tr.dataset.precio) || 0;
+    const stock  = parseFloat(tr.dataset.stock) || 0;
 
-    <td>
-      <input type="text" class="form-control txtImporte" name="importe[]" readonly value="${f2(imp)}">
-    </td>
+    const qtyInput = tr.querySelector('.qty');
+    let qty = parseFloat(qtyInput.value) || 0;
 
-    <td class="text-center">
-      <button type="button" class="btn btn-danger btn-sm btnQuitar">
-        <i class="fa fa-times"></i>
-      </button>
-    </td>
-  </tr>
-  `;
+    if (qty < 0) qty = 0;
+    if (qty > stock) qty = stock; // no pasar stock
+    qtyInput.value = qty;
 
-  $('#tablaDetalle tbody').append(row);
-  recalcularTotales();
-}
+    const importe = qty * precio;
+    tr.querySelector('.importe').textContent = money(importe);
 
-$('#btnAgregar').on('click', function(){
-  let opt = $('#selProducto option:selected');
-  let id = opt.val();
-  if(!id) return;
+    // actualiza hidden inputs
+    tr.querySelector('input[name="cantidad[]"]').value = qty;
+    tr.querySelector('input[name="precio[]"]').value   = precio;
+    tr.querySelector('input[name="idproducto[]"]').value = tr.dataset.id;
 
-  agregarFilaProducto({
-    id: id,
-    codigo: opt.data('codigo'),
-    nombre: opt.data('nombre'),
-    precio: opt.data('precio'),
-    stock: opt.data('stock'),
-    imagen: opt.data('imagen') || 'no.jpg',
-    um: opt.data('um') || ''
+    recalcular();
+  }
+
+  btnAgregar.addEventListener('click', () => {
+    const opt = selProducto.options[selProducto.selectedIndex];
+    const id  = opt.value;
+    if (!id) return;
+
+    if (existeProducto(id)) {
+      alert('Ese producto ya está agregado.');
+      return;
+    }
+
+    const codigo = opt.dataset.codigo || '';
+    const nombre = opt.dataset.nombre || '';
+    const precio = parseFloat(opt.dataset.precio || '0');
+    const stock  = parseFloat(opt.dataset.stock || '0');
+    const um     = opt.dataset.um || '';
+    const img    = opt.dataset.img || 'no.jpg';
+
+    const tr = document.createElement('tr');
+    tr.dataset.id = id;
+    tr.dataset.precio = precio;
+    tr.dataset.stock  = stock;
+
+    tr.innerHTML = `
+      <td>${codigo}</td>
+      <td>${nombre}</td>
+      <td class="text-center">
+        <a href="<?= base_url('uploads/productos') ?>/${img}" data-toggle="lightbox" data-title="${nombre}">
+          <img src="<?= base_url('uploads/productos') ?>/${img}" class="img-thumbnail" style="max-width:50px;max-height:50px;">
+        </a>
+      </td>
+      <td>${um}</td>
+      <td>${money(precio)}</td>
+      <td>${stock}</td>
+      <td>
+        <input type="number" step="0.01" min="0" class="form-control qty" value="1">
+      </td>
+      <td class="importe">${money(precio * 1)}</td>
+      <td class="text-center">
+        <button type="button" class="btn btn-danger btn-sm btnDel">
+          <i class="fa fa-times"></i>
+        </button>
+      </td>
+    `;
+
+    // hidden inputs
+    tr.appendChild(crearHidden('idproducto[]', id));
+    tr.appendChild(crearHidden('cantidad[]', 1));
+    tr.appendChild(crearHidden('precio[]', precio));
+
+    tbody.appendChild(tr);
+
+    // eventos
+    tr.querySelector('.qty').addEventListener('input', () => actualizarFila(tr));
+    tr.querySelector('.btnDel').addEventListener('click', () => {
+      tr.remove();
+      recalcular();
+    });
+
+    recalcular();
   });
-});
 
-$(document).on('input', '.txtCantidad', function(){
-  let tr = $(this).closest('tr');
-  let precio = parseFloat(tr.find('input[name="precio[]"]').val() || 0);
-  let cant = parseFloat($(this).val() || 1);
-  if(cant < 1) cant = 1;
-  $(this).val(cant);
+  descEl.addEventListener('input', recalcular);
 
-  let imp = precio * cant;
-  tr.find('.txtImporte').val(f2(imp));
-  recalcularTotales();
-});
-
-$(document).on('click', '.btnQuitar', function(){
-  $(this).closest('tr').remove();
-  recalcularTotales();
-});
-
-// Botón Buscar => abre modal
-$('#btnBuscar').on('click', function(){
-  $('#modalBuscarProducto').modal('show');
-});
-
-// Filtro del modal buscar
-$('#filtroProducto').on('keyup', function(){
-  let v = $(this).val().toLowerCase();
-  $('#tablaBuscar tbody tr').each(function(){
-    let text = $(this).text().toLowerCase();
-    $(this).toggle(text.indexOf(v) !== -1);
-  });
-});
-
-// Elegir desde modal
-$(document).on('click', '.btnPick', function(){
-  let tr = $(this).closest('tr');
-  agregarFilaProducto({
-    id: tr.data('id'),
-    codigo: tr.data('codigo'),
-    nombre: tr.data('nombre'),
-    precio: tr.data('precio'),
-    stock: tr.data('stock'),
-    imagen: tr.data('imagen') || 'no.jpg',
-    um: tr.data('um') || ''
-  });
-  $('#modalBuscarProducto').modal('hide');
-});
+})();
 </script>
 
 <?= $this->include('layouts/footer') ?>
