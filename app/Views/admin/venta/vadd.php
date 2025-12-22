@@ -397,3 +397,13 @@ $(document).on('click', '.selCli', function(){
 </script>
 
 <?= $this->include('layouts/footer') ?>
+
+<?= $this->section('scripts') ?>
+<script>
+  // AQUÍ va el JS de ventas:
+  // - abrir modal buscar producto
+  // - abrir modal buscar cliente
+  // - agregar al detalle
+  // - calcular subtotal/igv/total
+</script>
+<?= $this->endSection() ?>
