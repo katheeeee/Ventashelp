@@ -18,12 +18,19 @@
     const URL_PRODUCTOS = CFG.URL_PRODUCTOS || "";
     const IMG_DEFAULT = CFG.IMG_DEFAULT || "";
 
+    console.log("✅ vadd.js VERSION STOCK BADGE 22-12-2025");
+
     function n2(v) {
-      let x = parseFloat(v);
+      let x = parseFloat(String(v ?? "0").replace(",", "."));
       if (isNaN(x)) x = 0;
       return Math.round(x * 100) / 100;
     }
     function fmt(v) { return n2(v).toFixed(2); }
+
+    // stock robusto: acepta "0", "0.00", "0,00", null
+    function numStock(v) {
+      return Number(String(v ?? "0").replace(",", "."));
+    }
 
     function getRowById(id) {
       return $('#tablaDetalle tbody tr[data-id="' + id + '"]');
@@ -43,7 +50,7 @@
       $("#items").val(JSON.stringify(items));
     }
 
-    // ✅ Tu lógica actual (TOTAL incluye IGV)
+    // ✅ TOTAL incluye IGV (tu lógica actual)
     function calc() {
       let total = 0;
 
@@ -67,16 +74,35 @@
       buildItems();
     }
 
+    // ✅ No permitir cantidad > stock en una fila
+    function enforceRowStock($tr) {
+      const max = numStock($tr.attr("data-stock"));
+      if (max <= 0) return;
+
+      const $inp = $tr.find(".cantidad");
+      let v = numStock($inp.val());
+      if (isNaN(v) || v <= 0) v = 1;
+      if (v > max) v = max;
+      $inp.val(v);
+    }
+
     // ✅ Agregar producto (guarda stock y limita input)
     function addProducto(p) {
       const id = parseInt(p.idproducto, 10);
       if (!id) return;
 
+      const st = numStock(p.stock);
+
+      // si no hay stock, no permitir agregar
+      if (st <= 0) {
+        alert("Este producto no tiene stock.");
+        return;
+      }
+
       const $row = getRowById(id);
       if ($row.length) {
-        let c = n2($row.find(".cantidad").val());
+        let c = numStock($row.find(".cantidad").val());
         $row.find(".cantidad").val(Math.max(1, Math.round(c + 1)));
-        // revalidar stock
         enforceRowStock($row);
         calc();
         return;
@@ -84,7 +110,7 @@
 
       const img = p.img_url ? p.img_url : IMG_DEFAULT;
       const precio = fmt(p.precio);
-      const stockNum = parseFloat(p.stock ?? 0);
+      const stockNum = st;
 
       const $tr = $(`
         <tr data-id="${id}" data-stock="${stockNum}">
@@ -112,32 +138,19 @@
       $tr.find(".nombre").text(p.nombre ?? "");
       $tr.find(".um").text(p.unmedida ?? "");
       $tr.find(".precio").text(precio);
-      const st = parseFloat(p.stock ?? 0);
-if (st <= 0) {
-  $tr.find(".stock").html('<span class="badge badge-danger">NO HAY STOCK</span>');
-} else {
-  $tr.find(".stock").text(st);
-}
 
+      if (stockNum <= 0) {
+        $tr.find(".stock").html('<span class="badge badge-danger">NO HAY STOCK</span>');
+      } else {
+        $tr.find(".stock").text(stockNum);
+      }
 
       $("#tablaDetalle tbody").append($tr);
       enforceRowStock($tr);
       calc();
     }
 
-    // ✅ No permitir cantidad > stock en una fila
-    function enforceRowStock($tr) {
-      const max = parseFloat($tr.attr("data-stock")) || 0;
-      if (max <= 0) return;
-
-      const $inp = $tr.find(".cantidad");
-      let v = parseFloat($inp.val());
-      if (isNaN(v) || v <= 0) v = 1;
-      if (v > max) v = max;
-      $inp.val(v);
-    }
-
-    // ===================== CLIENTES (modal con búsqueda) =====================
+    // ===================== CLIENTES =====================
     function cargarClientes(q) {
       return $.getJSON(URL_CLIENTES, { q: q || "" });
     }
@@ -175,7 +188,7 @@ if (st <= 0) {
       tCli = setTimeout(() => { cargarClientes(q).done(renderClientes); }, 200);
     });
 
-    // ✅ Buscar cliente escribiendo en input principal
+    // buscar cliente escribiendo
     let tCli2 = null;
     $("#cliente_nombre").on("keyup", function (e) {
       const q = $(this).val().trim();
@@ -216,33 +229,34 @@ if (st <= 0) {
           url: URL_PRODUCTOS,
           dataSrc: "",
           data: function (d) {
-            // tu backend usa q
             return { q: (d.search && d.search.value) ? d.search.value : "" };
           },
         },
         columns: [
+          // ✅ botón add deshabilitado si stock=0
           {
-  data: null,
-  orderable: false,
-  searchable: false,
-  className: "text-center",
-  render: function (data, type, row) {
-    const st = parseFloat(row.stock ?? 0);
+            data: null,
+            orderable: false,
+            searchable: false,
+            className: "text-center",
+            render: function (data, type, row) {
+              const st = numStock(row.stock);
 
-    if (st <= 0) {
-      return `<button type="button" class="btn btn-secondary btn-sm" disabled title="No hay stock">
-                <i class="fa fa-ban"></i>
-              </button>`;
-    }
+              if (st <= 0) {
+                return `<button type="button" class="btn btn-secondary btn-sm" disabled title="No hay stock">
+                          <i class="fa fa-ban"></i>
+                        </button>`;
+              }
 
-    return `<button type="button" class="btn btn-success btn-sm selProdDt" title="Agregar">
-              <i class="fa fa-check"></i>
-            </button>`;
-  },
-},
+              return `<button type="button" class="btn btn-success btn-sm selProdDt" title="Agregar">
+                        <i class="fa fa-check"></i>
+                      </button>`;
+            },
+          },
 
           { data: "codigo" },
           { data: "nombre" },
+
           {
             data: "img_url",
             orderable: false,
@@ -253,20 +267,23 @@ if (st <= 0) {
               return `<img src="${img}" class="img-thumbnail" style="max-width:60px; max-height:60px;">`;
             },
           },
+
           {
             data: "precio",
             className: "text-right",
             render: function (v) { return fmt(v); },
           },
+
+          // ✅ badge NO HAY STOCK
           {
-  data: "stock",
-  className: "text-right",
-  render: function (v) {
-    const st = parseFloat(v ?? 0);
-    if (st <= 0) return `<span class="badge badge-danger">NO HAY STOCK</span>`;
-    return st;
-  }
-},
+            data: "stock",
+            className: "text-right",
+            render: function (v) {
+              const st = numStock(v);
+              if (st <= 0) return `<span class="badge badge-danger">NO HAY STOCK</span>`;
+              return st;
+            }
+          },
 
           { data: "unmedida" },
         ],
@@ -289,7 +306,7 @@ if (st <= 0) {
       }, 200);
     });
 
-    // ✅ Buscar producto escribiendo (abre modal y filtra)
+    // buscar producto escribiendo (abre modal y filtra)
     let tProdKey = null;
     $("#producto_buscar").on("keyup", function (e) {
       const q = $(this).val().trim();
@@ -315,7 +332,7 @@ if (st <= 0) {
     // ===================== DETALLE EVENTS =====================
     $(document).on("input", "#tablaDetalle .cantidad", function () {
       const $tr = $(this).closest("tr");
-      enforceRowStock($tr); // ✅ limita por stock
+      enforceRowStock($tr);
       calc();
     });
 
@@ -337,11 +354,11 @@ if (st <= 0) {
         return;
       }
 
-      // ✅ validar stock en front también
+      // validar stock en front
       let ok = true;
       $("#tablaDetalle tbody tr").each(function () {
-        const stock = parseFloat($(this).attr("data-stock")) || 0;
-        const cant = parseFloat($(this).find(".cantidad").val()) || 0;
+        const stock = numStock($(this).attr("data-stock"));
+        const cant = numStock($(this).find(".cantidad").val());
         if (stock > 0 && cant > stock) ok = false;
       });
 
