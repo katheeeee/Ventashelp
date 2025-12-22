@@ -5,20 +5,14 @@
   <title><?= esc($title ?? 'Helpnet') ?></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- ========================= -->
-  <!-- AdminLTE 3 / Bootstrap 4 -->
-  <!-- ========================= -->
+  <!-- ================= AdminLTE 3 / Bootstrap 4 ================= -->
   <link rel="stylesheet" href="<?= base_url('assets/template/dist/css/adminlte.min.css') ?>">
   <link rel="stylesheet" href="<?= base_url('assets/template/plugins/fontawesome-free/css/all.min.css') ?>">
 
-  <!-- ========================= -->
-  <!-- DataTables CSS (LOCAL) -->
-  <!-- ========================= -->
+  <!-- ================= DataTables CSS (LOCAL) ================= -->
   <link rel="stylesheet" href="<?= base_url('assets/template/plugins/datatables/dataTables.bootstrap4.min.css') ?>">
 
-  <!-- ========================= -->
-  <!-- Ekko Lightbox -->
-  <!-- ========================= -->
+  <!-- ================= Ekko Lightbox ================= -->
   <link rel="stylesheet" href="<?= base_url('assets/template/plugins/ekko-lightbox/ekko-lightbox.css') ?>">
 
   <style>
