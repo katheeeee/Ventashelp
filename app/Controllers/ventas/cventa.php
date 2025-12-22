@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers\movimientos;
+namespace App\Controllers\ventas;
 
 use App\Controllers\BaseController;
 use App\Models\mventa;
@@ -16,146 +16,89 @@ class cventa extends BaseController
 
     public function __construct()
     {
-        $this->venta    = new mventa();
-        $this->detalle  = new mdetalle_venta();
+        $this->venta   = new mventa();
+        $this->detalle = new mdetalle_venta();
     }
 
+    // =========================
+    // NUEVA VENTA
+    // =========================
     public function add()
     {
         if (!session()->get('login')) {
             return redirect()->to(base_url('login'));
         }
 
-        // combos
-        $tipos_documento = (new mtipo_documento())
-            ->select('idtipo_documento, nombre')
-            ->where('estado', 1)
-            ->findAll();
-
-        $clientes = (new mcliente())
-            ->select('idcliente, nombre')
-            ->where('estado', 1)
-            ->orderBy('nombre', 'ASC')
-            ->findAll();
-
-        $productos = (new mproducto())
-            ->select('producto.idproducto, producto.codigo, producto.nombre, producto.precio, producto.stock, producto.imagen, unmedida.nombre AS unmedida')
-            ->join('unmedida', 'unmedida.idunmedida = producto.idunmedida')
-            ->where('producto.estado', 1)
-            ->orderBy('producto.nombre', 'ASC')
-            ->findAll();
-
         $data = [
-            'active'         => 'ventas',      // para tu aside
-            'subactive'      => 'venta_add',    // para marcar "Agregar"
-            'tipos_documento'=> $tipos_documento,
-            'clientes'       => $clientes,
-            'productos'      => $productos,
-            'igv_rate'       => 0.18,
+            'active'         => 'ventas',
+            'subactive'      => 'venta_add',
+            'tipos_documento'=> (new mtipo_documento())->where('estado',1)->findAll(),
+            'clientes'       => (new mcliente())->where('estado',1)->findAll(),
+            'productos'      => (new mproducto())
+                                ->select('producto.*, unmedida.nombre AS unmedida')
+                                ->join('unmedida','unmedida.idunmedida = producto.idunmedida')
+                                ->where('producto.estado',1)
+                                ->findAll(),
         ];
 
         return view('admin/venta/vadd', $data);
     }
 
+    // =========================
+    // GUARDAR VENTA
+    // =========================
     public function store()
     {
         if (!session()->get('login')) {
             return redirect()->to(base_url('login'));
         }
 
-        // ====== VALIDACIÓN BÁSICA ======
-        $rules = [
-            'fecha'            => 'required',
-            'idtipo_documento' => 'required|integer',
-            'idcliente'        => 'required|integer',
-            'serie'            => 'permit_empty|max_length[30]',
-            'num_documento'    => 'permit_empty|max_length[15]',
+        $ids       = $this->request->getPost('idproducto');
+        $cantidades= $this->request->getPost('cantidad');
+        $precios   = $this->request->getPost('precio');
 
-            // arrays del detalle
-            'idproducto'       => 'required',
-            'cantidad'         => 'required',
-            'precio'           => 'required',
-        ];
-
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('error', $this->validator->getErrors());
+        if (!$ids) {
+            return redirect()->back()->with('error', ['Debe agregar productos']);
         }
 
-        // ====== DETALLE (arrays) ======
-        $ids       = (array) $this->request->getPost('idproducto');
-        $cantidades= (array) $this->request->getPost('cantidad');
-        $precios   = (array) $this->request->getPost('precio');
-
-        if (count($ids) === 0) {
-            return redirect()->back()->withInput()->with('error', ['Agrega al menos un producto.']);
+        // ====== CALCULAR TOTALES ======
+        $subtotal = 0;
+        foreach ($ids as $i => $idp) {
+            $subtotal += $cantidades[$i] * $precios[$i];
         }
 
-        // recalcular en backend (no confiar en JS)
-        $subtotal = 0.0;
-        $items = [];
-
-        foreach ($ids as $i => $idprod) {
-            $idprod = (int)$idprod;
-            $cant   = (float)($cantidades[$i] ?? 0);
-            $prec   = (float)($precios[$i] ?? 0);
-
-            if ($idprod <= 0 || $cant <= 0 || $prec < 0) continue;
-
-            $importe = $cant * $prec;
-            $subtotal += $importe;
-
-            $items[] = [
-                'idproducto' => $idprod,
-                'cantidad'   => $cant,
-                'precio'     => $prec,
-                'importe'    => $importe,
-            ];
-        }
-
-        if (count($items) === 0) {
-            return redirect()->back()->withInput()->with('error', ['Detalle inválido.']);
-        }
-
-        $igv_rate = 0.18;
-        $igv      = round($subtotal * $igv_rate, 2);
-        $descuento= (float)($this->request->getPost('descuento') ?? 0);
-        if ($descuento < 0) $descuento = 0;
-
-        $total    = round(($subtotal + $igv) - $descuento, 2);
+        $igv   = round($subtotal * 0.18, 2);
+        $total = round($subtotal + $igv, 2);
 
         // ====== INSERT CABECERA ======
-        $fecha = $this->request->getPost('fecha'); // si guardas como varchar(20) ok
-
         $idventa = $this->venta->insert([
-            'fecha'            => $fecha,
-            'subtotal'         => round($subtotal, 2),
-            'igv'              => $igv,
-            'descuento'        => round($descuento, 2),
-            'total'            => $total,
-            'estado'           => 1,
+            'fecha'            => $this->request->getPost('fecha'),
             'serie'            => $this->request->getPost('serie'),
             'num_documento'    => $this->request->getPost('num_documento'),
-            'idtipo_documento' => (int)$this->request->getPost('idtipo_documento'),
-            'idcliente'        => (int)$this->request->getPost('idcliente'),
-            'idusuario'        => (int)(session('idusuario') ?? 1),
+            'idtipo_documento' => $this->request->getPost('idtipo_documento'),
+            'idcliente'        => $this->request->getPost('idcliente'),
+            'subtotal'         => $subtotal,
+            'igv'              => $igv,
+            'total'            => $total,
+            'estado'           => 1,
+            'idusuario'        => session('idusuario'),
             'fecharegistro'    => date('Y-m-d H:i:s'),
-            'usuarioregistro'  => (int)(session('idusuario') ?? 1),
+            'usuarioregistro'  => session('idusuario'),
         ], true);
 
         // ====== INSERT DETALLE ======
-        foreach ($items as $it) {
+        foreach ($ids as $i => $idp) {
             $this->detalle->insert([
-                'idventa'       => $idventa,
-                'idproducto'    => $it['idproducto'],
-                'precio'        => $it['precio'],
-                'cantidad'      => $it['cantidad'],
-                'importe'       => round($it['importe'], 2),
-                'estado'        => 1,
-                'fecharegistro' => date('Y-m-d H:i:s'),
+                'idventa'   => $idventa,
+                'idproducto'=> $idp,
+                'precio'    => $precios[$i],
+                'cantidad'  => $cantidades[$i],
+                'importe'   => $cantidades[$i] * $precios[$i],
+                'estado'    => 1,
             ]);
         }
 
         return redirect()->to(base_url('ventas/add'))
-            ->with('success', 'Venta registrada correctamente.');
+            ->with('success', 'Venta registrada correctamente');
     }
 }
