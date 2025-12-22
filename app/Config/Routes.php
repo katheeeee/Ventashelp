@@ -14,7 +14,6 @@ $routes->get('login', 'clogin::index');
 $routes->post('clogeo', 'clogin::clogeo');
 $routes->get('logout', 'clogin::clogout');
 
-
 // =====================================================
 // RUTAS PROTEGIDAS (AUTH)
 // =====================================================
@@ -30,7 +29,6 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     // =================================================
     $routes->group('mantenimiento', function ($routes) {
 
-        // -------- CATEGORIA --------
         $routes->get('categoria', 'mantenimiento\ccategoria::index');
         $routes->get('categoria/add', 'mantenimiento\ccategoria::add');
         $routes->post('categoria/store', 'mantenimiento\ccategoria::store');
@@ -39,7 +37,6 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('categoria/view/(:num)', 'mantenimiento\ccategoria::view/$1');
         $routes->get('categoria/delete/(:num)', 'mantenimiento\ccategoria::delete/$1');
 
-        // -------- TIPO DOCUMENTO --------
         $routes->get('tipo_documento', 'mantenimiento\ctipo_documento::index');
         $routes->get('tipo_documento/add', 'mantenimiento\ctipo_documento::add');
         $routes->post('tipo_documento/store', 'mantenimiento\ctipo_documento::store');
@@ -48,7 +45,6 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('tipo_documento/view/(:num)', 'mantenimiento\ctipo_documento::view/$1');
         $routes->get('tipo_documento/delete/(:num)', 'mantenimiento\ctipo_documento::delete/$1');
 
-        // -------- COLOR --------
         $routes->get('color', 'mantenimiento\ccolor::index');
         $routes->get('color/add', 'mantenimiento\ccolor::add');
         $routes->post('color/store', 'mantenimiento\ccolor::store');
@@ -57,7 +53,6 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('color/view/(:num)', 'mantenimiento\ccolor::view/$1');
         $routes->get('color/delete/(:num)', 'mantenimiento\ccolor::delete/$1');
 
-        // -------- MARCA --------
         $routes->get('marca', 'mantenimiento\cmarca::index');
         $routes->get('marca/add', 'mantenimiento\cmarca::add');
         $routes->post('marca/store', 'mantenimiento\cmarca::store');
@@ -66,7 +61,6 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('marca/view/(:num)', 'mantenimiento\cmarca::view/$1');
         $routes->get('marca/delete/(:num)', 'mantenimiento\cmarca::delete/$1');
 
-        // -------- TIPO MATERIAL --------
         $routes->get('tipo_material', 'mantenimiento\ctipo_material::index');
         $routes->get('tipo_material/add', 'mantenimiento\ctipo_material::add');
         $routes->post('tipo_material/store', 'mantenimiento\ctipo_material::store');
@@ -75,7 +69,6 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('tipo_material/view/(:num)', 'mantenimiento\ctipo_material::view/$1');
         $routes->get('tipo_material/delete/(:num)', 'mantenimiento\ctipo_material::delete/$1');
 
-        // -------- UNIDAD MEDIDA --------
         $routes->get('unmedida', 'mantenimiento\cunmedida::index');
         $routes->get('unmedida/add', 'mantenimiento\cunmedida::add');
         $routes->post('unmedida/store', 'mantenimiento\cunmedida::store');
@@ -84,7 +77,6 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('unmedida/view/(:num)', 'mantenimiento\cunmedida::view/$1');
         $routes->get('unmedida/delete/(:num)', 'mantenimiento\cunmedida::delete/$1');
 
-        // -------- TIPO CLIENTE --------
         $routes->get('tipo_cliente', 'mantenimiento\ctipo_cliente::index');
         $routes->get('tipo_cliente/add', 'mantenimiento\ctipo_cliente::add');
         $routes->post('tipo_cliente/store', 'mantenimiento\ctipo_cliente::store');
@@ -93,7 +85,6 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('tipo_cliente/view/(:num)', 'mantenimiento\ctipo_cliente::view/$1');
         $routes->get('tipo_cliente/delete/(:num)', 'mantenimiento\ctipo_cliente::delete/$1');
 
-        // -------- CLIENTE --------
         $routes->get('cliente', 'mantenimiento\ccliente::index');
         $routes->get('cliente/add', 'mantenimiento\ccliente::add');
         $routes->post('cliente/store', 'mantenimiento\ccliente::store');
@@ -102,7 +93,6 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('cliente/view/(:num)', 'mantenimiento\ccliente::view/$1');
         $routes->get('cliente/delete/(:num)', 'mantenimiento\ccliente::delete/$1');
 
-        // -------- PROVEEDOR --------
         $routes->get('proveedor', 'mantenimiento\cproveedor::index');
         $routes->get('proveedor/add', 'mantenimiento\cproveedor::add');
         $routes->post('proveedor/store', 'mantenimiento\cproveedor::store');
@@ -111,7 +101,6 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('proveedor/view/(:num)', 'mantenimiento\cproveedor::view/$1');
         $routes->get('proveedor/delete/(:num)', 'mantenimiento\cproveedor::delete/$1');
 
-        // -------- PRODUCTO --------
         $routes->get('producto', 'mantenimiento\cproducto::index');
         $routes->get('producto/add', 'mantenimiento\cproducto::add');
         $routes->post('producto/store', 'mantenimiento\cproducto::store');
@@ -122,25 +111,17 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     });
 
     // =================================================
-    // VENTAS  (ANTES MOVIMIENTOS)
+    // VENTAS
     // =================================================
     $routes->group('ventas', function ($routes) {
 
-        // listar ventas (luego)
-        $routes->get('', 'ventas\cventa::index');
-
-        // nueva venta
+        $routes->get('/', 'ventas\cventa::index');
         $routes->get('add', 'ventas\cventa::add');
-
-        // guardar venta
         $routes->post('store', 'ventas\cventa::store');
-
-        // ver venta
         $routes->get('view/(:num)', 'ventas\cventa::view/$1');
 
-        // eliminar (opcional)
-        // $routes->get('delete/(:num)', 'ventas\cventa::delete/$1');
-            $routes->get('ajax-productos', 'ventas\cventa::ajaxProductos');
-    $routes->get('ajax-clientes', 'ventas\cventa::ajaxClientes');
+        // ✅ RUTAS AJAX (SIN GUIONES, para que coincida con el JS)
+        $routes->get('ajaxClientes', 'ventas\cventa::ajaxClientes');
+        $routes->get('ajaxProductos', 'ventas\cventa::ajaxProductos');
     });
 });
