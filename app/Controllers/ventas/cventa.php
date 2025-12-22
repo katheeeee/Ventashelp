@@ -59,64 +59,62 @@ class cventa extends BaseController
     }
 
     // ✅ AJAX: lista productos (para el modal) - SOLO ACTIVOS
-    public function ajaxProductos()
-    {
-        if (!session()->get('login')) return $this->response->setStatusCode(403);
+public function ajaxClientes()
+{
+    if (!session()->get('login')) return $this->response->setStatusCode(403);
 
-        $q = trim($this->request->getGet('q') ?? '');
+    $q = trim($this->request->getGet('q') ?? '');
 
-        $builder = $this->producto
-            ->select('producto.idproducto, producto.codigo, producto.nombre, producto.imagen, producto.precio, producto.stock,
-                      unmedida.nombre as unmedida')
-            ->join('unmedida', 'unmedida.idunmedida = producto.idunmedida')
-            ->where('producto.estado', 1);
+    $builder = $this->cliente->select('idcliente, codigo, nombre');
 
-        // ✅ IMPORTANTE: agrupar like/orLike para que NO rompa el where(estado=1)
-        if ($q !== '') {
-            $builder->groupStart()
-                ->like('producto.nombre', $q)
-                ->orLike('producto.codigo', $q)
+    if ($q !== '') {
+        $builder->groupStart()
+            ->like('nombre', $q)
+            ->orLike('codigo', $q)
             ->groupEnd();
-        }
-
-        $data = $builder
-            ->orderBy('producto.nombre', 'ASC')
-            ->findAll(200);
-
-        // imagen default
-        foreach ($data as &$r) {
-            $r['imagen']  = (!empty($r['imagen'])) ? $r['imagen'] : 'no.jpg';
-            $r['img_url'] = base_url('uploads/productos/' . $r['imagen']);
-        }
-
-        return $this->response->setJSON($data);
     }
 
-    // ✅ AJAX: lista clientes (para el modal) - SOLO ACTIVOS
-    public function ajaxClientes()
-    {
-        if (!session()->get('login')) return $this->response->setStatusCode(403);
-
-        $q = trim($this->request->getGet('q') ?? '');
-
-        $builder = $this->cliente
-            ->select('idcliente, nombre, codigo')
-            ->where('estado', 1);
-
-        // ✅ IMPORTANTE: agrupar like/orLike
-        if ($q !== '') {
-            $builder->groupStart()
-                ->like('nombre', $q)
-                ->orLike('codigo', $q)
-            ->groupEnd();
-        }
-
-        $data = $builder
-            ->orderBy('nombre', 'ASC')
-            ->findAll(200);
-
-        return $this->response->setJSON($data);
+    if ($this->cliente->db->fieldExists('estado', 'cliente')) {
+        $builder->where('estado', 1);
     }
+
+    $data = $builder->orderBy('nombre', 'ASC')->findAll(50);
+
+    return $this->response->setJSON($data);
+}
+
+public function ajaxProductos()
+{
+    if (!session()->get('login')) return $this->response->setStatusCode(403);
+
+    $q = trim($this->request->getGet('q') ?? '');
+
+    $builder = $this->producto
+        ->select('producto.idproducto, producto.codigo, producto.nombre, producto.imagen, producto.precio, producto.stock,
+                  unmedida.nombre as unmedida')
+        ->join('unmedida', 'unmedida.idunmedida = producto.idunmedida');
+
+    if ($q !== '') {
+        $builder->groupStart()
+            ->like('producto.nombre', $q)
+            ->orLike('producto.codigo', $q)
+            ->groupEnd();
+    }
+
+    if ($this->producto->db->fieldExists('estado', 'producto')) {
+        $builder->where('producto.estado', 1);
+    }
+
+    $data = $builder->orderBy('producto.nombre', 'ASC')->findAll(100);
+
+    foreach ($data as &$r) {
+        $r['imagen'] = $r['imagen'] ?: 'no.jpg';
+        $r['img_url'] = base_url('uploads/productos/' . $r['imagen']);
+    }
+
+    return $this->response->setJSON($data);
+}
+
 
     public function store()
     {
