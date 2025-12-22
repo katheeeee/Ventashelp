@@ -6,17 +6,18 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-// =========================
+// =====================================================
 // RUTAS PÚBLICAS
-// =========================
+// =====================================================
 $routes->get('/', 'clogin::index');
 $routes->get('login', 'clogin::index');
 $routes->post('clogeo', 'clogin::clogeo');
 $routes->get('logout', 'clogin::clogout');
 
-// =========================
-// RUTAS PROTEGIDAS (LOGIN)
-// =========================
+
+// =====================================================
+// RUTAS PROTEGIDAS (AUTH)
+// =====================================================
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 
     // -------------------------
@@ -24,9 +25,9 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     // -------------------------
     $routes->get('dashboard', 'Home::index');
 
-    // =========================
+    // =================================================
     // MANTENIMIENTO
-    // =========================
+    // =================================================
     $routes->group('mantenimiento', function ($routes) {
 
         // -------- CATEGORIA --------
@@ -92,7 +93,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('tipo_cliente/view/(:num)', 'mantenimiento\ctipo_cliente::view/$1');
         $routes->get('tipo_cliente/delete/(:num)', 'mantenimiento\ctipo_cliente::delete/$1');
 
-        // -------- CLIENTE (MAESTRO) --------
+        // -------- CLIENTE --------
         $routes->get('cliente', 'mantenimiento\ccliente::index');
         $routes->get('cliente/add', 'mantenimiento\ccliente::add');
         $routes->post('cliente/store', 'mantenimiento\ccliente::store');
@@ -100,9 +101,8 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->post('cliente/update/(:num)', 'mantenimiento\ccliente::update/$1');
         $routes->get('cliente/view/(:num)', 'mantenimiento\ccliente::view/$1');
         $routes->get('cliente/delete/(:num)', 'mantenimiento\ccliente::delete/$1');
-        
 
-        // proveedor
+        // -------- PROVEEDOR --------
         $routes->get('proveedor', 'mantenimiento\cproveedor::index');
         $routes->get('proveedor/add', 'mantenimiento\cproveedor::add');
         $routes->post('proveedor/store', 'mantenimiento\cproveedor::store');
@@ -111,7 +111,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('proveedor/view/(:num)', 'mantenimiento\cproveedor::view/$1');
         $routes->get('proveedor/delete/(:num)', 'mantenimiento\cproveedor::delete/$1');
 
-        // producto
+        // -------- PRODUCTO --------
         $routes->get('producto', 'mantenimiento\cproducto::index');
         $routes->get('producto/add', 'mantenimiento\cproducto::add');
         $routes->post('producto/store', 'mantenimiento\cproducto::store');
@@ -119,29 +119,26 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->post('producto/update/(:num)', 'mantenimiento\cproducto::update/$1');
         $routes->get('producto/view/(:num)', 'mantenimiento\cproducto::view/$1');
         $routes->get('producto/delete/(:num)', 'mantenimiento\cproducto::delete/$1');
-
     });
 
-    // =========================
-    // MOVIMIENTOS
-    // =========================
-$routes->group('ventas', function($routes){
+    // =================================================
+    // VENTAS  (ANTES MOVIMIENTOS)
+    // =================================================
+    $routes->group('ventas', function ($routes) {
 
-    // listar ventas
-    $routes->get('/', 'ventas\cventa::index');
+        // listar ventas (luego)
+        $routes->get('', 'ventas\cventa::index');
 
-    // nueva venta (form)
-    $routes->get('add', 'ventas\cventa::add');
+        // nueva venta
+        $routes->get('add', 'ventas\cventa::add');
 
-    // guardar venta
-    $routes->post('store', 'ventas\cventa::store');
+        // guardar venta
+        $routes->post('store', 'ventas\cventa::store');
 
-    // ver detalle venta
-    $routes->get('view/(:num)', 'ventas\cventa::view/$1');
+        // ver venta
+        $routes->get('view/(:num)', 'ventas\cventa::view/$1');
 
-    // (opcional) imprimir pdf/html si luego lo haces:
-    // $routes->get('boleta/(:num)', 'movimientos\cdocumento::boleta/$1');
-});
-
-
+        // eliminar (opcional)
+        // $routes->get('delete/(:num)', 'ventas\cventa::delete/$1');
+    });
 });
