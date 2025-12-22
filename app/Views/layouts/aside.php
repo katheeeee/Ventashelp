@@ -125,7 +125,6 @@
           </ul>
         </li>
 
-<!-- VENTAS -->
 <li class="nav-item has-treeview <?= ($active=='ventas')?'menu-open':'' ?>">
   <a href="#" class="nav-link <?= ($active=='ventas')?'active':'' ?>">
     <i class="nav-icon fas fa-shopping-cart"></i>
@@ -134,26 +133,24 @@
       <i class="right fas fa-angle-left"></i>
     </p>
   </a>
-
   <ul class="nav nav-treeview">
-
-    <!-- Agregar (Nueva venta) -->
     <li class="nav-item">
       <a href="<?= base_url('ventas/add') ?>"
-         class="nav-link <?= ($subactive=='ventas_add')?'active':'' ?>">
+         class="nav-link <?= ($subactive=='venta_add')?'active':'' ?>">
         <i class="far fa-circle nav-icon"></i>
         <p>Agregar</p>
       </a>
     </li>
 
-    <!-- Listar -->
     <li class="nav-item">
       <a href="<?= base_url('ventas') ?>"
-         class="nav-link <?= ($subactive=='ventas_list')?'active':'' ?>">
+         class="nav-link <?= ($subactive=='venta_list')?'active':'' ?>">
         <i class="far fa-circle nav-icon"></i>
         <p>Listar</p>
       </a>
     </li>
+  </ul>
+</li>
 
   </ul>
 </li>
