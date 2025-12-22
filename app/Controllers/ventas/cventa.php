@@ -45,8 +45,11 @@ class cventa extends BaseController
     {
         if (!session()->get('login')) return redirect()->to(base_url('login'));
 
-        // ✅ Usamos tipo_documento como "comprobante"
-        $tipos = (new mtipo_documento())->findAll();
+        // ✅ SOLO ACTIVOS (para que no salgan los inactivos)
+        $tipos = (new mtipo_documento())
+            ->where('estado', 1)
+            ->orderBy('nombre', 'ASC')
+            ->findAll();
 
         return view('admin/venta/vadd', [
             'active'          => 'ventas',
@@ -55,41 +58,61 @@ class cventa extends BaseController
         ]);
     }
 
-    // ✅ AJAX: lista productos (para el modal)
+    // ✅ AJAX: lista productos (para el modal) - SOLO ACTIVOS
     public function ajaxProductos()
     {
         if (!session()->get('login')) return $this->response->setStatusCode(403);
 
         $q = trim($this->request->getGet('q') ?? '');
 
-        $data = $this->producto
+        $builder = $this->producto
             ->select('producto.idproducto, producto.codigo, producto.nombre, producto.imagen, producto.precio, producto.stock,
                       unmedida.nombre as unmedida')
             ->join('unmedida', 'unmedida.idunmedida = producto.idunmedida')
-            ->like('producto.nombre', $q)
-            ->orLike('producto.codigo', $q)
+            ->where('producto.estado', 1);
+
+        // ✅ IMPORTANTE: agrupar like/orLike para que NO rompa el where(estado=1)
+        if ($q !== '') {
+            $builder->groupStart()
+                ->like('producto.nombre', $q)
+                ->orLike('producto.codigo', $q)
+            ->groupEnd();
+        }
+
+        $data = $builder
+            ->orderBy('producto.nombre', 'ASC')
             ->findAll(200);
 
         // imagen default
         foreach ($data as &$r) {
-            $r['imagen'] = (!empty($r['imagen'])) ? $r['imagen'] : 'no.jpg';
+            $r['imagen']  = (!empty($r['imagen'])) ? $r['imagen'] : 'no.jpg';
             $r['img_url'] = base_url('uploads/productos/' . $r['imagen']);
         }
 
         return $this->response->setJSON($data);
     }
 
-    // ✅ AJAX: lista clientes (para el select buscable)
+    // ✅ AJAX: lista clientes (para el modal) - SOLO ACTIVOS
     public function ajaxClientes()
     {
         if (!session()->get('login')) return $this->response->setStatusCode(403);
 
         $q = trim($this->request->getGet('q') ?? '');
 
-        $data = $this->cliente
+        $builder = $this->cliente
             ->select('idcliente, nombre, codigo')
-            ->like('nombre', $q)
-            ->orLike('codigo', $q)
+            ->where('estado', 1);
+
+        // ✅ IMPORTANTE: agrupar like/orLike
+        if ($q !== '') {
+            $builder->groupStart()
+                ->like('nombre', $q)
+                ->orLike('codigo', $q)
+            ->groupEnd();
+        }
+
+        $data = $builder
+            ->orderBy('nombre', 'ASC')
             ->findAll(200);
 
         return $this->response->setJSON($data);
@@ -99,10 +122,9 @@ class cventa extends BaseController
     {
         if (!session()->get('login')) return redirect()->to(base_url('login'));
 
-        // ✅ OJO: tú dijiste que tu llave usuario es idtipo_usuario (o similar).
-        // Aquí yo usaré lo que tengas guardado en sesión.
-        // Cambia 'idtipo_usuario' por tu sesión real.
-        $idUsuario = session('idtipo_usuario') ?? session('idusuario') ?? null;
+        // ✅ usa el id que realmente tengas en sesión
+        // (si tienes session('idusuario') mejor usa ese)
+        $idUsuario = session('idusuario') ?? session('idtipo_usuario') ?? 1;
 
         $rules = [
             'idtipo_documento' => 'required|integer',
@@ -128,36 +150,38 @@ class cventa extends BaseController
 
         // ✅ Insert cabecera venta
         $idventa = $this->venta->insert([
-            'fecha'           => $this->request->getPost('fecha'),
-            'subtotal'        => $this->request->getPost('subtotal'),
-            'igv'             => $this->request->getPost('igv'),
-            'descuento'       => $this->request->getPost('descuento') ?? 0,
-            'total'           => $this->request->getPost('total'),
-            'serie'           => $this->request->getPost('serie'),
-            'num_documento'   => $this->request->getPost('num_documento'),
-            'idtipo_documento'=> $this->request->getPost('idtipo_documento'),
-            'idcliente'       => $this->request->getPost('idcliente'),
-            'idusuario'       => $idUsuario ?? 1, // si tu DB NO permite null
-            'estado'          => 1,
-            'fecharegistro'   => date('Y-m-d H:i:s'),
-            'usuarioregistro' => $idUsuario ?? 1,
+            'fecha'            => $this->request->getPost('fecha'),
+            'subtotal'         => $this->request->getPost('subtotal'),
+            'igv'              => $this->request->getPost('igv'),
+            'descuento'        => $this->request->getPost('descuento') ?? 0,
+            'total'            => $this->request->getPost('total'),
+            'serie'            => $this->request->getPost('serie'),
+            'num_documento'    => $this->request->getPost('num_documento'),
+            'idtipo_documento' => $this->request->getPost('idtipo_documento'),
+            'idcliente'        => $this->request->getPost('idcliente'),
+            'idusuario'        => $idUsuario,
+            'estado'           => 1,
+            'fecharegistro'    => date('Y-m-d H:i:s'),
+            'usuarioregistro'  => $idUsuario,
         ], true);
 
         // ✅ Insert detalle + actualizar stock
         foreach ($items as $it) {
-            $idproducto = (int)$it['idproducto'];
-            $precio     = (float)$it['precio'];
-            $cantidad   = (float)$it['cantidad'];
-            $importe    = (float)$it['importe'];
+            $idproducto = (int)($it['idproducto'] ?? 0);
+            $precio     = (float)($it['precio'] ?? 0);
+            $cantidad   = (float)($it['cantidad'] ?? 0);
+            $importe    = (float)($it['importe'] ?? 0);
+
+            if ($idproducto <= 0 || $cantidad <= 0) continue;
 
             $this->detalle->insert([
-                'estado'       => 1,
-                'precio'       => $precio,
-                'cantidad'     => $cantidad,
-                'importe'      => $importe,
-                'idproducto'   => $idproducto,
-                'idventa'      => $idventa,
-                'fecharegistro'=> date('Y-m-d H:i:s'),
+                'estado'        => 1,
+                'precio'        => $precio,
+                'cantidad'      => $cantidad,
+                'importe'       => $importe,
+                'idproducto'    => $idproducto,
+                'idventa'       => $idventa,
+                'fecharegistro' => date('Y-m-d H:i:s'),
             ]);
 
             // bajar stock
