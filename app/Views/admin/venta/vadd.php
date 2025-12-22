@@ -43,12 +43,20 @@
         <input type="hidden" name="idcliente" id="idcliente" value="<?= old('idcliente') ?>">
         <input type="text" id="cliente_nombre" class="form-control" placeholder="Seleccione o busque..." value="<?= old('cliente_nombre') ?>" readonly>
       </div>
-      <div class="col-md-2 form-group">
-        <button type="button" id="btnBuscarCliente" class="btn btn-info btn-block">
-          <i class="fa fa-search"></i> Buscar
-        </button>
-      </div>
-    </div>
+<div class="col-md-2 form-group">
+  <div class="d-flex">
+    <button type="button" id="btnBuscarCliente" class="btn btn-info flex-fill mr-1">
+      <i class="fa fa-search"></i>
+    </button>
+
+    <a href="<?= base_url('mantenimiento/cliente/add') ?>"
+       class="btn btn-success flex-fill ml-1"
+       title="Agregar cliente">
+      <i class="fa fa-plus"></i>
+    </a>
+  </div>
+</div>
+
 
     <!-- PRODUCTO -->
     <div class="row align-items-end">
@@ -56,12 +64,21 @@
         <label>Producto</label>
         <input type="text" id="producto_buscar" class="form-control" placeholder="Buscar producto (Enter)">
       </div>
-      <div class="col-md-2 form-group">
-        <button type="button" id="btnBuscarProducto" class="btn btn-primary btn-block">
-          <i class="fa fa-search"></i> Buscar
-        </button>
-      </div>
-    </div>
+<div class="col-md-2 form-group">
+  <div class="d-flex">
+    <button type="button" id="btnBuscarProducto" class="btn btn-primary flex-fill mr-1">
+      <i class="fa fa-search"></i>
+    </button>
+
+    <a href="<?= base_url('mantenimiento/producto/add') ?>"
+       class="btn btn-success flex-fill ml-1"
+       title="Agregar producto">
+      <i class="fa fa-plus"></i>
+    </a>
+  </div>
+</div>
+
+
 
     <!-- DETALLE -->
     <table class="table table-bordered" id="tablaDetalle">
