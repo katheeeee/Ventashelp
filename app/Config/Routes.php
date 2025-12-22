@@ -125,16 +125,23 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     // =========================
     // MOVIMIENTOS
     // =========================
-    $routes->group('movimientos', function ($routes) {
+$routes->group('ventas', function($routes){
 
-        // documentos HTML
-        $routes->get('boleta/(:num)', 'movimientos\cdocumento::boleta/$1');
-        $routes->get('factura/(:num)', 'movimientos\cdocumento::factura/$1');
+    // listar ventas
+    $routes->get('/', 'movimientos\cventa::index');
 
-        // documentos PDF
-        $routes->get('boleta_pdf/(:num)', 'movimientos\cdocumento::boleta_pdf/$1');
-        $routes->get('factura_pdf/(:num)', 'movimientos\cdocumento::factura_pdf/$1');
+    // nueva venta (form)
+    $routes->get('add', 'movimientos\cventa::add');
 
-    });
+    // guardar venta
+    $routes->post('store', 'movimientos\cventa::store');
+
+    // ver detalle venta
+    $routes->get('view/(:num)', 'movimientos\cventa::view/$1');
+
+    // (opcional) imprimir pdf/html si luego lo haces:
+    // $routes->get('boleta/(:num)', 'movimientos\cdocumento::boleta/$1');
+});
+
 
 });
