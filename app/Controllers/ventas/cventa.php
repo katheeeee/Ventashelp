@@ -30,7 +30,7 @@ class cventa extends BaseController
 
         $registros = $this->venta
             ->select('venta.*, cliente.nombre as cliente')
-            ->join('cliente', 'cliente.idcliente = venta.idcliente', 'left')
+            ->join('cliente', 'cliente.idcliente = venta.idcliente')
             ->orderBy('venta.idventa', 'DESC')
             ->findAll();
 
@@ -45,6 +45,7 @@ class cventa extends BaseController
     {
         if (!session()->get('login')) return redirect()->to(base_url('login'));
 
+        // ✅ Tipos documento activos
         $tipos = (new mtipo_documento())
             ->where('estado', 1)
             ->orderBy('nombre', 'ASC')
@@ -57,7 +58,9 @@ class cventa extends BaseController
         ]);
     }
 
-    // ✅ AJAX Clientes
+    // ==========================
+    // AJAX CLIENTES
+    // ==========================
     public function ajaxClientes()
     {
         if (!session()->get('login')) return $this->response->setStatusCode(403);
@@ -73,6 +76,7 @@ class cventa extends BaseController
                 ->groupEnd();
         }
 
+        // Solo activos si existe campo estado
         if ($this->cliente->db->fieldExists('estado', 'cliente')) {
             $builder->where('estado', 1);
         }
@@ -82,7 +86,9 @@ class cventa extends BaseController
         return $this->response->setJSON($data);
     }
 
-    // ✅ AJAX Productos
+    // ==========================
+    // AJAX PRODUCTOS
+    // ==========================
     public function ajaxProductos()
     {
         if (!session()->get('login')) return $this->response->setStatusCode(403);
@@ -92,7 +98,7 @@ class cventa extends BaseController
         $builder = $this->producto
             ->select('producto.idproducto, producto.codigo, producto.nombre, producto.imagen, producto.precio, producto.stock,
                       unmedida.nombre as unmedida')
-            ->join('unmedida', 'unmedida.idunmedida = producto.idunmedida', 'left'); // ✅ left
+            ->join('unmedida', 'unmedida.idunmedida = producto.idunmedida');
 
         if ($q !== '') {
             $builder->groupStart()
@@ -101,11 +107,12 @@ class cventa extends BaseController
                 ->groupEnd();
         }
 
+        // Solo activos si existe campo estado
         if ($this->producto->db->fieldExists('estado', 'producto')) {
             $builder->where('producto.estado', 1);
         }
 
-        $data = $builder->orderBy('producto.nombre', 'ASC')->findAll(100);
+        $data = $builder->orderBy('producto.nombre', 'ASC')->findAll(200);
 
         foreach ($data as &$r) {
             $r['imagen']  = $r['imagen'] ?: 'no.jpg';
@@ -115,11 +122,15 @@ class cventa extends BaseController
         return $this->response->setJSON($data);
     }
 
+    // ==========================
+    // STORE (VENTA + DETALLE + STOCK)
+    // ==========================
     public function store()
     {
         if (!session()->get('login')) return redirect()->to(base_url('login'));
 
-        $idUsuario = session('idusuario') ?? 1;
+        // ✅ usa el id de usuario real
+        $idUsuario = session('idusuario') ?? session('idtipo_usuario') ?? 1;
 
         $rules = [
             'idtipo_documento' => 'required|integer',
@@ -136,95 +147,95 @@ class cventa extends BaseController
             return redirect()->back()->withInput()->with('error', $this->validator->getErrors());
         }
 
-        $items = json_decode($this->request->getPost('items') ?? '[]', true);
+        $items = $this->request->getPost('items');
+        $items = json_decode($items, true);
 
         if (!is_array($items) || count($items) === 0) {
             return redirect()->back()->withInput()->with('error', ['Debes agregar al menos 1 producto.']);
         }
 
-        // ✅ fecha input type="date" -> YYYY-MM-DD
-        // la guardamos como DATETIME: YYYY-MM-DD 00:00:00
-        $fecha = $this->request->getPost('fecha');
-        $fecha = $fecha ? ($fecha . ' 00:00:00') : date('Y-m-d H:i:s');
+        // ✅ VALIDAR STOCK ANTES (seguro)
+        foreach ($items as $it) {
+            $idproducto = (int)($it['idproducto'] ?? 0);
+            $cantidad   = (float)($it['cantidad'] ?? 0);
 
-        $db = \Config\Database::connect();
-        $db->transBegin();
-
-        try {
-            $idventa = $this->venta->insert([
-                'fecha'            => $fecha,
-                'subtotal'         => (float)$this->request->getPost('subtotal'),
-                'igv'              => (float)$this->request->getPost('igv'),
-                'descuento'        => (float)($this->request->getPost('descuento') ?? 0),
-                'total'            => (float)$this->request->getPost('total'),
-                'serie'            => $this->request->getPost('serie'),
-                'num_documento'    => $this->request->getPost('num_documento'),
-                'idtipo_documento' => (int)$this->request->getPost('idtipo_documento'),
-                'idcliente'        => (int)$this->request->getPost('idcliente'),
-                'idusuario'        => (int)$idUsuario,
-                'estado'           => 1,
-                // si ya tienes DEFAULT CURRENT_TIMESTAMP en DB, esto es opcional:
-                'fecharegistro'    => date('Y-m-d H:i:s'),
-                'usuarioregistro'  => (int)$idUsuario,
-            ], true);
-
-            if (!$idventa) {
-                throw new \Exception('No se pudo registrar la cabecera de la venta.');
+            if ($idproducto <= 0 || $cantidad <= 0) {
+                return redirect()->back()->withInput()->with('error', ['Hay items inválidos en el detalle.']);
             }
 
-            foreach ($items as $it) {
-                $idproducto = (int)($it['idproducto'] ?? 0);
-                $precio     = (float)($it['precio'] ?? 0);
-                $cantidad   = (int)($it['cantidad'] ?? 0);
+            $p = $this->producto->find($idproducto);
+            if (!$p) {
+                return redirect()->back()->withInput()->with('error', ['Producto no encontrado.']);
+            }
 
-                if ($idproducto <= 0 || $cantidad <= 0) {
-                    continue;
-                }
-
-                $p = $this->producto->find($idproducto);
-                if (!$p) {
-                    throw new \Exception("Producto no existe (ID: {$idproducto}).");
-                }
-
-                if ((int)$p['stock'] < $cantidad) {
-                    throw new \Exception("Stock insuficiente para {$p['nombre']} (Stock: {$p['stock']}).");
-                }
-
-                $importe = round($precio * $cantidad, 2);
-
-                $okDet = $this->detalle->insert([
-                    'estado'        => 1,
-                    'precio'        => $precio,
-                    'cantidad'      => $cantidad,
-                    'importe'       => $importe,
-                    'idproducto'    => $idproducto,
-                    'idventa'       => $idventa,
-                    'fecharegistro' => date('Y-m-d H:i:s'),
+            if ((float)$p['stock'] < (float)$cantidad) {
+                return redirect()->back()->withInput()->with('error', [
+                    "Stock insuficiente para {$p['nombre']}. Disponible: {$p['stock']}"
                 ]);
-
-                if (!$okDet) {
-                    throw new \Exception("No se pudo guardar el detalle del producto: {$p['nombre']}");
-                }
-
-                // ✅ bajar stock
-                $nuevoStock = (int)$p['stock'] - $cantidad;
-                $this->producto->update($idproducto, ['stock' => $nuevoStock]);
             }
-
-            if ($db->transStatus() === false) {
-                throw new \Exception('Error en la transacción.');
-            }
-
-            $db->transCommit();
-
-            return redirect()->to(base_url('ventas'))
-                ->with('success', 'Venta registrada correctamente');
-
-        } catch (\Throwable $e) {
-            $db->transRollback();
-            return redirect()->back()->withInput()
-                ->with('error', ['Error: ' . $e->getMessage()]);
         }
+
+        // ✅ TRANSACCIÓN (venta + detalle + stock)
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        // Insert cabecera venta
+        $idventa = $this->venta->insert([
+            'fecha'            => $this->request->getPost('fecha'),
+            'subtotal'         => $this->request->getPost('subtotal'),
+            'igv'              => $this->request->getPost('igv'),
+            'descuento'        => $this->request->getPost('descuento') ?? 0,
+            'total'            => $this->request->getPost('total'),
+            'serie'            => $this->request->getPost('serie'),
+            'num_documento'    => $this->request->getPost('num_documento'),
+            'idtipo_documento' => $this->request->getPost('idtipo_documento'),
+            'idcliente'        => $this->request->getPost('idcliente'),
+            'idusuario'        => $idUsuario,
+            'estado'           => 1,
+            'fecharegistro'    => date('Y-m-d H:i:s'),
+            'usuarioregistro'  => $idUsuario,
+        ], true);
+
+        // Insert detalle + descontar stock atómico
+        foreach ($items as $it) {
+            $idproducto = (int)($it['idproducto'] ?? 0);
+            $precio     = (float)($it['precio'] ?? 0);
+            $cantidad   = (float)($it['cantidad'] ?? 0);
+            $importe    = (float)($it['importe'] ?? 0);
+
+            $this->detalle->insert([
+                'estado'        => 1,
+                'precio'        => $precio,
+                'cantidad'      => $cantidad,
+                'importe'       => $importe,
+                'idproducto'    => $idproducto,
+                'idventa'       => $idventa,
+                'fecharegistro' => date('Y-m-d H:i:s'),
+            ]);
+
+            // ✅ Stock seguro: stock = stock - cantidad WHERE stock >= cantidad
+            $builder = $db->table('producto');
+            $builder->set('stock', "stock - {$db->escape($cantidad)}", false)
+                ->where('idproducto', $idproducto)
+                ->where('stock >=', $cantidad)
+                ->update();
+
+            if ($db->affectedRows() === 0) {
+                // alguien vendió antes o stock cambió
+                $db->transRollback();
+                return redirect()->back()->withInput()->with('error', [
+                    'Stock insuficiente (se actualizó mientras vendías). Intenta nuevamente.'
+                ]);
+            }
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return redirect()->back()->withInput()->with('error', ['Error al registrar la venta.']);
+        }
+
+        return redirect()->to(base_url('ventas'))->with('success', 'Venta registrada correctamente');
     }
 
     public function view($id)
@@ -233,13 +244,13 @@ class cventa extends BaseController
 
         $cab = $this->venta
             ->select('venta.*, cliente.nombre as cliente, tipo_documento.nombre as tipo_documento')
-            ->join('cliente', 'cliente.idcliente = venta.idcliente', 'left')
-            ->join('tipo_documento', 'tipo_documento.idtipo_documento = venta.idtipo_documento', 'left')
+            ->join('cliente', 'cliente.idcliente = venta.idcliente')
+            ->join('tipo_documento', 'tipo_documento.idtipo_documento = venta.idtipo_documento')
             ->find($id);
 
         $det = $this->detalle
             ->select('detalle_venta.*, producto.codigo, producto.nombre, producto.imagen')
-            ->join('producto', 'producto.idproducto = detalle_venta.idproducto', 'left')
+            ->join('producto', 'producto.idproducto = detalle_venta.idproducto')
             ->where('detalle_venta.idventa', $id)
             ->findAll();
 
