@@ -113,15 +113,15 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     // =================================================
     // VENTAS
     // =================================================
-    $routes->group('ventas', function ($routes) {
+    $routes->group('ventas', ['namespace' => 'App\Controllers\ventas'], function ($routes) {
 
-        $routes->get('/', 'ventas\cventa::index');
-        $routes->get('add', 'ventas\cventa::add');
-        $routes->post('store', 'ventas\cventa::store');
-        $routes->get('view/(:num)', 'ventas\cventa::view/$1');
+        $routes->get('/', 'cventa::index');
+        $routes->get('add', 'cventa::add');
+        $routes->post('store', 'cventa::store');
+        $routes->get('view/(:num)', 'cventa::view/$1');
 
-        // ✅ RUTAS AJAX (SIN GUIONES, para que coincida con el JS)
-        $routes->get('ajaxClientes', 'ventas\cventa::ajaxClientes');
-        $routes->get('ajaxProductos', 'ventas\cventa::ajaxProductos');
+        // AJAX
+        $routes->get('ajaxClientes', 'cventa::ajaxClientes');
+        $routes->get('ajaxProductos', 'cventa::ajaxProductos');
     });
 });

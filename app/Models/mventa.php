@@ -18,7 +18,7 @@ class mventa extends Model
         'igv',
         'descuento',
         'total',
-        'idtipo_comprobante',
+        'num_documento',
         'idusuario',
         'idcliente',
         'fecharegistro',
@@ -26,5 +26,5 @@ class mventa extends Model
         'idtipo_documento',
     ];
 
-    public $useTimestamps = false;
+    protected $useTimestamps = false;
 }

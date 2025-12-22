@@ -4,91 +4,59 @@
 <div class="container-fluid">
 
 <div class="card">
-  <div class="card-header">
-    <a href="<?= base_url('ventas/add') ?>" class="btn btn-primary btn-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Listado de Ventas</h5>
+    <a href="<?= base_url('ventas/add') ?>" class="btn btn-success">
       <i class="fa fa-plus"></i> Nueva Venta
     </a>
   </div>
 
   <div class="card-body">
-
     <?php if (session()->getFlashdata('success')): ?>
-      <div class="alert alert-success alert-dismissible fade show">
+      <div class="alert alert-success">
         <?= session()->getFlashdata('success') ?>
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
       </div>
     <?php endif; ?>
 
-    <?php if (session()->getFlashdata('error')): ?>
-      <div class="alert alert-danger">
-        <?php foreach (session()->getFlashdata('error') as $err): ?>
-          <div><?= esc($err) ?></div>
-        <?php endforeach; ?>
-      </div>
-    <?php endif; ?>
-
-    <table id="tablaVentas" class="table table-bordered table-striped">
-      <thead>
+    <table class="table table-bordered table-hover">
+      <thead class="bg-dark text-white">
         <tr>
           <th>ID</th>
           <th>Fecha</th>
-          <th>Comprobante</th>
-          <th>Serie</th>
           <th>Cliente</th>
           <th>Total</th>
           <th>Estado</th>
-          <th width="120">Acciones</th>
+          <th style="width:120px;">Acciones</th>
         </tr>
       </thead>
-
       <tbody>
-      <?php foreach ($registros as $r): ?>
-        <tr>
-          <td><?= esc($r['idventa']) ?></td>
-          <td><?= esc($r['fecha']) ?></td>
-          <td><?= esc($r['comprobante']) ?></td>
-          <td><?= esc($r['serie']) ?></td>
-          <td><?= esc($r['cliente']) ?></td>
-          <td><?= esc($r['total']) ?></td>
-          <td>
-            <?= ((int)$r['estado'] === 1)
-              ? '<span class="badge badge-success">Activo</span>'
-              : '<span class="badge badge-danger">Anulado</span>' ?>
-          </td>
-
-          <td>
-            <a class="btn btn-info btn-sm"
-               href="<?= base_url('ventas/view/'.$r['idventa']) ?>"
-               title="Ver">
-              <i class="fa fa-eye"></i>
-            </a>
-
-            <a class="btn btn-danger btn-sm"
-               href="<?= base_url('ventas/delete/'.$r['idventa']) ?>"
-               onclick="return confirm('¿Eliminar venta?')"
-               title="Eliminar">
-              <i class="fa fa-trash"></i>
-            </a>
-          </td>
-        </tr>
-      <?php endforeach; ?>
+        <?php foreach ($registros as $r): ?>
+          <tr>
+            <td><?= esc($r['idventa']) ?></td>
+            <td><?= esc($r['fecha']) ?></td>
+            <td><?= esc($r['cliente'] ?? '-') ?></td>
+            <td class="text-right">S/ <?= number_format($r['total'], 2) ?></td>
+            <td>
+              <?php if ($r['estado'] == 1): ?>
+                <span class="badge badge-success">Activo</span>
+              <?php else: ?>
+                <span class="badge badge-danger">Anulado</span>
+              <?php endif; ?>
+            </td>
+            <td class="text-center">
+              <a href="<?= base_url('ventas/view/'.$r['idventa']) ?>" 
+                 class="btn btn-info btn-sm">
+                <i class="fa fa-eye"></i>
+              </a>
+            </td>
+          </tr>
+        <?php endforeach; ?>
       </tbody>
     </table>
-
   </div>
 </div>
 
 </div>
 </section>
-
-<script>
-  $(function () {
-    if ($('#tablaVentas').length) {
-      $('#tablaVentas').DataTable({
-        language: { url: "//cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json" }
-      });
-    }
-  });
-</script>
 
 <?= $this->include('layouts/footer') ?>

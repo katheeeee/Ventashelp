@@ -11,14 +11,8 @@ class mdetalle_venta extends Model
     protected $returnType = 'array';
 
     protected $allowedFields = [
-        'estado',
-        'precio',
-        'cantidad',
-        'importe',
-        'idproducto',
-        'idventa',
-        'fecharegistro',
+        'estado','precio','cantidad','importe','idproducto','idventa','fecharegistro'
     ];
 
-    public $useTimestamps = false;
+    protected $useTimestamps = false;
 }
