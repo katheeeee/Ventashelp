@@ -306,28 +306,36 @@
       }, 200);
     });
 
-    // buscar producto escribiendo (abre modal y filtra)
-    let tProdKey = null;
-    $("#producto_buscar").on("keyup", function (e) {
-      const q = $(this).val().trim();
+ $("#producto_buscar").on("keyup", function (e) {
+  const q = $(this).val().trim();
 
-      if (e.key === "Enter") {
-        e.preventDefault();
-        $("#btnBuscarProducto").click();
-        return;
-      }
+  // Enter abre directamente
+  if (e.key === "Enter") {
+    e.preventDefault();
+    $("#btnBuscarProducto").click();
+    return;
+  }
 
-      clearTimeout(tProdKey);
-      tProdKey = setTimeout(function () {
-        if (q.length >= 2) {
-          $("#modalProductos").modal("show");
-          setTimeout(function () {
-            initDtProductos();
-            dtProd.search(q).draw();
-          }, 150);
-        }
-      }, 250);
-    });
+  clearTimeout(tProdKey);
+  tProdKey = setTimeout(function () {
+
+    // Si hay texto, abre y filtra por nombre/código
+    if (q.length >= 1) {
+      $("#modalProductos").modal("show");
+      setTimeout(function () {
+        initDtProductos();
+        dtProd.search(q).draw(); // 🔥 busca por nombre
+      }, 150);
+    }
+
+    // Si borran todo, mostrar todos los productos
+    if (q.length === 0 && dtProd) {
+      dtProd.search("").draw();
+    }
+
+  }, 250);
+});
+
 
     // ===================== DETALLE EVENTS =====================
     $(document).on("input", "#tablaDetalle .cantidad", function () {
