@@ -140,5 +140,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
         // eliminar (opcional)
         // $routes->get('delete/(:num)', 'ventas\cventa::delete/$1');
+            $routes->get('ajax-productos', 'ventas\cventa::ajaxProductos');
+    $routes->get('ajax-clientes', 'ventas\cventa::ajaxClientes');
     });
 });
