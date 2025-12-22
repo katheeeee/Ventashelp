@@ -128,16 +128,16 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 $routes->group('ventas', function($routes){
 
     // listar ventas
-    $routes->get('/', 'movimientos\cventa::index');
+    $routes->get('/', 'ventas\cventa::index');
 
     // nueva venta (form)
-    $routes->get('add', 'movimientos\cventa::add');
+    $routes->get('add', 'ventas\cventa::add');
 
     // guardar venta
-    $routes->post('store', 'movimientos\cventa::store');
+    $routes->post('store', 'ventas\cventa::store');
 
     // ver detalle venta
-    $routes->get('view/(:num)', 'movimientos\cventa::view/$1');
+    $routes->get('view/(:num)', 'ventas\cventa::view/$1');
 
     // (opcional) imprimir pdf/html si luego lo haces:
     // $routes->get('boleta/(:num)', 'movimientos\cdocumento::boleta/$1');
