@@ -81,9 +81,9 @@ class cventa extends BaseController
             'igv'              => $igv,
             'total'            => $total,
             'estado'           => 1,
-            'idusuario'        => session('idusuario'),
+            'idusuario'        => session('idtipo_usuario'),
             'fecharegistro'    => date('Y-m-d H:i:s'),
-            'usuarioregistro'  => session('idusuario'),
+            'usuarioregistro'  => session('idtipo_usuario'),
         ], true);
 
         // ====== INSERT DETALLE ======
