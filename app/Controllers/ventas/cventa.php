@@ -275,4 +275,126 @@ class cventa extends BaseController
             'det'       => $det,
         ]);
     }
+    public function pdf($idventa)
+{
+    if (!session()->get('login')) return redirect()->to(base_url('login'));
+
+    // Cabecera
+    $cab = $this->venta
+        ->select('venta.*,
+                  cliente.nombre as cliente,
+                  cliente.direccion as direccion,
+                  cliente.telefono as telefono,
+                  tipo_comprobante.nombre as comprobante,
+                  tipo_comprobante.serie as serie_conf')
+        ->join('cliente', 'cliente.idcliente = venta.idcliente', 'left')
+        ->join('tipo_comprobante', 'tipo_comprobante.idtipo_comprobante = venta.idtipo_comprobante', 'left')
+        ->where('venta.idventa', (int)$idventa)
+        ->first();
+
+    if (!$cab) {
+        return redirect()->to(base_url('ventas'))->with('error', 'Venta no encontrada');
+    }
+
+    // Detalle
+    $det = $this->detalle
+        ->select('detalle_venta.*,
+                  producto.codigo as cod_producto,
+                  producto.nombre as nom_producto')
+        ->join('producto', 'producto.idproducto = detalle_venta.idproducto', 'left')
+        ->where('detalle_venta.idventa', (int)$idventa)
+        ->findAll();
+
+    // Crear PDF
+    $pdf = new \App\Libraries\Pdf('P', 'mm', 'A4');
+    $pdf->SetTitle("Comprobante {$cab['serie']}-{$cab['num_documento']}");
+    $pdf->AddPage();
+    $pdf->SetAutoPageBreak(true, 15);
+
+    // ====== ENCABEZADO EMPRESA ======
+    $pdf->SetFont('Arial', 'B', 14);
+    $pdf->Cell(0, 8, 'HELPNET', 0, 1, 'L');
+
+    $pdf->SetFont('Arial', '', 10);
+    $pdf->Cell(0, 5, 'Direccion: (pon tu direccion aqui)', 0, 1, 'L');
+    $pdf->Cell(0, 5, 'Telefono: (pon tu telefono aqui)', 0, 1, 'L');
+    $pdf->Ln(3);
+
+    // ====== TITULO COMPROBANTE ======
+    $pdf->SetFont('Arial', 'B', 13);
+    $pdf->Cell(0, 8, strtoupper($cab['comprobante'] ?? 'COMPROBANTE'), 0, 1, 'C');
+
+    $pdf->SetFont('Arial', '', 11);
+    $pdf->Cell(0, 6, "Serie-Nro: {$cab['serie']}-{$cab['num_documento']}", 0, 1, 'C');
+    $pdf->Ln(2);
+
+    // ====== DATOS CLIENTE ======
+    $fecha = $cab['fecha'] ? date('d/m/Y H:i', strtotime($cab['fecha'])) : '';
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(30, 6, 'Fecha:', 0, 0, 'L');
+    $pdf->SetFont('Arial', '', 10);
+    $pdf->Cell(0, 6, $fecha, 0, 1, 'L');
+
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(30, 6, 'Cliente:', 0, 0, 'L');
+    $pdf->SetFont('Arial', '', 10);
+    $pdf->Cell(0, 6, $cab['cliente'] ?? '-', 0, 1, 'L');
+
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(30, 6, 'Direccion:', 0, 0, 'L');
+    $pdf->SetFont('Arial', '', 10);
+    $pdf->Cell(0, 6, $cab['direccion'] ?? '-', 0, 1, 'L');
+
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(30, 6, 'Telefono:', 0, 0, 'L');
+    $pdf->SetFont('Arial', '', 10);
+    $pdf->Cell(0, 6, $cab['telefono'] ?? '-', 0, 1, 'L');
+
+    $pdf->Ln(4);
+
+    // ====== TABLA DETALLE ======
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(25, 7, 'COD', 1, 0, 'C');
+    $pdf->Cell(85, 7, 'PRODUCTO', 1, 0, 'C');
+    $pdf->Cell(20, 7, 'CANT', 1, 0, 'C');
+    $pdf->Cell(25, 7, 'PRECIO', 1, 0, 'C');
+    $pdf->Cell(30, 7, 'IMPORTE', 1, 1, 'C');
+
+    $pdf->SetFont('Arial', '', 10);
+
+    foreach ($det as $r) {
+        $pdf->Cell(25, 7, $r['cod_producto'] ?? '', 1, 0, 'L');
+        $pdf->Cell(85, 7, mb_strimwidth($r['nom_producto'] ?? '', 0, 45, '...'), 1, 0, 'L');
+        $pdf->Cell(20, 7, number_format((float)$r['cantidad'], 0), 1, 0, 'C');
+        $pdf->Cell(25, 7, number_format((float)$r['precio'], 2), 1, 0, 'R');
+        $pdf->Cell(30, 7, number_format((float)$r['importe'], 2), 1, 1, 'R');
+    }
+
+    $pdf->Ln(4);
+
+    // ====== TOTALES ======
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(130, 7, '', 0, 0);
+    $pdf->Cell(30, 7, 'Subtotal:', 0, 0, 'R');
+    $pdf->SetFont('Arial', '', 10);
+    $pdf->Cell(30, 7, number_format((float)$cab['subtotal'], 2), 0, 1, 'R');
+
+    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->Cell(130, 7, '', 0, 0);
+    $pdf->Cell(30, 7, 'IGV:', 0, 0, 'R');
+    $pdf->SetFont('Arial', '', 10);
+    $pdf->Cell(30, 7, number_format((float)$cab['igv'], 2), 0, 1, 'R');
+
+    $pdf->SetFont('Arial', 'B', 11);
+    $pdf->Cell(130, 8, '', 0, 0);
+    $pdf->Cell(30, 8, 'TOTAL:', 0, 0, 'R');
+    $pdf->Cell(30, 8, number_format((float)$cab['total'], 2), 0, 1, 'R');
+
+    // Salida al navegador
+    $this->response->setHeader('Content-Type', 'application/pdf');
+    // I = inline (se abre en navegador); D = descarga
+    $pdf->Output('I', "comprobante_{$cab['serie']}_{$cab['num_documento']}.pdf");
+    exit;
+}
+
 }

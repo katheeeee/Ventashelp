@@ -119,11 +119,13 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('add', 'ventas\cventa::add');
         $routes->post('store', 'ventas\cventa::store');
         $routes->get('view/(:num)', 'ventas\cventa::view/$1');
-
+        
         // AJAX
         $routes->get('ajaxClientes', 'ventas\cventa::ajaxClientes');
         $routes->get('ajaxProductos', 'ventas\cventa::ajaxProductos');
         $routes->get('ajaxComprobanteData/(:num)', 'ventas\cventa::ajaxComprobanteData/$1');
+
+        $routes->get('pdf/(:num)', 'ventas\cventa::pdf/$1');
 
     });
 });
