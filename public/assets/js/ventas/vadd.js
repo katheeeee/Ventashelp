@@ -12,15 +12,16 @@
   onReady(function () {
     const $ = window.jQuery;
     const CFG = window.VENTA_CFG || {};
-    const IGV_RATE = CFG.IGV_RATE ?? 0.18;
 
+    const IGV_RATE = CFG.IGV_RATE ?? 0.18;
     const URL_CLIENTES = CFG.URL_CLIENTES || "";
     const URL_PRODUCTOS = CFG.URL_PRODUCTOS || "";
+    const URL_COMP = CFG.URL_COMP || "";
     const IMG_DEFAULT = CFG.IMG_DEFAULT || "";
-    const BASE = (CFG.BASE_URL || "").toString(); // ej: "http://tu-dominio.com/" o "http://ip/proyecto/public/"
 
-    console.log("✅ vadd.js VERSION 22-12-2025 (stock + comprobante auto)");
+    console.log("✅ vadd.js COMPLETO cargado");
 
+    // ===================== HELPERS =====================
     function n2(v) {
       let x = parseFloat(String(v ?? "0").replace(",", "."));
       if (isNaN(x)) x = 0;
@@ -36,6 +37,7 @@
       return $('#tablaDetalle tbody tr[data-id="' + id + '"]');
     }
 
+    // ===================== ITEMS JSON =====================
     function buildItems() {
       const items = [];
       $("#tablaDetalle tbody tr").each(function () {
@@ -50,7 +52,7 @@
       $("#items").val(JSON.stringify(items));
     }
 
-    // ✅ TOTAL incluye IGV
+    // ===================== TOTALES =====================
     function calc() {
       let total = 0;
 
@@ -74,28 +76,32 @@
       buildItems();
     }
 
+    // ===================== STOCK LIMIT =====================
     function enforceRowStock($tr) {
       const max = numStock($tr.attr("data-stock"));
-      if (max <= 0) return;
-
       const $inp = $tr.find(".cantidad");
+
       let v = numStock($inp.val());
       if (isNaN(v) || v <= 0) v = 1;
-      if (v > max) v = max;
+
+      if (max > 0 && v > max) v = max;
       $inp.val(v);
     }
 
+    // ===================== ADD PRODUCTO =====================
     function addProducto(p) {
       const id = parseInt(p.idproducto, 10);
       if (!id) return;
 
       const st = numStock(p.stock);
 
+      // no permitir agregar si stock 0
       if (st <= 0) {
         alert("Este producto no tiene stock.");
         return;
       }
 
+      // si ya existe, sumar cantidad
       const $row = getRowById(id);
       if ($row.length) {
         let c = numStock($row.find(".cantidad").val());
@@ -185,7 +191,7 @@
       tCli = setTimeout(() => { cargarClientes(q).done(renderClientes); }, 200);
     });
 
-    // buscar cliente escribiendo
+    // buscar cliente escribiendo en input principal
     let tCli2 = null;
     $("#cliente_nombre").on("keyup", function (e) {
       const q = $(this).val().trim();
@@ -296,7 +302,7 @@
       }, 200);
     });
 
-    // ✅ DECLARAR tProdKey (esto te faltaba y rompía el resto del JS)
+    // buscar producto escribiendo (abre modal y filtra)
     let tProdKey = null;
 
     $("#producto_buscar").on("keyup", function (e) {
@@ -351,6 +357,7 @@
         return;
       }
 
+      // validar stock en front
       let ok = true;
       $("#tablaDetalle tbody tr").each(function () {
         const stock = numStock($(this).attr("data-stock"));
@@ -367,7 +374,7 @@
       buildItems();
     });
 
-    // ===================== COMPROBANTE AUTO (SERIE + NÚMERO) =====================
+    // ===================== COMPROBANTE AUTO =====================
     function loadComprobante(id) {
       if (!id) {
         $("#serie").val("");
@@ -375,16 +382,14 @@
         return;
       }
 
-      const url = BASE + "ventas/ajaxComprobanteData/" + id;
-
-      $.getJSON(url)
+      $.getJSON(URL_COMP + "/" + id)
         .done(function (r) {
           $("#serie").val(r.serie || "");
           $("#num_documento").val(r.numero || "");
         })
         .fail(function (xhr) {
           console.log("❌ ajaxComprobanteData falló:", xhr.status, xhr.responseText);
-          alert("No se pudo cargar serie y número. Revisa consola (F12).");
+          alert("No se pudo cargar serie y número.");
         });
     }
 
