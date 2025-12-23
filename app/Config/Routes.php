@@ -115,14 +115,14 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     // =================================================
     $routes->group('ventas',  function ($routes) {
 
-        $routes->get('/', 'cventa::index');
-        $routes->get('add', 'cventa::add');
-        $routes->post('store', 'cventa::store');
-        $routes->get('view/(:num)', 'cventa::view/$1');
-        
+        $routes->get('/', 'ventas\cventa::index');
+        $routes->get('add', 'ventas\cventa::add');
+        $routes->post('store', 'ventas\cventa::store');
+        $routes->get('view/(:num)', 'ventas\cventa::view/$1');
+
         // AJAX
-        $routes->get('ajaxClientes', 'cventa::ajaxClientes');
-        $routes->get('ajaxProductos', 'cventa::ajaxProductos');
+        $routes->get('ajaxClientes', 'ventas\cventa::ajaxClientes');
+        $routes->get('ajaxProductos', 'ventas\cventa::ajaxProductos');
         $routes->get('ajaxComprobanteData/(:num)', 'ventas\cventa::ajaxComprobanteData/$1');
 
     });
