@@ -70,7 +70,7 @@
               <a href="<?= base_url('mantenimiento/tipo_material') ?>"
                  class="nav-link <?= ($subactive=='tipo_material')?'active':'' ?>">
                 <i class="fas fa-cubes nav-icon"></i>
-                <p>Tipo Material</p>
+                <p>Tipo de Material</p>
               </a>
             </li>
 
@@ -94,7 +94,7 @@
               <a href="<?= base_url('mantenimiento/tipo_cliente') ?>"
                  class="nav-link <?= ($subactive=='tipo_cliente')?'active':'' ?>">
                 <i class="fas fa-users nav-icon"></i>
-                <p>Tipo Cliente</p>
+                <p>Tipo de Cliente</p>
               </a>
             </li>
 
