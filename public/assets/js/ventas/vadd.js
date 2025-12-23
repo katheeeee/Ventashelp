@@ -17,8 +17,9 @@
     const URL_CLIENTES = CFG.URL_CLIENTES || "";
     const URL_PRODUCTOS = CFG.URL_PRODUCTOS || "";
     const IMG_DEFAULT = CFG.IMG_DEFAULT || "";
+    const BASE = (CFG.BASE_URL || "").toString(); // ej: "http://tu-dominio.com/" o "http://ip/proyecto/public/"
 
-    console.log("✅ vadd.js VERSION STOCK BADGE 22-12-2025");
+    console.log("✅ vadd.js VERSION 22-12-2025 (stock + comprobante auto)");
 
     function n2(v) {
       let x = parseFloat(String(v ?? "0").replace(",", "."));
@@ -27,7 +28,6 @@
     }
     function fmt(v) { return n2(v).toFixed(2); }
 
-    // stock robusto: acepta "0", "0.00", "0,00", null
     function numStock(v) {
       return Number(String(v ?? "0").replace(",", "."));
     }
@@ -50,7 +50,7 @@
       $("#items").val(JSON.stringify(items));
     }
 
-    // ✅ TOTAL incluye IGV (tu lógica actual)
+    // ✅ TOTAL incluye IGV
     function calc() {
       let total = 0;
 
@@ -74,7 +74,6 @@
       buildItems();
     }
 
-    // ✅ No permitir cantidad > stock en una fila
     function enforceRowStock($tr) {
       const max = numStock($tr.attr("data-stock"));
       if (max <= 0) return;
@@ -86,14 +85,12 @@
       $inp.val(v);
     }
 
-    // ✅ Agregar producto (guarda stock y limita input)
     function addProducto(p) {
       const id = parseInt(p.idproducto, 10);
       if (!id) return;
 
       const st = numStock(p.stock);
 
-      // si no hay stock, no permitir agregar
       if (st <= 0) {
         alert("Este producto no tiene stock.");
         return;
@@ -233,7 +230,6 @@
           },
         },
         columns: [
-          // ✅ botón add deshabilitado si stock=0
           {
             data: null,
             orderable: false,
@@ -253,10 +249,8 @@
                       </button>`;
             },
           },
-
           { data: "codigo" },
           { data: "nombre" },
-
           {
             data: "img_url",
             orderable: false,
@@ -267,14 +261,11 @@
               return `<img src="${img}" class="img-thumbnail" style="max-width:60px; max-height:60px;">`;
             },
           },
-
           {
             data: "precio",
             className: "text-right",
             render: function (v) { return fmt(v); },
           },
-
-          // ✅ badge NO HAY STOCK
           {
             data: "stock",
             className: "text-right",
@@ -284,7 +275,6 @@
               return st;
             }
           },
-
           { data: "unmedida" },
         ],
         language: { url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json" },
@@ -306,36 +296,35 @@
       }, 200);
     });
 
- $("#producto_buscar").on("keyup", function (e) {
-  const q = $(this).val().trim();
+    // ✅ DECLARAR tProdKey (esto te faltaba y rompía el resto del JS)
+    let tProdKey = null;
 
-  // Enter abre directamente
-  if (e.key === "Enter") {
-    e.preventDefault();
-    $("#btnBuscarProducto").click();
-    return;
-  }
+    $("#producto_buscar").on("keyup", function (e) {
+      const q = $(this).val().trim();
 
-  clearTimeout(tProdKey);
-  tProdKey = setTimeout(function () {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        $("#btnBuscarProducto").click();
+        return;
+      }
 
-    // Si hay texto, abre y filtra por nombre/código
-    if (q.length >= 1) {
-      $("#modalProductos").modal("show");
-      setTimeout(function () {
-        initDtProductos();
-        dtProd.search(q).draw(); // 🔥 busca por nombre
-      }, 150);
-    }
+      clearTimeout(tProdKey);
+      tProdKey = setTimeout(function () {
 
-    // Si borran todo, mostrar todos los productos
-    if (q.length === 0 && dtProd) {
-      dtProd.search("").draw();
-    }
+        if (q.length >= 1) {
+          $("#modalProductos").modal("show");
+          setTimeout(function () {
+            initDtProductos();
+            if (dtProd) dtProd.search(q).draw();
+          }, 150);
+        }
 
-  }, 250);
-});
+        if (q.length === 0 && dtProd) {
+          dtProd.search("").draw();
+        }
 
+      }, 250);
+    });
 
     // ===================== DETALLE EVENTS =====================
     $(document).on("input", "#tablaDetalle .cantidad", function () {
@@ -362,7 +351,6 @@
         return;
       }
 
-      // validar stock en front
       let ok = true;
       $("#tablaDetalle tbody tr").each(function () {
         const stock = numStock($(this).attr("data-stock"));
@@ -379,24 +367,37 @@
       buildItems();
     });
 
-    calc();
- 
-$("#idtipo_comprobante").on("change", function () {
-  const id = $(this).val();
+    // ===================== COMPROBANTE AUTO (SERIE + NÚMERO) =====================
+    function loadComprobante(id) {
+      if (!id) {
+        $("#serie").val("");
+        $("#num_documento").val("");
+        return;
+      }
 
-  if (!id) {
-    $("#serie").val("");
-    $("#num_documento").val("");
-    return;
-  }
+      const url = BASE + "ventas/ajaxComprobanteData/" + id;
 
-  $.getJSON(
-    BASE_URL + "ventas/ajaxComprobanteData/" + id,
-    function (r) {
-      $("#serie").val(r.serie || "");
-      $("#num_documento").val(r.numero || "");
+      $.getJSON(url)
+        .done(function (r) {
+          $("#serie").val(r.serie || "");
+          $("#num_documento").val(r.numero || "");
+        })
+        .fail(function (xhr) {
+          console.log("❌ ajaxComprobanteData falló:", xhr.status, xhr.responseText);
+          alert("No se pudo cargar serie y número. Revisa consola (F12).");
+        });
     }
-  );
-});
-});
+
+    $("#idtipo_comprobante").on("change", function () {
+      loadComprobante($(this).val());
+    });
+
+    // si ya viene seleccionado, cargar al iniciar
+    if ($("#idtipo_comprobante").val()) {
+      loadComprobante($("#idtipo_comprobante").val());
+    }
+
+    // init
+    calc();
+  });
 })();
