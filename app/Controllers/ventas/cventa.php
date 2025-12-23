@@ -240,6 +240,11 @@ class cventa extends BaseController
         }
 
         return redirect()->to(base_url('ventas'))->with('success', 'Venta registrada correctamente');
+        $db->table('tipo_comprobante')
+   ->set('cantidad', 'cantidad + 1', false)
+   ->where('idtipo_comprobante', $this->request->getPost('idtipo_comprobante'))
+   ->update();
+        
     }
 
     public function view($id)
@@ -267,4 +272,27 @@ class cventa extends BaseController
             'det'       => $det,
         ]);
     }
+    public function ajaxComprobanteData($id)
+{
+    if (!session()->get('login')) {
+        return $this->response->setStatusCode(403);
+    }
+
+    $tc = (new \App\Models\mtipo_comprobante())->find($id);
+
+    if (!$tc) {
+        return $this->response->setJSON([
+            'serie' => '',
+            'numero' => ''
+        ]);
+    }
+
+    $numero = str_pad(((int)$tc['cantidad']) + 1, 6, '0', STR_PAD_LEFT);
+
+    return $this->response->setJSON([
+        'serie'  => $tc['serie'],
+        'numero' => $numero,
+    ]);
+}
+
 }

@@ -380,5 +380,23 @@
     });
 
     calc();
-  });
+ 
+$("#idtipo_comprobante").on("change", function () {
+  const id = $(this).val();
+
+  if (!id) {
+    $("#serie").val("");
+    $("#num_documento").val("");
+    return;
+  }
+
+  $.getJSON(
+    BASE_URL + "ventas/ajaxComprobanteData/" + id,
+    function (r) {
+      $("#serie").val(r.serie || "");
+      $("#num_documento").val(r.numero || "");
+    }
+  );
+});
+});
 })();

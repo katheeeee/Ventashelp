@@ -12,7 +12,7 @@
     <div class="row">
       <div class="col-md-3 form-group">
         <label>Comprobante</label>
-        <select name="idtipo_comprobante" class="form-control" required>
+        <select name="idtipo_comprobante" id="idtipo_comprobante" class="form-control" required>
   <option value="">Seleccione...</option>
   <?php foreach ($tipos_comprobante as $t): ?>
     <option value="<?= esc($t['idtipo_comprobante']) ?>">
@@ -24,12 +24,12 @@
 
       <div class="col-md-3 form-group">
         <label>Serie</label>
-        <input type="text" name="serie" class="form-control" required>
+        <input type="text" name="serie" id="serie" class="form-control" required>
       </div>
 
       <div class="col-md-3 form-group">
         <label>Número</label>
-        <input type="text" name="num_documento" class="form-control" required>
+        <input type="text" name="num_documento" id="num_documento" class="form-control" required>
       </div>
 
       <div class="col-md-3 form-group">
@@ -188,6 +188,9 @@
     </div>
   </div>
 </div>
+<script>
+const BASE_URL = "<?= base_url() ?>";
+</script>
 
 <!-- Variables para JS -->
 <script>
