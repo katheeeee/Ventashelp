@@ -12,13 +12,15 @@
     <div class="row">
       <div class="col-md-3 form-group">
         <label>Comprobante</label>
-        <select name="idtipo_documento" class="form-control" required>
-          <option value="">Seleccione...</option>
-          <?php foreach ($tipos_documento as $t): ?>
-            <option value="<?= esc($t['idtipo_documento']) ?>"><?= esc($t['nombre']) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
+        <select name="idtipo_comprobante" class="form-control" required>
+  <option value="">Seleccione...</option>
+  <?php foreach ($tipos_comprobante as $t): ?>
+    <option value="<?= esc($t['idtipo_comprobante']) ?>">
+      <?= esc($t['nombre']) ?>
+    </option>
+  <?php endforeach; ?>
+</select>
+
 
       <div class="col-md-3 form-group">
         <label>Serie</label>

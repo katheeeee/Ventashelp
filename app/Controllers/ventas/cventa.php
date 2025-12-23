@@ -7,7 +7,7 @@ use App\Models\mventa;
 use App\Models\mdetalle_venta;
 use App\Models\mproducto;
 use App\Models\mcliente;
-use App\Models\mtipo_documento;
+use App\Models\mtipo_comprobante;
 
 class cventa extends BaseController
 {
@@ -29,8 +29,9 @@ class cventa extends BaseController
         if (!session()->get('login')) return redirect()->to(base_url('login'));
 
         $registros = $this->venta
-            ->select('venta.*, cliente.nombre as cliente')
+            ->select('venta.*, cliente.nombre as cliente, tipo_comprobante.nombre as comprobante')
             ->join('cliente', 'cliente.idcliente = venta.idcliente')
+            ->join('tipo_comprobante', 'tipo_comprobante.idtipo_comprobante = venta.idtipo_comprobante', 'left')
             ->orderBy('venta.idventa', 'DESC')
             ->findAll();
 
@@ -45,16 +46,16 @@ class cventa extends BaseController
     {
         if (!session()->get('login')) return redirect()->to(base_url('login'));
 
-        // ✅ Tipos documento activos
-        $tipos = (new mtipo_documento())
+        // ✅ Cargar COMPROBANTES (Boleta/Factura/Recibo)
+        $tipos_comprobante = (new mtipo_comprobante())
             ->where('estado', 1)
             ->orderBy('nombre', 'ASC')
             ->findAll();
 
         return view('admin/venta/vadd', [
-            'active'          => 'ventas',
-            'subactive'       => 'venta_add',
-            'tipos_documento' => $tipos,
+            'active'            => 'ventas',
+            'subactive'         => 'venta_add',
+            'tipos_comprobante' => $tipos_comprobante,
         ]);
     }
 
@@ -76,13 +77,11 @@ class cventa extends BaseController
                 ->groupEnd();
         }
 
-        // Solo activos si existe campo estado
         if ($this->cliente->db->fieldExists('estado', 'cliente')) {
             $builder->where('estado', 1);
         }
 
         $data = $builder->orderBy('nombre', 'ASC')->findAll(50);
-
         return $this->response->setJSON($data);
     }
 
@@ -98,7 +97,7 @@ class cventa extends BaseController
         $builder = $this->producto
             ->select('producto.idproducto, producto.codigo, producto.nombre, producto.imagen, producto.precio, producto.stock,
                       unmedida.nombre as unmedida')
-            ->join('unmedida', 'unmedida.idunmedida = producto.idunmedida');
+            ->join('unmedida', 'unmedida.idunmedida = producto.idunmedida', 'left');
 
         if ($q !== '') {
             $builder->groupStart()
@@ -107,12 +106,11 @@ class cventa extends BaseController
                 ->groupEnd();
         }
 
-        // Solo activos si existe campo estado
         if ($this->producto->db->fieldExists('estado', 'producto')) {
             $builder->where('producto.estado', 1);
         }
 
-        $data = $builder->orderBy('producto.nombre', 'ASC')->findAll(200);
+        $data = $builder->orderBy('producto.nombre', 'ASC')->findAll(300);
 
         foreach ($data as &$r) {
             $r['imagen']  = $r['imagen'] ?: 'no.jpg';
@@ -129,18 +127,18 @@ class cventa extends BaseController
     {
         if (!session()->get('login')) return redirect()->to(base_url('login'));
 
-        // ✅ usa el id de usuario real
         $idUsuario = session('idusuario') ?? session('idtipo_usuario') ?? 1;
 
+        // ✅ Reglas (COMPROBANTE)
         $rules = [
-            'idtipo_documento' => 'required|integer',
-            'serie'            => 'required',
-            'num_documento'    => 'required',
-            'fecha'            => 'required',
-            'idcliente'        => 'required|integer',
-            'subtotal'         => 'required',
-            'igv'              => 'required',
-            'total'            => 'required',
+            'idtipo_comprobante' => 'required|integer',
+            'serie'              => 'required',
+            'num_documento'      => 'required',
+            'fecha'              => 'required',
+            'idcliente'          => 'required|integer',
+            'subtotal'           => 'required',
+            'igv'                => 'required',
+            'total'              => 'required',
         ];
 
         if (!$this->validate($rules)) {
@@ -154,7 +152,7 @@ class cventa extends BaseController
             return redirect()->back()->withInput()->with('error', ['Debes agregar al menos 1 producto.']);
         }
 
-        // ✅ VALIDAR STOCK ANTES (seguro)
+        // ✅ validar stock antes
         foreach ($items as $it) {
             $idproducto = (int)($it['idproducto'] ?? 0);
             $cantidad   = (float)($it['cantidad'] ?? 0);
@@ -175,28 +173,35 @@ class cventa extends BaseController
             }
         }
 
-        // ✅ TRANSACCIÓN (venta + detalle + stock)
         $db = \Config\Database::connect();
         $db->transStart();
 
-        // Insert cabecera venta
+        // ✅ Insert cabecera venta (OJO: fecha es DATETIME en DB)
+        $fecha = $this->request->getPost('fecha');
+        if (strlen($fecha) === 10) { // viene YYYY-MM-DD del input date
+            $fecha = $fecha . ' 00:00:00';
+        }
+
         $idventa = $this->venta->insert([
-            'fecha'            => $this->request->getPost('fecha'),
-            'subtotal'         => $this->request->getPost('subtotal'),
-            'igv'              => $this->request->getPost('igv'),
-            'descuento'        => $this->request->getPost('descuento') ?? 0,
-            'total'            => $this->request->getPost('total'),
-            'serie'            => $this->request->getPost('serie'),
-            'num_documento'    => $this->request->getPost('num_documento'),
-            'idtipo_documento' => $this->request->getPost('idtipo_documento'),
-            'idcliente'        => $this->request->getPost('idcliente'),
-            'idusuario'        => $idUsuario,
-            'estado'           => 1,
-            'fecharegistro'    => date('Y-m-d H:i:s'),
-            'usuarioregistro'  => $idUsuario,
+            'fecha'              => $fecha,
+            'subtotal'           => $this->request->getPost('subtotal'),
+            'igv'                => $this->request->getPost('igv'),
+            'descuento'          => $this->request->getPost('descuento') ?? 0,
+            'total'              => $this->request->getPost('total'),
+            'serie'              => $this->request->getPost('serie'),
+            'num_documento'      => $this->request->getPost('num_documento'),
+            'idtipo_comprobante' => $this->request->getPost('idtipo_comprobante'),
+            'idcliente'          => $this->request->getPost('idcliente'),
+            'idusuario'          => $idUsuario,
+            'estado'             => 1,
+            'fecharegistro'      => date('Y-m-d H:i:s'),
+            'usuarioregistro'    => $idUsuario,
+
+            // Si en tu DB lo tienes y lo quieres usar, descomenta:
+            // 'idtipo_documento' => $this->request->getPost('idtipo_documento'),
         ], true);
 
-        // Insert detalle + descontar stock atómico
+        // ✅ Detalle + descuento stock atómico
         foreach ($items as $it) {
             $idproducto = (int)($it['idproducto'] ?? 0);
             $precio     = (float)($it['precio'] ?? 0);
@@ -213,15 +218,14 @@ class cventa extends BaseController
                 'fecharegistro' => date('Y-m-d H:i:s'),
             ]);
 
-            // ✅ Stock seguro: stock = stock - cantidad WHERE stock >= cantidad
-            $builder = $db->table('producto');
-            $builder->set('stock', "stock - {$db->escape($cantidad)}", false)
+            // stock = stock - cantidad (solo si stock >= cantidad)
+            $db->table('producto')
+                ->set('stock', 'stock - ' . $db->escape($cantidad), false)
                 ->where('idproducto', $idproducto)
                 ->where('stock >=', $cantidad)
                 ->update();
 
             if ($db->affectedRows() === 0) {
-                // alguien vendió antes o stock cambió
                 $db->transRollback();
                 return redirect()->back()->withInput()->with('error', [
                     'Stock insuficiente (se actualizó mientras vendías). Intenta nuevamente.'
@@ -243,9 +247,11 @@ class cventa extends BaseController
         if (!session()->get('login')) return redirect()->to(base_url('login'));
 
         $cab = $this->venta
-            ->select('venta.*, cliente.nombre as cliente, tipo_documento.nombre as tipo_documento')
+            ->select('venta.*,
+                      cliente.nombre as cliente,
+                      tipo_comprobante.nombre as comprobante')
             ->join('cliente', 'cliente.idcliente = venta.idcliente')
-            ->join('tipo_documento', 'tipo_documento.idtipo_documento = venta.idtipo_documento')
+            ->join('tipo_comprobante', 'tipo_comprobante.idtipo_comprobante = venta.idtipo_comprobante', 'left')
             ->find($id);
 
         $det = $this->detalle
