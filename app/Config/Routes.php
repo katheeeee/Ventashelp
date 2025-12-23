@@ -113,7 +113,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     // =================================================
     // VENTAS
     // =================================================
-    $routes->group('ventas', ['namespace' => 'App\Controllers\ventas'], function ($routes) {
+    $routes->group('ventas',  function ($routes) {
 
         $routes->get('/', 'cventa::index');
         $routes->get('add', 'cventa::add');
