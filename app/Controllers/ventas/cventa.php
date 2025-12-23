@@ -46,7 +46,6 @@ class cventa extends BaseController
     {
         if (!session()->get('login')) return redirect()->to(base_url('login'));
 
-        // ✅ Cargar COMPROBANTES (Boleta/Factura/Recibo)
         $tipos_comprobante = (new mtipo_comprobante())
             ->where('estado', 1)
             ->orderBy('nombre', 'ASC')
@@ -59,9 +58,6 @@ class cventa extends BaseController
         ]);
     }
 
-    // ==========================
-    // AJAX CLIENTES
-    // ==========================
     public function ajaxClientes()
     {
         if (!session()->get('login')) return $this->response->setStatusCode(403);
@@ -85,9 +81,6 @@ class cventa extends BaseController
         return $this->response->setJSON($data);
     }
 
-    // ==========================
-    // AJAX PRODUCTOS
-    // ==========================
     public function ajaxProductos()
     {
         if (!session()->get('login')) return $this->response->setStatusCode(403);
@@ -120,16 +113,31 @@ class cventa extends BaseController
         return $this->response->setJSON($data);
     }
 
-    // ==========================
-    // STORE (VENTA + DETALLE + STOCK)
-    // ==========================
+    // ✅ AJAX para rellenar serie y número
+    public function ajaxComprobanteData($id)
+    {
+        if (!session()->get('login')) return $this->response->setStatusCode(403);
+
+        $tc = (new mtipo_comprobante())->find($id);
+
+        if (!$tc) {
+            return $this->response->setJSON(['serie' => '', 'numero' => '']);
+        }
+
+        $numero = str_pad(((int)$tc['cantidad']) + 1, 6, '0', STR_PAD_LEFT);
+
+        return $this->response->setJSON([
+            'serie'  => $tc['serie'],
+            'numero' => $numero,
+        ]);
+    }
+
     public function store()
     {
         if (!session()->get('login')) return redirect()->to(base_url('login'));
 
         $idUsuario = session('idusuario') ?? session('idtipo_usuario') ?? 1;
 
-        // ✅ Reglas (COMPROBANTE)
         $rules = [
             'idtipo_comprobante' => 'required|integer',
             'serie'              => 'required',
@@ -145,14 +153,13 @@ class cventa extends BaseController
             return redirect()->back()->withInput()->with('error', $this->validator->getErrors());
         }
 
-        $items = $this->request->getPost('items');
-        $items = json_decode($items, true);
+        $items = json_decode($this->request->getPost('items'), true);
 
         if (!is_array($items) || count($items) === 0) {
             return redirect()->back()->withInput()->with('error', ['Debes agregar al menos 1 producto.']);
         }
 
-        // ✅ validar stock antes
+        // ✅ Validar stock antes
         foreach ($items as $it) {
             $idproducto = (int)($it['idproducto'] ?? 0);
             $cantidad   = (float)($it['cantidad'] ?? 0);
@@ -176,12 +183,13 @@ class cventa extends BaseController
         $db = \Config\Database::connect();
         $db->transStart();
 
-        // ✅ Insert cabecera venta (OJO: fecha es DATETIME en DB)
+        // ✅ fecha DATETIME
         $fecha = $this->request->getPost('fecha');
-        if (strlen($fecha) === 10) { // viene YYYY-MM-DD del input date
-            $fecha = $fecha . ' 00:00:00';
-        }
+        if (strlen($fecha) === 10) $fecha .= ' 00:00:00';
 
+        $idtipo_comprobante = (int)$this->request->getPost('idtipo_comprobante');
+
+        // ✅ Insert cabecera
         $idventa = $this->venta->insert([
             'fecha'              => $fecha,
             'subtotal'           => $this->request->getPost('subtotal'),
@@ -190,18 +198,15 @@ class cventa extends BaseController
             'total'              => $this->request->getPost('total'),
             'serie'              => $this->request->getPost('serie'),
             'num_documento'      => $this->request->getPost('num_documento'),
-            'idtipo_comprobante' => $this->request->getPost('idtipo_comprobante'),
+            'idtipo_comprobante' => $idtipo_comprobante,
             'idcliente'          => $this->request->getPost('idcliente'),
             'idusuario'          => $idUsuario,
             'estado'             => 1,
             'fecharegistro'      => date('Y-m-d H:i:s'),
             'usuarioregistro'    => $idUsuario,
-
-            // Si en tu DB lo tienes y lo quieres usar, descomenta:
-            // 'idtipo_documento' => $this->request->getPost('idtipo_documento'),
         ], true);
 
-        // ✅ Detalle + descuento stock atómico
+        // ✅ Detalle + bajar stock
         foreach ($items as $it) {
             $idproducto = (int)($it['idproducto'] ?? 0);
             $precio     = (float)($it['precio'] ?? 0);
@@ -218,7 +223,6 @@ class cventa extends BaseController
                 'fecharegistro' => date('Y-m-d H:i:s'),
             ]);
 
-            // stock = stock - cantidad (solo si stock >= cantidad)
             $db->table('producto')
                 ->set('stock', 'stock - ' . $db->escape($cantidad), false)
                 ->where('idproducto', $idproducto)
@@ -233,6 +237,12 @@ class cventa extends BaseController
             }
         }
 
+        // ✅ AUMENTAR correlativo del comprobante (cantidad + 1) ANTES del return
+        $db->table('tipo_comprobante')
+            ->set('cantidad', 'cantidad + 1', false)
+            ->where('idtipo_comprobante', $idtipo_comprobante)
+            ->update();
+
         $db->transComplete();
 
         if ($db->transStatus() === false) {
@@ -240,11 +250,6 @@ class cventa extends BaseController
         }
 
         return redirect()->to(base_url('ventas'))->with('success', 'Venta registrada correctamente');
-        $db->table('tipo_comprobante')
-   ->set('cantidad', 'cantidad + 1', false)
-   ->where('idtipo_comprobante', $this->request->getPost('idtipo_comprobante'))
-   ->update();
-        
     }
 
     public function view($id)
@@ -252,9 +257,7 @@ class cventa extends BaseController
         if (!session()->get('login')) return redirect()->to(base_url('login'));
 
         $cab = $this->venta
-            ->select('venta.*,
-                      cliente.nombre as cliente,
-                      tipo_comprobante.nombre as comprobante')
+            ->select('venta.*, cliente.nombre as cliente, tipo_comprobante.nombre as comprobante')
             ->join('cliente', 'cliente.idcliente = venta.idcliente')
             ->join('tipo_comprobante', 'tipo_comprobante.idtipo_comprobante = venta.idtipo_comprobante', 'left')
             ->find($id);
@@ -272,27 +275,4 @@ class cventa extends BaseController
             'det'       => $det,
         ]);
     }
-    public function ajaxComprobanteData($id)
-{
-    if (!session()->get('login')) {
-        return $this->response->setStatusCode(403);
-    }
-
-    $tc = (new \App\Models\mtipo_comprobante())->find($id);
-
-    if (!$tc) {
-        return $this->response->setJSON([
-            'serie' => '',
-            'numero' => ''
-        ]);
-    }
-
-    $numero = str_pad(((int)$tc['cantidad']) + 1, 6, '0', STR_PAD_LEFT);
-
-    return $this->response->setJSON([
-        'serie'  => $tc['serie'],
-        'numero' => $numero,
-    ]);
-}
-
 }
