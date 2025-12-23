@@ -306,7 +306,10 @@ class cventa extends BaseController
         ->findAll();
 
     // Crear PDF
-    $pdf = new \App\Libraries\Pdf('P', 'mm', 'A4');
+    require_once ROOTPATH . 'vendor/setasign/fpdf/fpdf.php';
+
+$pdf = new \FPDF('P', 'mm', 'A4');
+
     $pdf->SetTitle("Comprobante {$cab['serie']}-{$cab['num_documento']}");
     $pdf->AddPage();
     $pdf->SetAutoPageBreak(true, 15);
