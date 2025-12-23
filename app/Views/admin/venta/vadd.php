@@ -2,6 +2,22 @@
 
 <section class="content pt-3">
   <div class="container-fluid">
+<?php if (session()->getFlashdata('error')): ?>
+  <div class="alert alert-danger">
+    <?php
+      $err = session()->getFlashdata('error');
+      echo is_array($err) ? implode('<br>', $err) : $err;
+    ?>
+  </div>
+<?php endif; ?>
+<?php if (session()->getFlashdata('error')): ?>
+  <div class="alert alert-danger">
+    <?php
+      $err = session()->getFlashdata('error');
+      echo is_array($err) ? implode('<br>', $err) : $err;
+    ?>
+  </div>
+<?php endif; ?>
 
     <form id="formVenta" action="<?= base_url('ventas/store') ?>" method="post">
       <?= csrf_field() ?>
