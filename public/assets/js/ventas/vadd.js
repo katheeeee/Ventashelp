@@ -330,11 +330,16 @@ $("#btnBuscarProducto").on("click", function () {
   $("#modalProductos").modal("show");
 
   setTimeout(function () {
-    if (!dtProd) {
-      initDtProductos();          // ✅ primera vez: init (esto ya carga ajax)
-    } else {
-      dtProd.ajax.reload(null, false); // ✅ siguientes veces: solo reload
+    // ✅ Si aún no está inicializado: init y listo (NO reload)
+    if (!$.fn.DataTable.isDataTable("#dtProductos")) {
+      $("#dtProductos tbody").empty();   // ✅ limpia por si acaso
+      initDtProductos();
+      return;
     }
+
+    // ✅ Si ya estaba inicializado: recién ahí recargas
+    dtProd = $("#dtProductos").DataTable();
+    dtProd.ajax.reload(null, false);
   }, 150);
 });
 
