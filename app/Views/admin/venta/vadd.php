@@ -200,4 +200,15 @@
 <!-- ✅ IMPORTANTE: el js debe existir en public/assets/js/vadd.js -->
 <script src="<?= base_url('assets/js/ventas/vadd.js') ?>"></script>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const f = document.getElementById('formVenta');
+  if (!f) { alert('NO existe #formVenta'); return; }
+
+  f.addEventListener('submit', (e) => {
+    alert('SUBMIT DISPARADO ✅ (si no hay POST, algo lo bloquea)');
+  });
+});
+</script>
+
 <?= $this->include('layouts/footer') ?>
