@@ -9,9 +9,9 @@
   <link rel="stylesheet" href="<?= base_url('assets/template/plugins/fontawesome-free/css/all.min.css') ?>">
   <link rel="stylesheet" href="<?= base_url('assets/template/dist/css/adminlte.min.css') ?>">
 
-  <!-- ================= DATATABLES (Bootstrap 4) ================= -->
-  <link rel="stylesheet" href="<?= base_url('assets/template/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') ?>">
-<link rel="stylesheet" href="<?= base_url('assets/template/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') ?>">
+  <!-- DataTables CSS (LOCAL que sí tienes) -->
+<link rel="stylesheet" href="<?= base_url('assets/template/plugins/datatables/dataTables.bootstrap4.min.css') ?>">
+
 
 
   <!-- ================= EKKO LIGHTBOX ================= -->
