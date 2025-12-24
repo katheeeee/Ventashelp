@@ -35,10 +35,7 @@
   <!-- ===================================== -->
   <script src="<?= base_url('assets/template/plugins/ekko-lightbox/ekko-lightbox.min.js') ?>"></script>
 
-  <!-- ===================================== -->
-  <!-- 6. JS PROPIO - VENTAS -->
-  <!-- ===================================== -->
-  <script src="<?= base_url('assets/js/ventas/vadd.js') ?>"></script>
+  
 
 </body>
 </html>
