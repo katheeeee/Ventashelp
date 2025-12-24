@@ -81,28 +81,46 @@ class cventa extends BaseController
         return $this->response->setJSON($data);
     }
 
-public function ajaxProductos()
+  public function ajaxProductos()
 {
+    if (!session()->get('login')) return $this->response->setStatusCode(403);
+
     $q = trim($this->request->getGet('q') ?? '');
 
-    $builder = $this->db->table('producto p')
-        ->select('p.idproducto, p.codigo, p.nombre, p.precio, p.stock, um.nombre AS unmedida, p.img_url')
-        ->join('unmedida um', 'um.idunmedida = p.idunmedida', 'left')
-        ->distinct(); // ✅ evita duplicados por joins
+    // ✅ Usa el builder del MODEL, pero ejecuta con get() (NO findAll)
+    $builder = $this->producto
+        ->select('producto.idproducto, producto.codigo, producto.nombre, producto.imagen, producto.precio, producto.stock,
+                  unmedida.nombre as unmedida')
+        ->join('unmedida', 'unmedida.idunmedida = producto.idunmedida', 'left')
+        ->distinct()                 // ✅ evita duplicados
+        ->groupBy('producto.idproducto'); // ✅ extra blindaje por si algo duplica
 
     if ($q !== '') {
         $builder->groupStart()
-            ->like('p.codigo', $q)
-            ->orLike('p.nombre', $q)
-        ->groupEnd();
+            ->like('producto.nombre', $q)
+            ->orLike('producto.codigo', $q)
+            ->groupEnd();
     }
 
-    $rows = $builder->orderBy('p.idproducto', 'DESC')
+    if ($this->producto->db->fieldExists('estado', 'producto')) {
+        $builder->where('producto.estado', 1);
+    }
+
+    // ✅ Importante: ejecutar el query aquí
+    $data = $builder
+        ->orderBy('producto.nombre', 'ASC')
+        ->limit(300)
         ->get()
         ->getResultArray();
 
-    return $this->response->setJSON($rows);
+    foreach ($data as &$r) {
+        $r['imagen']  = $r['imagen'] ?: 'no.jpg';
+        $r['img_url'] = base_url('uploads/productos/' . $r['imagen']);
+    }
+
+    return $this->response->setJSON($data);
 }
+
 
     // ✅ AJAX para rellenar serie y número
     public function ajaxComprobanteData($id)
