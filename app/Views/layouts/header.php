@@ -5,16 +5,18 @@
   <title><?= esc($title ?? 'Helpnet') ?></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- ================= AdminLTE 3 / Bootstrap 4 ================= -->
-  <link rel="stylesheet" href="<?= base_url('assets/template/dist/css/adminlte.min.css') ?>">
+  <!-- ================= ADMINLTE 3 / BOOTSTRAP 4 ================= -->
   <link rel="stylesheet" href="<?= base_url('assets/template/plugins/fontawesome-free/css/all.min.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/template/dist/css/adminlte.min.css') ?>">
 
-  <!-- ================= DataTables CSS (LOCAL) ================= -->
-  <link rel="stylesheet" href="<?= base_url('assets/template/plugins/datatables/dataTables.bootstrap4.min.css') ?>">
+  <!-- ================= DATATABLES (Bootstrap 4) ================= -->
+  <link rel="stylesheet" href="<?= base_url('assets/template/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/template/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') ?>">
 
-  <!-- ================= Ekko Lightbox ================= -->
+  <!-- ================= EKKO LIGHTBOX ================= -->
   <link rel="stylesheet" href="<?= base_url('assets/template/plugins/ekko-lightbox/ekko-lightbox.css') ?>">
 
+  <!-- ================= ESTILOS PROPIOS ================= -->
   <style>
     .main-header.navbar { background:#2f80c0; }
     .navbar-dark .navbar-nav .nav-link,
@@ -26,16 +28,16 @@
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
 
-<!-- NAVBAR -->
+<!-- ================= NAVBAR ================= -->
 <nav class="main-header navbar navbar-expand navbar-dark">
   <ul class="navbar-nav">
     <li class="nav-item">
-      <a class="nav-link" data-widget="pushmenu" href="#">
+      <a class="nav-link" data-widget="pushmenu" href="#" role="button">
         <i class="fas fa-bars"></i>
       </a>
     </li>
     <li class="nav-item">
-      <a class="navbar-brand font-weight-bold" href="<?= base_url('dashboard') ?>">
+      <a class="navbar-brand font-weight-bold ml-2" href="<?= base_url('dashboard') ?>">
         HELPNET
       </a>
     </li>
@@ -56,6 +58,8 @@
   </ul>
 </nav>
 
+<!-- ================= ASIDE ================= -->
 <?= $this->include('layouts/aside') ?>
 
+<!-- ================= CONTENIDO ================= -->
 <div class="content-wrapper">

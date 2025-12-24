@@ -1,18 +1,15 @@
 <?php
-  // evita "Undefined variable"
   $active    = $active    ?? '';
   $subactive = $subactive ?? '';
 ?>
 
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
 
-  <!-- LOGO -->
   <a href="<?= base_url('dashboard') ?>" class="brand-link">
     <span class="brand-text font-weight-bold">Katventas</span>
   </a>
 
   <div class="sidebar">
-
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column"
           data-widget="treeview"
@@ -28,9 +25,7 @@
           </a>
         </li>
 
-        <!-- ===================== -->
         <!-- MANTENIMIENTO -->
-        <!-- ===================== -->
         <li class="nav-item has-treeview <?= ($active=='mantenimiento')?'menu-open':'' ?>">
           <a href="#" class="nav-link <?= ($active=='mantenimiento')?'active':'' ?>">
             <i class="nav-icon fas fa-tools"></i>
@@ -41,7 +36,6 @@
           </a>
 
           <ul class="nav nav-treeview">
-
             <li class="nav-item">
               <a href="<?= base_url('mantenimiento/categoria') ?>"
                  class="nav-link <?= ($subactive=='categoria')?'active':'' ?>">
@@ -117,49 +111,43 @@
             <li class="nav-item">
               <a href="<?= base_url('mantenimiento/producto') ?>"
                  class="nav-link <?= ($subactive=='producto')?'active':'' ?>">
-                <i class="fas fa-truck nav-icon"></i>
+                <i class="fas fa-box nav-icon"></i>
                 <p>Productos</p>
               </a>
             </li>
-
           </ul>
         </li>
 
-<li class="nav-item has-treeview <?= ($active=='ventas')?'menu-open':'' ?>">
-  <a href="#" class="nav-link <?= ($active=='ventas')?'active':'' ?>">
-    <i class="nav-icon fas fa-shopping-cart"></i>
-    <p>
-      Ventas
-      <i class="right fas fa-angle-left"></i>
-    </p>
-  </a>
-  <ul class="nav nav-treeview">
-    <li class="nav-item">
-      <a href="<?= base_url('ventas/add') ?>"
-         class="nav-link <?= ($subactive=='venta_add')?'active':'' ?>">
-        <i class="far fa-circle nav-icon"></i>
-        <p>Agregar</p>
-      </a>
-    </li>
+        <!-- VENTAS -->
+        <li class="nav-item has-treeview <?= ($active=='ventas')?'menu-open':'' ?>">
+          <a href="#" class="nav-link <?= ($active=='ventas')?'active':'' ?>">
+            <i class="nav-icon fas fa-shopping-cart"></i>
+            <p>
+              Ventas
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
 
-    <li class="nav-item">
-      <a href="<?= base_url('ventas') ?>"
-         class="nav-link <?= ($subactive=='venta_list')?'active':'' ?>">
-        <i class="far fa-circle nav-icon"></i>
-        <p>Listar</p>
-      </a>
-    </li>
-  </ul>
-</li>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="<?= base_url('ventas/add') ?>"
+                 class="nav-link <?= ($subactive=='venta_add')?'active':'' ?>">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Agregar</p>
+              </a>
+            </li>
 
-  </ul>
-</li>
+            <li class="nav-item">
+              <a href="<?= base_url('ventas') ?>"
+                 class="nav-link <?= ($subactive=='venta_list')?'active':'' ?>">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Listar</p>
+              </a>
+            </li>
+          </ul>
+        </li>
 
-
-
-        <!-- ===================== -->
         <!-- REPORTES -->
-        <!-- ===================== -->
         <li class="nav-item">
           <a href="#" class="nav-link <?= ($active=='reportes')?'active':'' ?>">
             <i class="nav-icon fas fa-chart-bar"></i>
@@ -167,9 +155,7 @@
           </a>
         </li>
 
-        <!-- ===================== -->
         <!-- ADMINISTRADOR -->
-        <!-- ===================== -->
         <li class="nav-item">
           <a href="#" class="nav-link <?= ($active=='admin')?'active':'' ?>">
             <i class="nav-icon fas fa-user-shield"></i>
@@ -179,6 +165,5 @@
 
       </ul>
     </nav>
-
   </div>
 </aside>
