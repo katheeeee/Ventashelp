@@ -229,7 +229,7 @@
     let tProdKey = null;
 
 function initDtProductos() {
-  // ✅ Si ya existe instancia, no reinicializar
+  // ✅ Si ya está inicializado, solo recupera la instancia
   if ($.fn.DataTable.isDataTable("#dtProductos")) {
     dtProd = $("#dtProductos").DataTable();
     return;
@@ -237,6 +237,9 @@ function initDtProductos() {
 
   dtProd = $("#dtProductos").DataTable({
     pageLength: 10,
+    retrieve: true,  // ✅
+    destroy: true,   // ✅
+
     ajax: {
       url: URL_PRODUCTOS,
       dataSrc: "",
@@ -244,6 +247,7 @@ function initDtProductos() {
         return { q: (d.search && d.search.value) ? d.search.value : "" };
       },
     },
+
     columns: [
       {
         data: null,
@@ -286,26 +290,35 @@ function initDtProductos() {
       },
       { data: "unmedida" },
     ],
+
     language: { url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json" },
   });
 
-  // ✅ Evita doble binding si alguien llama init otra vez
-  $("#dtProductos tbody").off("click", ".selProdDt").on("click", ".selProdDt", function () {
-    const row = dtProd.row($(this).closest("tr")).data();
-    addProducto(row);
-    $("#modalProductos").modal("hide");
-    $("#producto_buscar").val("");
-  });
+  // ✅ Evita que el click se enganche 2 veces
+  $("#dtProductos tbody")
+    .off("click", ".selProdDt")
+    .on("click", ".selProdDt", function () {
+      const row = dtProd.row($(this).closest("tr")).data();
+      addProducto(row);
+      $("#modalProductos").modal("hide");
+      $("#producto_buscar").val("");
+    });
 }
 
 
-    $("#btnBuscarProducto").on("click", function () {
-      $("#modalProductos").modal("show");
-      setTimeout(function () {
-        initDtProductos();
-        dtProd.ajax.reload(null, false);
-      }, 150);
-    });
+
+$("#btnBuscarProducto").on("click", function () {
+  $("#modalProductos").modal("show");
+
+  setTimeout(function () {
+    if (!dtProd) {
+      initDtProductos();          // ✅ primera vez: init (esto ya carga ajax)
+    } else {
+      dtProd.ajax.reload(null, false); // ✅ siguientes veces: solo reload
+    }
+  }, 150);
+});
+
 
     $("#producto_buscar").on("keyup", function (e) {
       const q = $(this).val().trim();
