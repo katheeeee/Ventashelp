@@ -228,74 +228,76 @@
     let dtProd = null;
     let tProdKey = null;
 
-    function initDtProductos() {
-      if (dtProd) return;
+function initDtProductos() {
+  // ✅ Si ya existe instancia, no reinicializar
+  if ($.fn.DataTable.isDataTable("#dtProductos")) {
+    dtProd = $("#dtProductos").DataTable();
+    return;
+  }
 
-      dtProd = $("#dtProductos").DataTable({
-        pageLength: 10,
-        ajax: {
-          url: URL_PRODUCTOS,
-          dataSrc: "",
-          data: function (d) {
-            return { q: (d.search && d.search.value) ? d.search.value : "" };
-          },
+  dtProd = $("#dtProductos").DataTable({
+    pageLength: 10,
+    ajax: {
+      url: URL_PRODUCTOS,
+      dataSrc: "",
+      data: function (d) {
+        return { q: (d.search && d.search.value) ? d.search.value : "" };
+      },
+    },
+    columns: [
+      {
+        data: null,
+        orderable: false,
+        searchable: false,
+        className: "text-center",
+        render: function (data, type, row) {
+          const st = numStock(row.stock);
+          if (st <= 0) {
+            return `<button type="button" class="btn btn-secondary btn-sm" disabled title="No hay stock">
+                      <i class="fa fa-ban"></i>
+                    </button>`;
+          }
+          return `<button type="button" class="btn btn-success btn-sm selProdDt" title="Agregar">
+                    <i class="fa fa-check"></i>
+                  </button>`;
         },
-        columns: [
-          {
-            data: null,
-            orderable: false,
-            searchable: false,
-            className: "text-center",
-            render: function (data, type, row) {
-              const st = numStock(row.stock);
-              if (st <= 0) {
-                return `<button type="button" class="btn btn-secondary btn-sm" disabled title="No hay stock">
-                          <i class="fa fa-ban"></i>
-                        </button>`;
-              }
-              return `<button type="button" class="btn btn-success btn-sm selProdDt" title="Agregar">
-                        <i class="fa fa-check"></i>
-                      </button>`;
-            },
-          },
-          { data: "codigo" },
-          { data: "nombre" },
-          {
-            data: "img_url",
-            orderable: false,
-            searchable: false,
-            className: "text-center",
-            render: function (url) {
-              const img = url || IMG_DEFAULT;
-              return `<img src="${img}" class="img-thumbnail" style="max-width:60px; max-height:60px;">`;
-            },
-          },
-          {
-            data: "precio",
-            className: "text-right",
-            render: function (v) { return fmt(v); },
-          },
-          {
-            data: "stock",
-            className: "text-right",
-            render: function (v) {
-              const st = numStock(v);
-              if (st <= 0) return `<span class="badge badge-danger">NO HAY STOCK</span>`;
-              return st;
-            }
-          },
-          { data: "unmedida" },
-        ],
-        language: { url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json" },
-      });
+      },
+      { data: "codigo" },
+      { data: "nombre" },
+      {
+        data: "img_url",
+        orderable: false,
+        searchable: false,
+        className: "text-center",
+        render: function (url) {
+          const img = url || IMG_DEFAULT;
+          return `<img src="${img}" class="img-thumbnail" style="max-width:60px; max-height:60px;">`;
+        },
+      },
+      { data: "precio", className: "text-right", render: function (v) { return fmt(v); } },
+      {
+        data: "stock",
+        className: "text-right",
+        render: function (v) {
+          const st = numStock(v);
+          if (st <= 0) return `<span class="badge badge-danger">NO HAY STOCK</span>`;
+          return st;
+        }
+      },
+      { data: "unmedida" },
+    ],
+    language: { url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json" },
+  });
 
-      $("#dtProductos tbody").on("click", ".selProdDt", function () {
-        const row = dtProd.row($(this).closest("tr")).data();
-        addProducto(row);
-        $("#modalProductos").modal("hide");
-        $("#producto_buscar").val("");
-      });
-    }
+  // ✅ Evita doble binding si alguien llama init otra vez
+  $("#dtProductos tbody").off("click", ".selProdDt").on("click", ".selProdDt", function () {
+    const row = dtProd.row($(this).closest("tr")).data();
+    addProducto(row);
+    $("#modalProductos").modal("hide");
+    $("#producto_buscar").val("");
+  });
+}
+
 
     $("#btnBuscarProducto").on("click", function () {
       $("#modalProductos").modal("show");
