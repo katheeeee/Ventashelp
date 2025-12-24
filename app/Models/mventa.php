@@ -24,6 +24,7 @@ class mventa extends Model
         'fecharegistro',
         'usuarioregistro',
         'idtipo_documento',
+        'idtipo_comprobante',
     ];
 
     protected $useTimestamps = false;
