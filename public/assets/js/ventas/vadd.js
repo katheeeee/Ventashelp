@@ -225,29 +225,23 @@
     });
 
     // ===================== PRODUCTOS (DATATABLE) =====================
-    let dtProd = null;
-    let tProdKey = null;
+    // ===================== PRODUCTOS (DATATABLE) =====================
+let dtProd = null;
 
-function initDtProductos() {
-  // ✅ Si ya está inicializado, solo recupera la instancia
+function cargarProductos(q) {
+  return $.getJSON(URL_PRODUCTOS, { q: q || "" });
+}
+
+function initDtProductosConData(rows) {
+  // Si ya existe, destruir limpio
   if ($.fn.DataTable.isDataTable("#dtProductos")) {
-    dtProd = $("#dtProductos").DataTable();
-    return;
+    $("#dtProductos").DataTable().clear().destroy();
+    $("#dtProductos tbody").empty();
   }
 
   dtProd = $("#dtProductos").DataTable({
     pageLength: 10,
-    retrieve: true,  // ✅
-    destroy: true,   // ✅
-
-    ajax: {
-      url: URL_PRODUCTOS,
-      dataSrc: "",
-      data: function (d) {
-        return { q: (d.search && d.search.value) ? d.search.value : "" };
-      },
-    },
-
+    data: rows || [],   // ✅ NO ajax aquí
     columns: [
       {
         data: null,
@@ -290,21 +284,46 @@ function initDtProductos() {
       },
       { data: "unmedida" },
     ],
-
     language: { url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json" },
   });
 
-  // ✅ Evita que el click se enganche 2 veces
-  $("#dtProductos tbody")
-    .off("click", ".selProdDt")
-    .on("click", ".selProdDt", function () {
-      const row = dtProd.row($(this).closest("tr")).data();
-      addProducto(row);
-      $("#modalProductos").modal("hide");
-      $("#producto_buscar").val("");
-    });
+  // click agregar
+  $("#dtProductos tbody").off("click", ".selProdDt").on("click", ".selProdDt", function () {
+    const row = dtProd.row($(this).closest("tr")).data();
+    addProducto(row);
+    $("#modalProductos").modal("hide");
+    $("#producto_buscar").val("");
+  });
 }
 
+$("#btnBuscarProducto").on("click", function () {
+  $("#modalProductos").modal("show");
+
+  setTimeout(function () {
+    cargarProductos("").done(function (rows) {
+      initDtProductosConData(rows);
+    });
+  }, 150);
+});
+
+let tProdKey = null;
+$("#producto_buscar").on("keyup", function (e) {
+  const q = $(this).val().trim();
+
+  if (e.key === "Enter") {
+    e.preventDefault();
+    $("#btnBuscarProducto").click();
+    return;
+  }
+
+  clearTimeout(tProdKey);
+  tProdKey = setTimeout(function () {
+    $("#modalProductos").modal("show");
+    cargarProductos(q).done(function (rows) {
+      initDtProductosConData(rows);
+    });
+  }, 250);
+});
 
 
 $("#btnBuscarProducto").on("click", function () {
