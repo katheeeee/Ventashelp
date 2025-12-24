@@ -134,6 +134,8 @@ class cventa extends BaseController
 
 public function store()
 {
+    log_message('error', 'STORE venta POST: ' . json_encode($this->request->getPost()));
+
     if (!session()->get('login')) return redirect()->to(base_url('login'));
 
     $idUsuario = session('idusuario') ?? session('idtipo_usuario') ?? 1;

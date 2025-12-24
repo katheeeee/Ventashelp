@@ -198,6 +198,6 @@
 </script>
 
 <!-- ✅ IMPORTANTE: el js debe existir en public/assets/js/vadd.js -->
-<script src="<?= base_url('assets/js/vadd.js') ?>"></script>
+<script src="<?= base_url('assets/js/ventas/vadd.js') ?>"></script>
 
 <?= $this->include('layouts/footer') ?>

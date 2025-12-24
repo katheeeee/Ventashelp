@@ -21,7 +21,8 @@
     const URL_COMP_DATA = CFG.URL_COMP_DATA || ""; // base_url('ventas/ajaxComprobanteData')
     const IMG_DEFAULT = CFG.IMG_DEFAULT || "";
 
-    console.log("✅ vadd.js COMPLETO cargado");
+    console.log("items json =", $("#items").val());
+
 
     function n2(v) {
       let x = parseFloat(String(v ?? "0").replace(",", "."));
