@@ -23,7 +23,6 @@
 
     console.log("items json =", $("#items").val());
 
-
     function n2(v) {
       let x = parseFloat(String(v ?? "0").replace(",", "."));
       if (isNaN(x)) x = 0;
@@ -151,6 +150,7 @@
       return $.getJSON(URL_CLIENTES, { q: q || "" });
     }
 
+    // ✅ REEMPLAZADO: render con auto-selección si hay 1 resultado
     function renderClientes(rows) {
       const $tb = $("#tablaClientes tbody");
       $tb.empty();
@@ -167,6 +167,13 @@
         `);
         $tb.append($tr);
       });
+
+      // ✅ si solo hay 1, selecciona automáticamente
+      if (rows && rows.length === 1) {
+        $("#idcliente").val(rows[0].idcliente);
+        $("#cliente_nombre").val(rows[0].nombre ?? "");
+        $("#modalClientes").modal("hide");
+      }
     }
 
     let tCli = null;
@@ -203,6 +210,11 @@
           setTimeout(() => $("#qCliente").focus(), 150);
         }
       }, 250);
+    });
+
+    // ✅ NUEVO: si editas el nombre manualmente, invalidas la selección
+    $("#cliente_nombre").on("input", function () {
+      $("#idcliente").val("");
     });
 
     $(document).on("click", ".selCli", function () {
@@ -327,7 +339,6 @@
         return;
       }
 
-      // URL_COMP_DATA ya viene como base_url('ventas/ajaxComprobanteData')
       const url = URL_COMP_DATA.replace(/\/+$/, "") + "/" + id;
 
       $.getJSON(url)
@@ -355,17 +366,22 @@
     // ===================== SUBMIT =====================
     $("#formVenta").on("submit", function (e) {
       console.log("SUBMIT: defaultPrevented antes =", e.isDefaultPrevented());
-  setTimeout(() => console.log("SUBMIT: defaultPrevented después =", e.isDefaultPrevented()), 0);
+      setTimeout(() => console.log("SUBMIT: defaultPrevented después =", e.isDefaultPrevented()), 0);
+
       if (!$("#idtipo_comprobante").val()) {
         e.preventDefault();
         alert("Seleccione un comprobante.");
         return;
       }
+
+      // ✅ MEJORADO: si falta cliente, abre modal automáticamente
       if (!$("#idcliente").val()) {
         e.preventDefault();
-        alert("Seleccione un cliente.");
+        alert("Seleccione un cliente (de la lista).");
+        $("#btnBuscarCliente").click();
         return;
       }
+
       if ($("#tablaDetalle tbody tr").length === 0) {
         e.preventDefault();
         alert("Agregue al menos 1 producto.");
