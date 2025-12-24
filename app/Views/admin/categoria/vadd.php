@@ -1,3 +1,23 @@
+<?php if (session()->getFlashdata('error')): ?>
+  <div class="alert alert-danger">
+    <?php
+      $e = session()->getFlashdata('error');
+      if (is_array($e)) {
+        echo "<ul class='mb-0'>";
+        foreach ($e as $msg) echo "<li>".esc($msg)."</li>";
+        echo "</ul>";
+      } else {
+        echo esc($e);
+      }
+    ?>
+  </div>
+<?php endif; ?>
+
+<?php if (session()->getFlashdata('success')): ?>
+  <div class="alert alert-success">
+    <?= esc(session()->getFlashdata('success')) ?>
+  </div>
+<?php endif; ?>
 <?= $this->include('layouts/header') ?>
 
 <section class="content pt-3">

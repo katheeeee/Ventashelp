@@ -132,125 +132,133 @@ class cventa extends BaseController
         ]);
     }
 
-    public function store()
-    {
-        if (!session()->get('login')) return redirect()->to(base_url('login'));
+public function store()
+{
+    if (!session()->get('login')) return redirect()->to(base_url('login'));
 
-        $idUsuario = session('idusuario') ?? session('idtipo_usuario') ?? 1;
+    $idUsuario = session('idusuario') ?? session('idtipo_usuario') ?? 1;
 
-        $rules = [
-            'idtipo_comprobante' => 'required|integer',
-            'serie'              => 'required',
-            'num_documento'      => 'required',
-            'fecha'              => 'required',
-            'idcliente'          => 'required|integer',
-            'subtotal'           => 'required',
-            'igv'                => 'required',
-            'total'              => 'required',
-        ];
+    $rules = [
+        'idtipo_comprobante' => 'required|integer',
+        'serie'              => 'required',
+        'num_documento'      => 'required',
+        'fecha'              => 'required',
+        'idcliente'          => 'required|integer',
+        'subtotal'           => 'required',
+        'igv'                => 'required',
+        'total'              => 'required',
+    ];
 
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('error', $this->validator->getErrors());
+    if (!$this->validate($rules)) {
+        return redirect()->back()->withInput()->with('error', $this->validator->getErrors());
+    }
+
+    $items = json_decode($this->request->getPost('items'), true);
+
+    if (!is_array($items) || count($items) === 0) {
+        return redirect()->back()->withInput()->with('error', ['Debes agregar al menos 1 producto.']);
+    }
+
+    // ✅ fecha a DATETIME
+    $fecha = $this->request->getPost('fecha');
+    if (strlen($fecha) === 10) $fecha .= ' 00:00:00';
+
+    $db = \Config\Database::connect();
+    $db->transStart();
+
+    // ✅ 1) Validar stock (antes)
+    foreach ($items as $it) {
+        $idproducto = (int)($it['idproducto'] ?? 0);
+        $cantidad   = (float)($it['cantidad'] ?? 0);
+
+        if ($idproducto <= 0 || $cantidad <= 0) {
+            $db->transRollback();
+            return redirect()->back()->withInput()->with('error', ['Hay items inválidos en el detalle.']);
         }
 
-        $items = json_decode($this->request->getPost('items'), true);
-
-        if (!is_array($items) || count($items) === 0) {
-            return redirect()->back()->withInput()->with('error', ['Debes agregar al menos 1 producto.']);
+        $p = $this->producto->find($idproducto);
+        if (!$p) {
+            $db->transRollback();
+            return redirect()->back()->withInput()->with('error', ['Producto no encontrado.']);
         }
 
-        // ✅ Validar stock antes
-        foreach ($items as $it) {
-            $idproducto = (int)($it['idproducto'] ?? 0);
-            $cantidad   = (float)($it['cantidad'] ?? 0);
-
-            if ($idproducto <= 0 || $cantidad <= 0) {
-                return redirect()->back()->withInput()->with('error', ['Hay items inválidos en el detalle.']);
-            }
-
-            $p = $this->producto->find($idproducto);
-            if (!$p) {
-                return redirect()->back()->withInput()->with('error', ['Producto no encontrado.']);
-            }
-
-            if ((float)$p['stock'] < (float)$cantidad) {
-                return redirect()->back()->withInput()->with('error', [
-                    "Stock insuficiente para {$p['nombre']}. Disponible: {$p['stock']}"
-                ]);
-            }
-        }
-
-        $db = \Config\Database::connect();
-        $db->transStart();
-
-        // ✅ fecha DATETIME
-        $fecha = $this->request->getPost('fecha');
-        if (strlen($fecha) === 10) $fecha .= ' 00:00:00';
-
-        $idtipo_comprobante = (int)$this->request->getPost('idtipo_comprobante');
-
-        // ✅ Insert cabecera
-        $idventa = $this->venta->insert([
-            'fecha'              => $fecha,
-            'subtotal'           => $this->request->getPost('subtotal'),
-            'igv'                => $this->request->getPost('igv'),
-            'descuento'          => $this->request->getPost('descuento') ?? 0,
-            'total'              => $this->request->getPost('total'),
-            'serie'              => $this->request->getPost('serie'),
-            'num_documento'      => $this->request->getPost('num_documento'),
-            'idtipo_comprobante' => $idtipo_comprobante,
-            'idcliente'          => $this->request->getPost('idcliente'),
-            'idusuario'          => $idUsuario,
-            'estado'             => 1,
-            'fecharegistro'      => date('Y-m-d H:i:s'),
-            'usuarioregistro'    => $idUsuario,
-        ], true);
-
-        // ✅ Detalle + bajar stock
-        foreach ($items as $it) {
-            $idproducto = (int)($it['idproducto'] ?? 0);
-            $precio     = (float)($it['precio'] ?? 0);
-            $cantidad   = (float)($it['cantidad'] ?? 0);
-            $importe    = (float)($it['importe'] ?? 0);
-
-            $this->detalle->insert([
-                'estado'        => 1,
-                'precio'        => $precio,
-                'cantidad'      => $cantidad,
-                'importe'       => $importe,
-                'idproducto'    => $idproducto,
-                'idventa'       => $idventa,
-                'fecharegistro' => date('Y-m-d H:i:s'),
+        if ((float)$p['stock'] < $cantidad) {
+            $db->transRollback();
+            return redirect()->back()->withInput()->with('error', [
+                "Stock insuficiente para {$p['nombre']}. Disponible: {$p['stock']}"
             ]);
-
-            $db->table('producto')
-                ->set('stock', 'stock - ' . $db->escape($cantidad), false)
-                ->where('idproducto', $idproducto)
-                ->where('stock >=', $cantidad)
-                ->update();
-
-            if ($db->affectedRows() === 0) {
-                $db->transRollback();
-                return redirect()->back()->withInput()->with('error', [
-                    'Stock insuficiente (se actualizó mientras vendías). Intenta nuevamente.'
-                ]);
-            }
         }
+    }
 
-        // ✅ AUMENTAR correlativo del comprobante (cantidad + 1) ANTES del return
-        $db->table('tipo_comprobante')
-            ->set('cantidad', 'cantidad + 1', false)
-            ->where('idtipo_comprobante', $idtipo_comprobante)
+    // ✅ 2) Insert cabecera venta
+    $idventa = $this->venta->insert([
+        'fecha'              => $fecha,
+        'subtotal'           => $this->request->getPost('subtotal'),
+        'igv'                => $this->request->getPost('igv'),
+        'descuento'          => $this->request->getPost('descuento') ?? 0,
+        'total'              => $this->request->getPost('total'),
+        'serie'              => $this->request->getPost('serie'),
+        'num_documento'      => $this->request->getPost('num_documento'),
+        'idtipo_comprobante' => $this->request->getPost('idtipo_comprobante'),
+        'idcliente'          => $this->request->getPost('idcliente'),
+        'idusuario'          => $idUsuario,
+        'estado'             => 1,
+        'fecharegistro'      => date('Y-m-d H:i:s'),
+        'usuarioregistro'    => $idUsuario,
+    ], true);
+
+    if (!$idventa) {
+        $db->transRollback();
+        return redirect()->back()->withInput()->with('error', ['No se pudo insertar la venta.']);
+    }
+
+    // ✅ 3) Insert detalle + descontar stock atómico
+    foreach ($items as $it) {
+        $idproducto = (int)($it['idproducto'] ?? 0);
+        $precio     = (float)($it['precio'] ?? 0);
+        $cantidad   = (float)($it['cantidad'] ?? 0);
+        $importe    = (float)($it['importe'] ?? 0);
+
+        $this->detalle->insert([
+            'estado'        => 1,
+            'precio'        => $precio,
+            'cantidad'      => $cantidad,
+            'importe'       => $importe,
+            'idproducto'    => $idproducto,
+            'idventa'       => $idventa,
+            'fecharegistro' => date('Y-m-d H:i:s'),
+        ]);
+
+        // ✅ descontar stock con condición
+        $db->table('producto')
+            ->set('stock', 'stock - ' . (float)$cantidad, false)
+            ->where('idproducto', $idproducto)
+            ->where('stock >=', $cantidad)
             ->update();
 
-        $db->transComplete();
-
-        if ($db->transStatus() === false) {
-            return redirect()->back()->withInput()->with('error', ['Error al registrar la venta.']);
+        if ($db->affectedRows() === 0) {
+            $db->transRollback();
+            return redirect()->back()->withInput()->with('error', [
+                'Stock insuficiente (se actualizó mientras vendías). Intenta nuevamente.'
+            ]);
         }
-
-        return redirect()->to(base_url('ventas'))->with('success', 'Venta registrada correctamente');
     }
+
+    // ✅ 4) Aumentar correlativo del comprobante (cantidad = cantidad + 1)
+    $db->table('tipo_comprobante')
+        ->set('cantidad', 'cantidad + 1', false)
+        ->where('idtipo_comprobante', (int)$this->request->getPost('idtipo_comprobante'))
+        ->update();
+
+    $db->transComplete();
+
+    if ($db->transStatus() === false) {
+        return redirect()->back()->withInput()->with('error', ['Error al registrar la venta.']);
+    }
+
+    return redirect()->to(base_url('ventas'))->with('success', 'Venta registrada correctamente');
+}
+
 
     public function view($id)
     {
