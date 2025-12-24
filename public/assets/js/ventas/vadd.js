@@ -6,46 +6,35 @@
       setTimeout(function () { onReady(fn); }, 50);
       return;
     }
-    jQuery(fn);
+    window.jQuery(fn);
   }
 
   onReady(function () {
     const $ = window.jQuery;
     const CFG = window.VENTA_CFG || {};
 
-    const BASE_URL     = (CFG.BASE_URL || "").replace(/\/?$/, "/"); // asegura / final
-    const IGV_RATE     = CFG.IGV_RATE ?? 0.18;
+    const BASE_URL = (CFG.BASE_URL || "").replace(/\/+$/, "") + "/";
+    const IGV_RATE = CFG.IGV_RATE ?? 0.18;
 
-    const URL_CLIENTES = CFG.URL_CLIENTES || (BASE_URL + "ventas/ajaxClientes");
-    const URL_PRODUCTOS= CFG.URL_PRODUCTOS || (BASE_URL + "ventas/ajaxProductos");
-    const URL_COMP_DATA= CFG.URL_COMP_DATA || (BASE_URL + "ventas/ajaxComprobanteData"); // + /ID
-    const IMG_DEFAULT  = CFG.IMG_DEFAULT || (BASE_URL + "uploads/productos/no.jpg");
+    const URL_CLIENTES = CFG.URL_CLIENTES || "";
+    const URL_PRODUCTOS = CFG.URL_PRODUCTOS || "";
+    const URL_COMP_DATA = CFG.URL_COMP_DATA || ""; // base_url('ventas/ajaxComprobanteData')
+    const IMG_DEFAULT = CFG.IMG_DEFAULT || "";
 
     console.log("✅ vadd.js COMPLETO cargado");
 
-    /* ===================== UTILIDADES ===================== */
     function n2(v) {
       let x = parseFloat(String(v ?? "0").replace(",", "."));
       if (isNaN(x)) x = 0;
       return Math.round(x * 100) / 100;
     }
     function fmt(v) { return n2(v).toFixed(2); }
-
-    function numStock(v) {
-      const x = Number(String(v ?? "0").replace(",", "."));
-      return isNaN(x) ? 0 : x;
-    }
+    function numStock(v) { return Number(String(v ?? "0").replace(",", ".")); }
 
     function getRowById(id) {
       return $('#tablaDetalle tbody tr[data-id="' + id + '"]');
     }
 
-    function toast(msg) {
-      // simple, sin librerías extra
-      alert(msg);
-    }
-
-    /* ===================== ITEMS JSON ===================== */
     function buildItems() {
       const items = [];
       $("#tablaDetalle tbody tr").each(function () {
@@ -54,21 +43,20 @@
           idproducto: parseInt($tr.attr("data-id"), 10),
           precio: n2($tr.find(".precio").text()),
           cantidad: n2($tr.find(".cantidad").val()),
-          importe: n2($tr.find(".importe").text())
+          importe: n2($tr.find(".importe").text()),
         });
       });
       $("#items").val(JSON.stringify(items));
     }
 
-    /* ===================== CALCULO (TOTAL incluye IGV) ===================== */
     function calc() {
       let total = 0;
 
       $("#tablaDetalle tbody tr").each(function () {
         const $tr = $(this);
         const precio = n2($tr.find(".precio").text());
-        const cant   = n2($tr.find(".cantidad").val());
-        const imp    = n2(precio * cant);
+        const cant = n2($tr.find(".cantidad").val());
+        const imp = n2(precio * cant);
 
         $tr.find(".importe").text(fmt(imp));
         total += imp;
@@ -84,36 +72,32 @@
       buildItems();
     }
 
-    /* ===================== STOCK EN FILA ===================== */
     function enforceRowStock($tr) {
       const max = numStock($tr.attr("data-stock"));
+      if (max <= 0) return;
+
       const $inp = $tr.find(".cantidad");
-
       let v = numStock($inp.val());
-      if (v <= 0) v = 1;
-
-      if (max > 0 && v > max) v = max;
+      if (isNaN(v) || v <= 0) v = 1;
+      if (v > max) v = max;
       $inp.val(v);
     }
 
-    /* ===================== AGREGAR PRODUCTO AL DETALLE ===================== */
     function addProducto(p) {
       const id = parseInt(p.idproducto, 10);
       if (!id) return;
 
       const st = numStock(p.stock);
 
-      // si no hay stock, no permitir agregar
       if (st <= 0) {
-        toast("❌ Este producto no tiene stock.");
+        alert("Este producto no tiene stock.");
         return;
       }
 
-      // si ya existe, subir cantidad
       const $row = getRowById(id);
       if ($row.length) {
         let c = numStock($row.find(".cantidad").val());
-        $row.find(".cantidad").val(c + 1);
+        $row.find(".cantidad").val(Math.max(1, Math.round(c + 1)));
         enforceRowStock($row);
         calc();
         return;
@@ -121,9 +105,10 @@
 
       const img = p.img_url ? p.img_url : IMG_DEFAULT;
       const precio = fmt(p.precio);
+      const stockNum = st;
 
       const $tr = $(`
-        <tr data-id="${id}" data-stock="${st}">
+        <tr data-id="${id}" data-stock="${stockNum}">
           <td class="codigo"></td>
           <td class="nombre"></td>
           <td class="text-center">
@@ -133,7 +118,7 @@
           <td class="precio text-right"></td>
           <td class="stock text-right"></td>
           <td>
-            <input type="number" class="form-control cantidad" min="1" step="1" value="1" max="${st}">
+            <input type="number" min="1" step="1" class="form-control cantidad" value="1" max="${stockNum}">
           </td>
           <td class="importe text-right">0.00</td>
           <td class="text-center">
@@ -149,10 +134,10 @@
       $tr.find(".um").text(p.unmedida ?? "");
       $tr.find(".precio").text(precio);
 
-      if (st <= 0) {
+      if (stockNum <= 0) {
         $tr.find(".stock").html('<span class="badge badge-danger">NO HAY STOCK</span>');
       } else {
-        $tr.find(".stock").text(st);
+        $tr.find(".stock").text(stockNum);
       }
 
       $("#tablaDetalle tbody").append($tr);
@@ -160,7 +145,7 @@
       calc();
     }
 
-    /* ===================== CLIENTES (modal + escribir) ===================== */
+    // ===================== CLIENTES =====================
     function cargarClientes(q) {
       return $.getJSON(URL_CLIENTES, { q: q || "" });
     }
@@ -189,7 +174,7 @@
       $("#modalClientes").modal("show");
       $("#qCliente").val("");
       cargarClientes("").done(renderClientes);
-      setTimeout(() => $("#qCliente").focus(), 150);
+      setTimeout(() => $("#qCliente").focus(), 200);
     });
 
     $("#qCliente").on("keyup", function () {
@@ -198,7 +183,6 @@
       tCli = setTimeout(() => { cargarClientes(q).done(renderClientes); }, 200);
     });
 
-    // escribir en input principal abre el modal y filtra
     let tCli2 = null;
     $("#cliente_nombre").on("keyup", function (e) {
       const q = $(this).val().trim();
@@ -227,8 +211,9 @@
       $("#modalClientes").modal("hide");
     });
 
-    /* ===================== PRODUCTOS (DataTables) ===================== */
+    // ===================== PRODUCTOS (DATATABLE) =====================
     let dtProd = null;
+    let tProdKey = null;
 
     function initDtProductos() {
       if (dtProd) return;
@@ -239,9 +224,8 @@
           url: URL_PRODUCTOS,
           dataSrc: "",
           data: function (d) {
-            // tu backend usa q
             return { q: (d.search && d.search.value) ? d.search.value : "" };
-          }
+          },
         },
         columns: [
           {
@@ -259,7 +243,7 @@
               return `<button type="button" class="btn btn-success btn-sm selProdDt" title="Agregar">
                         <i class="fa fa-check"></i>
                       </button>`;
-            }
+            },
           },
           { data: "codigo" },
           { data: "nombre" },
@@ -271,12 +255,12 @@
             render: function (url) {
               const img = url || IMG_DEFAULT;
               return `<img src="${img}" class="img-thumbnail" style="max-width:60px; max-height:60px;">`;
-            }
+            },
           },
           {
             data: "precio",
             className: "text-right",
-            render: function (v) { return fmt(v); }
+            render: function (v) { return fmt(v); },
           },
           {
             data: "stock",
@@ -287,11 +271,9 @@
               return st;
             }
           },
-          { data: "unmedida" }
+          { data: "unmedida" },
         ],
-        language: {
-          url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json"
-        }
+        language: { url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json" },
       });
 
       $("#dtProductos tbody").on("click", ".selProdDt", function () {
@@ -310,8 +292,6 @@
       }, 150);
     });
 
-    // escribir en input principal abre modal y busca por nombre/código
-    let tProdKey = null;
     $("#producto_buscar").on("keyup", function (e) {
       const q = $(this).val().trim();
 
@@ -327,17 +307,16 @@
           $("#modalProductos").modal("show");
           setTimeout(function () {
             initDtProductos();
-            dtProd.search(q).draw(); // busca por nombre/código
-          }, 120);
-        } else if (q.length === 0 && dtProd) {
+            dtProd.search(q).draw();
+          }, 150);
+        }
+        if (q.length === 0 && dtProd) {
           dtProd.search("").draw();
         }
       }, 250);
     });
 
-    /* ===================== COMPROBANTE (serie + numero auto) ===================== */
-    // IMPORTANTÍSIMO: en tu vadd.php los inputs deben tener id="serie" y id="num_documento"
-    // y el select debe ser id="idtipo_comprobante"
+    // ===================== AUTOLLENADO SERIE / NUMERO =====================
     $("#idtipo_comprobante").on("change", function () {
       const id = $(this).val();
 
@@ -347,9 +326,10 @@
         return;
       }
 
-      // URL_COMP_DATA debe ser algo como: BASE_URL + "ventas/ajaxComprobanteData"
-      // y el backend debe aceptar /ID
-      $.getJSON(URL_COMP_DATA + "/" + id)
+      // URL_COMP_DATA ya viene como base_url('ventas/ajaxComprobanteData')
+      const url = URL_COMP_DATA.replace(/\/+$/, "") + "/" + id;
+
+      $.getJSON(url)
         .done(function (r) {
           $("#serie").val(r.serie || "");
           $("#num_documento").val(r.numero || "");
@@ -359,7 +339,7 @@
         });
     });
 
-    /* ===================== EVENTOS DETALLE ===================== */
+    // ===================== DETALLE EVENTS =====================
     $(document).on("input", "#tablaDetalle .cantidad", function () {
       const $tr = $(this).closest("tr");
       enforceRowStock($tr);
@@ -371,35 +351,39 @@
       calc();
     });
 
-    /* ===================== SUBMIT ===================== */
+    // ===================== SUBMIT =====================
     $("#formVenta").on("submit", function (e) {
+      if (!$("#idtipo_comprobante").val()) {
+        e.preventDefault();
+        alert("Seleccione un comprobante.");
+        return;
+      }
       if (!$("#idcliente").val()) {
         e.preventDefault();
-        toast("Seleccione un cliente.");
+        alert("Seleccione un cliente.");
         return;
       }
       if ($("#tablaDetalle tbody tr").length === 0) {
         e.preventDefault();
-        toast("Agregue al menos 1 producto.");
+        alert("Agregue al menos 1 producto.");
         return;
       }
 
-      // validación stock en front
+      // validar stock en front
       let ok = true;
       $("#tablaDetalle tbody tr").each(function () {
         const stock = numStock($(this).attr("data-stock"));
-        const cant  = numStock($(this).find(".cantidad").val());
+        const cant = numStock($(this).find(".cantidad").val());
         if (stock > 0 && cant > stock) ok = false;
       });
 
       if (!ok) {
         e.preventDefault();
-        toast("Hay productos con cantidad mayor al stock. Corrige antes de guardar.");
+        alert("Hay productos con cantidad mayor al stock. Corrige antes de guardar.");
         return;
       }
 
-      buildItems(); // 🔥 CLAVE para que registre
-      // console.log("ITEMS:", $("#items").val()); // útil para debug
+      buildItems();
     });
 
     calc();
