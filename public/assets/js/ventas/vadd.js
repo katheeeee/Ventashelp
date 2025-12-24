@@ -354,6 +354,8 @@
 
     // ===================== SUBMIT =====================
     $("#formVenta").on("submit", function (e) {
+      console.log("SUBMIT: defaultPrevented antes =", e.isDefaultPrevented());
+  setTimeout(() => console.log("SUBMIT: defaultPrevented después =", e.isDefaultPrevented()), 0);
       if (!$("#idtipo_comprobante").val()) {
         e.preventDefault();
         alert("Seleccione un comprobante.");
