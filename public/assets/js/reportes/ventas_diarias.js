@@ -38,22 +38,34 @@
 
       if (chart) chart.destroy();
 
-      chart = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels: labels,
-          datasets: [{
-            label: "total vendido",
-            data: data
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: "index", intersect: false },
-          scales: { y: { beginAtZero: true } }
+chart = new Chart(ctx, {
+  type: "bar",
+  data: {
+    labels: labels,
+    datasets: [{
+      label: "total vendido",
+      data: data,
+      backgroundColor: "rgba(54, 162, 235, 0.7)",
+      borderColor: "rgba(54, 162, 235, 1)",
+      borderWidth: 1
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function (value) {
+            return "S/ " + value;
+          }
         }
-      });
+      }
+    }
+  }
+});
+
     }
 
     function ejecutar() {
