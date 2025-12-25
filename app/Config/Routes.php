@@ -130,6 +130,9 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
     });
    $routes->get('reportes', 'reportes\creportes::index');
+$routes->get('reportes/resumen', 'reportes\creportes::resumen');
+$routes->get('reportes/resumen_data', 'reportes\cestadisticas::resumen');
+
 $routes->get('reportes/top_productos', 'reportes\creportes::top_productos');
 $routes->get('reportes/top_clientes', 'reportes\creportes::top_clientes');
 $routes->get('reportes/ventas_diarias', 'reportes\creportes::ventas_diarias');
