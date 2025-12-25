@@ -1,61 +1,73 @@
 (function () {
   "use strict";
 
-  const cfg = window.reportes_cfg || {};
-  const base_url = (cfg.base_url || "").replace(/\/+$/, "") + "/";
-
-  let chart = null;
-
-  function cargar(desde, hasta) {
-    return $.getJSON(base_url + "reportes/ventas_diarias", { desde, hasta });
+  function onReady(fn) {
+    if (typeof window.jQuery === "undefined") {
+      setTimeout(function () { onReady(fn); }, 50);
+      return;
+    }
+    window.jQuery(fn);
   }
 
-  function pintar(rows) {
-    const labels = (rows || []).map(r => r.fecha);
-    const data = (rows || []).map(r => parseFloat(r.total || 0));
+  onReady(function () {
+    const $ = window.jQuery;
+    const cfg = window.reportes_cfg || {};
+    const url_data = cfg.url_data || "";
 
-    const ctx = document.getElementById("grafica_ventas");
-    if (!ctx) return;
+    console.log("✅ reportes js cargado");
+    console.log("url_data =", url_data);
 
-    if (chart) chart.destroy();
+    let chart = null;
 
-    chart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: labels,
-        datasets: [{
-          label: "total vendido",
-          data: data
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: "index", intersect: false },
-        scales: {
-          y: { beginAtZero: true }
+    function fecha_hoy() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function cargar(desde, hasta) {
+      return $.getJSON(url_data, { desde, hasta });
+    }
+
+    function pintar(rows) {
+      console.log("rows =", rows);
+
+      const labels = (rows || []).map(r => r.fecha);
+      const data = (rows || []).map(r => parseFloat(r.total || 0));
+
+      const ctx = document.getElementById("grafica_ventas");
+      if (!ctx) return;
+
+      if (chart) chart.destroy();
+
+      chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "total vendido",
+            data: data
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          scales: { y: { beginAtZero: true } }
         }
-      }
-    });
-  }
-
-  function ejecutar() {
-    const desde = $("#desde").val();
-    const hasta = $("#hasta").val();
-
-    cargar(desde, hasta)
-      .done(pintar)
-      .fail(function (xhr) {
-        console.error("ventas_diarias error:", xhr.status, xhr.responseText);
-        alert("error cargando ventas diarias (mira consola)");
       });
-  }
+    }
 
-  function fecha_hoy() {
-    return new Date().toISOString().slice(0, 10);
-  }
+    function ejecutar() {
+      const desde = $("#desde").val();
+      const hasta = $("#hasta").val();
 
-  $(function () {
+      cargar(desde, hasta)
+        .done(pintar)
+        .fail(function (xhr) {
+          console.error("❌ ajax error:", xhr.status, xhr.responseText);
+          alert("no carga datos (mira consola y network)");
+        });
+    }
+
     const hoy = fecha_hoy();
     $("#desde").val(hoy);
     $("#hasta").val(hoy);
