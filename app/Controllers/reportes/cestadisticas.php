@@ -58,50 +58,79 @@ class cestadisticas extends BaseController
         return $this->response->setJSON($builder->get()->getResultArray());
     }
 
-    public function top_productos()
-    {
-        if (!session()->get('login')) return $this->response->setStatusCode(403);
+public function top_productos()
+{
+  if (!session()->get('login')) return $this->response->setStatusCode(403);
 
-        $desde = $this->request->getGet('desde');
-        $hasta = $this->request->getGet('hasta');
+  $desde = $this->request->getGet('desde');
+  $hasta = $this->request->getGet('hasta');
 
-        $builder = $this->db->table('detalle_venta dv')
-            ->select('p.nombre, sum(dv.cantidad) as total_vendido')
-            ->join('producto p', 'p.idproducto = dv.idproducto')
-            ->join('venta v', 'v.idventa = dv.idventa')
-            ->where('v.estado', 1)
-            ->groupBy('p.idproducto')
-            ->orderBy('total_vendido', 'desc')
-            ->limit(10);
+  $db = \Config\Database::connect();
 
-        if ($desde && $hasta) {
-            $builder->where('date(v.fecha) >=', $desde)
-                    ->where('date(v.fecha) <=', $hasta);
-        }
+  $sql = "
+    select
+      p.nombre as nombre,
+      sum(dv.cantidad) as cantidad,
+      sum(dv.importe) as total
+    from detalle_venta dv
+    join venta v on v.idventa = dv.idventa
+    join producto p on p.idproducto = dv.idproducto
+    where v.estado = 1
+  ";
 
-        return $this->response->setJSON($builder->get()->getResultArray());
-    }
+  $params = [];
 
-    public function top_clientes()
-    {
-        if (!session()->get('login')) return $this->response->setStatusCode(403);
+  if ($desde && $hasta) {
+    $sql .= " and date(v.fecha) between ? and ? ";
+    $params[] = $desde;
+    $params[] = $hasta;
+  }
 
-        $desde = $this->request->getGet('desde');
-        $hasta = $this->request->getGet('hasta');
+  $sql .= "
+    group by p.idproducto, p.nombre
+    order by total desc
+    limit 10
+  ";
 
-        $builder = $this->db->table('venta v')
-            ->select('c.nombre, sum(v.total) as total_comprado')
-            ->join('cliente c', 'c.idcliente = v.idcliente')
-            ->where('v.estado', 1)
-            ->groupBy('c.idcliente')
-            ->orderBy('total_comprado', 'desc')
-            ->limit(10);
+  $rows = $db->query($sql, $params)->getResultArray();
+  return $this->response->setJSON($rows);
+}
 
-        if ($desde && $hasta) {
-            $builder->where('date(v.fecha) >=', $desde)
-                    ->where('date(v.fecha) <=', $hasta);
-        }
+public function top_clientes()
+{
+  if (!session()->get('login')) return $this->response->setStatusCode(403);
 
-        return $this->response->setJSON($builder->get()->getResultArray());
-    }
+  $desde = $this->request->getGet('desde');
+  $hasta = $this->request->getGet('hasta');
+
+  $db = \Config\Database::connect();
+
+  $sql = "
+    select
+      c.nombre as nombre,
+      count(distinct v.idventa) as ventas,
+      sum(v.total) as total
+    from venta v
+    join cliente c on c.idcliente = v.idcliente
+    where v.estado = 1
+  ";
+
+  $params = [];
+
+  if ($desde && $hasta) {
+    $sql .= " and date(v.fecha) between ? and ? ";
+    $params[] = $desde;
+    $params[] = $hasta;
+  }
+
+  $sql .= "
+    group by c.idcliente, c.nombre
+    order by total desc
+    limit 10
+  ";
+
+  $rows = $db->query($sql, $params)->getResultArray();
+  return $this->response->setJSON($rows);
+}
+
 }
