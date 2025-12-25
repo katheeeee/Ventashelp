@@ -27,10 +27,12 @@ class Clogin extends BaseController
         }
 
         session()->set([
-            'idtipo_usuario' => $res['idtipo_usuario'],
-            'user'           => $res['user'],
-            'login'          => true
-        ]);
+    'idusuario'      => $res['idtipo_usuario'],   // ✅ agregar
+    'idtipo_usuario' => $res['idtipo_usuario'],
+    'user'           => $res['user'],
+    'login'          => true
+]);
+
 
         return redirect()->to(base_url('dashboard'));
     }

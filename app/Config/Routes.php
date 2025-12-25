@@ -129,7 +129,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
 
     });
-    
+
    $routes->get('reportes', 'reportes\creportes::resumen');
 $routes->get('reportes/resumen', 'reportes\creportes::resumen');
 $routes->get('reportes/resumen_data', 'reportes\cestadisticas::resumen');
@@ -143,6 +143,13 @@ $routes->get('reportes/top_productos_data', 'reportes\cestadisticas::top_product
 $routes->get('reportes/top_clientes_data', 'reportes\cestadisticas::top_clientes');
 $routes->get('reportes/ventas_diarias_data', 'reportes\cestadisticas::ventas_diarias');
 
+$routes->group('admin', function($routes) {
+  $routes->get('usuarios', 'admin\cadmin::usuarios');
+  $routes->get('empresa', 'admin\cadmin::empresa');
+
+  $routes->get('cambiar_password', 'admin\cadmin::cambiar_password');
+  $routes->post('cambiar_password', 'admin\cadmin::guardar_password');
+});
 
 
 });
