@@ -25,7 +25,7 @@ public function resumen()
     'active' => 'reportes',
     'subactive' => 'resumen'
   ];
-  return view('admin/reportes/resumen', $data);
+  return view('admin/reportes/index', $data);
 }
 
 

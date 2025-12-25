@@ -129,7 +129,8 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
 
     });
-   $routes->get('reportes', 'reportes\creportes::index');
+    
+   $routes->get('reportes', 'reportes\creportes::resumen');
 $routes->get('reportes/resumen', 'reportes\creportes::resumen');
 $routes->get('reportes/resumen_data', 'reportes\cestadisticas::resumen');
 
