@@ -1,14 +1,44 @@
 <?= $this->include('layouts/header') ?>
 
 <section class="content pt-3">
-  <div class="container-fluid">
-    <div class="card">
-      <div class="card-body">
-        <h4>ventas diarias</h4>
-        <div id="contenido_reporte">aquí irá la gráfica</div>
-      </div>
+<div class="container-fluid">
+
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <label>desde</label>
+      <input type="date" id="desde" class="form-control">
+    </div>
+
+    <div class="col-md-3">
+      <label>hasta</label>
+      <input type="date" id="hasta" class="form-control">
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+      <button id="btn_filtrar" class="btn btn-primary btn-block">filtrar</button>
     </div>
   </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">ventas por día</h3>
+    </div>
+    <div class="card-body">
+      <canvas id="grafica_ventas" height="110"></canvas>
+    </div>
+  </div>
+
+</div>
 </section>
+
+<script>
+  window.reportes_cfg = { base_url: "<?= base_url() ?>" };
+</script>
+
+<!-- chartjs (cdn) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- tu js -->
+<script src="<?= base_url('assets/js/reportes/ventas_diarias.js') ?>"></script>
 
 <?= $this->include('layouts/footer') ?>
