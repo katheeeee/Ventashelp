@@ -148,12 +148,14 @@
         </li>
 
         <!-- REPORTES -->
-        <li class="nav-item">
-          <a href="#" class="nav-link <?= ($active=='reportes')?'active':'' ?>">
-            <i class="nav-icon fas fa-chart-bar"></i>
-            <p>Reportes</p>
-          </a>
-        </li>
+<li class="nav-item">
+  <a href="<?= base_url('reportes') ?>"
+     class="nav-link <?= ($active=='reportes')?'active':'' ?>">
+    <i class="nav-icon fas fa-chart-bar"></i>
+    <p>Reportes</p>
+  </a>
+</li>
+
 
         <!-- ADMINISTRADOR -->
         <li class="nav-item">
