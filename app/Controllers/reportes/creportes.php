@@ -6,15 +6,36 @@ use App\Controllers\BaseController;
 
 class creportes extends BaseController
 {
-    public function index()
+    private function render($vista, $subactive)
     {
         if (!session()->get('login')) {
             return redirect()->to(base_url('login'));
         }
 
-        return view('admin/reportes/index', [
-            'title'  => 'reportes',
-            'active' => 'reportes',
+        return view('admin/reportes/' . $vista, [
+            'title'     => 'reportes',
+            'active'    => 'reportes',
+            'subactive' => $subactive
         ]);
+    }
+
+    public function index()
+    {
+        return $this->render('index', 'resumen');
+    }
+
+    public function top_productos()
+    {
+        return $this->render('top_productos', 'top_productos');
+    }
+
+    public function top_clientes()
+    {
+        return $this->render('top_clientes', 'top_clientes');
+    }
+
+    public function ventas_diarias()
+    {
+        return $this->render('ventas_diarias', 'ventas_diarias');
     }
 }

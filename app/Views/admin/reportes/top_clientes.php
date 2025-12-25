@@ -4,8 +4,8 @@
   <div class="container-fluid">
     <div class="card">
       <div class="card-body">
-        <h4>resumen de ventas</h4>
-        <div id="contenido_reporte">aquí irá el resumen</div>
+        <h4>top clientes</h4>
+        <div id="contenido_reporte">aquí irá el top clientes</div>
       </div>
     </div>
   </div>
