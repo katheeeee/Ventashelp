@@ -60,77 +60,75 @@ class cestadisticas extends BaseController
 
 public function top_productos()
 {
-  if (!session()->get('login')) return $this->response->setStatusCode(403);
+    if (!session()->get('login')) return $this->response->setStatusCode(403);
 
-  $desde = $this->request->getGet('desde');
-  $hasta = $this->request->getGet('hasta');
+    $desde = $this->request->getGet('desde');
+    $hasta = $this->request->getGet('hasta');
 
-  $db = \Config\Database::connect();
+    $db = \Config\Database::connect();
 
-  $sql = "
-    select
-      p.nombre as nombre,
-      sum(dv.cantidad) as cantidad,
-      sum(dv.importe) as total
-    from detalle_venta dv
-    join venta v on v.idventa = dv.idventa
-    join producto p on p.idproducto = dv.idproducto
-    where v.estado = 1
-  ";
+    $sql = "
+      select
+        p.nombre as nombre,
+        sum(dv.cantidad) as cantidad,
+        sum(dv.importe) as total
+      from detalle_venta dv
+      join venta v on v.idventa = dv.idventa
+      join producto p on p.idproducto = dv.idproducto
+      where v.estado = 1
+    ";
 
-  $params = [];
+    $params = [];
 
-  if ($desde && $hasta) {
-    $sql .= " and date(v.fecha) between ? and ? ";
-    $params[] = $desde;
-    $params[] = $hasta;
-  }
+    if ($desde && $hasta) {
+      $sql .= " and date(v.fecha) between ? and ? ";
+      $params[] = $desde;
+      $params[] = $hasta;
+    }
 
-  $sql .= "
-    group by p.idproducto, p.nombre
-    order by total desc
-    limit 10
-  ";
+    $sql .= "
+      group by p.idproducto, p.nombre
+      order by total desc
+      limit 10
+    ";
 
-  $rows = $db->query($sql, $params)->getResultArray();
-  return $this->response->setJSON($rows);
+    return $this->response->setJSON($db->query($sql, $params)->getResultArray());
 }
 
 public function top_clientes()
 {
-  if (!session()->get('login')) return $this->response->setStatusCode(403);
+    if (!session()->get('login')) return $this->response->setStatusCode(403);
 
-  $desde = $this->request->getGet('desde');
-  $hasta = $this->request->getGet('hasta');
+    $desde = $this->request->getGet('desde');
+    $hasta = $this->request->getGet('hasta');
 
-  $db = \Config\Database::connect();
+    $db = \Config\Database::connect();
 
-  $sql = "
-    select
-      c.nombre as nombre,
-      count(distinct v.idventa) as ventas,
-      sum(v.total) as total
-    from venta v
-    join cliente c on c.idcliente = v.idcliente
-    where v.estado = 1
-  ";
+    $sql = "
+      select
+        c.nombre as nombre,
+        count(distinct v.idventa) as ventas,
+        sum(v.total) as total
+      from venta v
+      join cliente c on c.idcliente = v.idcliente
+      where v.estado = 1
+    ";
 
-  $params = [];
+    $params = [];
 
-  if ($desde && $hasta) {
-    $sql .= " and date(v.fecha) between ? and ? ";
-    $params[] = $desde;
-    $params[] = $hasta;
-  }
+    if ($desde && $hasta) {
+      $sql .= " and date(v.fecha) between ? and ? ";
+      $params[] = $desde;
+      $params[] = $hasta;
+    }
 
-  $sql .= "
-    group by c.idcliente, c.nombre
-    order by total desc
-    limit 10
-  ";
+    $sql .= "
+      group by c.idcliente, c.nombre
+      order by total desc
+      limit 10
+    ";
 
-  $rows = $db->query($sql, $params)->getResultArray();
-  return $this->response->setJSON($rows);
+    return $this->response->setJSON($db->query($sql, $params)->getResultArray());
 }
 
 }

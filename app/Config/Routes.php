@@ -133,9 +133,11 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 $routes->get('reportes/top_productos', 'reportes\creportes::top_productos');
 $routes->get('reportes/top_clientes', 'reportes\creportes::top_clientes');
 $routes->get('reportes/ventas_diarias', 'reportes\creportes::ventas_diarias');
-$routes->get('reportes/top_clientes', 'reportes\cestadisticas::top_clientes');
-$routes->get('reportes/ventas_diarias_data', 'reportes\cestadisticas::ventas_diarias');
 $routes->get('reportes/ventas_diarias', 'reportes\creportes::ventas_diarias');
+
+$routes->get('reportes/top_productos_data', 'reportes\cestadisticas::top_productos');
+$routes->get('reportes/top_clientes_data', 'reportes\cestadisticas::top_clientes');
+$routes->get('reportes/ventas_diarias_data', 'reportes\cestadisticas::ventas_diarias');
 
 
 
