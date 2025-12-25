@@ -41,6 +41,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <!-- tu js también puede ir aquí, pero DEBE esperar a jQuery -->
-<script src="<?= base_url('assets/js/reportes/ventas_diarias.js') ?>"></script>
+<script src="<?= base_url('assets/js/reportes/ventas_diarias.js') ?>?v=<?= time() ?>"></script>
 
 <?= $this->include('layouts/footer') ?>
