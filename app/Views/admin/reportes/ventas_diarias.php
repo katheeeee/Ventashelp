@@ -21,9 +21,10 @@
     <div class="card-header">
       <h3 class="card-title">ventas por día</h3>
     </div>
-    <div class="card-body" style="min-height:320px;">
-      <canvas id="grafica_ventas"></canvas>
-    </div>
+<div class="card-body" style="height:360px;">
+  <canvas id="grafica_ventas"></canvas>
+</div>
+
   </div>
 
 </div>

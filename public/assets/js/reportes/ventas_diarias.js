@@ -27,46 +27,48 @@
       return $.getJSON(url_data, { desde, hasta });
     }
 
-    function pintar(rows) {
-      console.log("rows =", rows);
+function pintar(rows) {
+  console.log("rows =", rows);
 
-      const labels = (rows || []).map(r => r.fecha);
-      const data = (rows || []).map(r => parseFloat(r.total || 0));
+  const labels = (rows || []).map(r => r.fecha);
+  const data = (rows || []).map(r => Number(r.total || 0));
 
-      const ctx = document.getElementById("grafica_ventas");
-      if (!ctx) return;
+  const canvas = document.getElementById("grafica_ventas");
+  if (!canvas) return;
 
-      if (chart) chart.destroy();
+  // si no hay datos, no dibujes “vacío”
+  if (!labels.length) {
+    if (chart) chart.destroy();
+    const ctx0 = canvas.getContext("2d");
+    ctx0.clearRect(0, 0, canvas.width, canvas.height);
+    ctx0.font = "16px Arial";
+    ctx0.fillText("no hay ventas en ese rango", 20, 40);
+    return;
+  }
 
-chart = new Chart(ctx, {
-  type: "bar",
-  data: {
-    labels: labels,
-    datasets: [{
-      label: "total vendido",
-      data: data,
-      backgroundColor: "rgba(54, 162, 235, 0.7)",
-      borderColor: "rgba(54, 162, 235, 1)",
-      borderWidth: 1
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          callback: function (value) {
-            return "S/ " + value;
-          }
-        }
+  if (chart) chart.destroy();
+
+  const ctx = canvas.getContext("2d");
+
+  chart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "total vendido",
+        data: data
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true }
       }
     }
-  }
-});
+  });
+}
 
-    }
 
     function ejecutar() {
       const desde = $("#desde").val();
