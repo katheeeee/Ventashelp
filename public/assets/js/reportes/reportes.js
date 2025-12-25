@@ -1,50 +1,41 @@
-$(function () {
+(function () {
+  "use strict";
 
-  const base_url = window.location.origin + '/ventas/public/';
+  const cfg = window.reportes_cfg || {};
+  const base_url = (cfg.base_url || "").replace(/\/+$/, "") + "/";
+
+  function fmt(n) {
+    n = parseFloat(n || 0);
+    return n.toFixed(2);
+  }
 
   function cargar_resumen(desde, hasta) {
-    $.getJSON(base_url + 'reportes/resumen', { desde, hasta }, function (r) {
-      $('#total_vendido').text(parseFloat(r.total_vendido || 0).toFixed(2));
-      $('#total_ventas').text(r.total_ventas || 0);
-      $('#total_igv').text(parseFloat(r.total_igv || 0).toFixed(2));
-      $('#ticket_promedio').text(parseFloat(r.ticket_promedio || 0).toFixed(2));
+    return $.getJSON(base_url + "reportes/resumen", { desde, hasta });
+  }
+
+  function ejecutar() {
+    const desde = $("#desde").val();
+    const hasta = $("#hasta").val();
+
+    cargar_resumen(desde, hasta).done(function (r) {
+      $("#r_total_vendido").text(fmt(r.total_vendido));
+      $("#r_total_ventas").text(r.total_ventas || 0);
+      $("#r_total_igv").text(fmt(r.total_igv));
+      $("#r_ticket_promedio").text(fmt(r.ticket_promedio));
+    }).fail(function (xhr) {
+      console.error("resumen error:", xhr.status, xhr.responseText);
+      alert("error cargando resumen (mira consola)");
     });
   }
 
-  function cargar_ventas_diarias(desde, hasta) {
-    $.getJSON(base_url + 'reportes/ventas_diarias', { desde, hasta }, function (rows) {
+  $(function () {
+    $("#btn_filtrar").on("click", ejecutar);
 
-      const labels = rows.map(r => r.fecha);
-      const data = rows.map(r => r.total);
+    // carga inicial: hoy
+    const hoy = new Date().toISOString().slice(0, 10);
+    $("#desde").val(hoy);
+    $("#hasta").val(hoy);
 
-      const ctx = document.getElementById('grafica_ventas').getContext('2d');
-
-      if (window.chart_ventas) {
-        window.chart_ventas.destroy();
-      }
-
-      window.chart_ventas = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'ventas por día',
-            data: data,
-            borderColor: '#007bff',
-            backgroundColor: 'rgba(0,123,255,0.2)',
-            fill: true
-          }]
-        }
-      });
-    });
-  }
-
-  $('#btn_filtrar').on('click', function () {
-    const desde = $('#desde').val();
-    const hasta = $('#hasta').val();
-
-    cargar_resumen(desde, hasta);
-    cargar_ventas_diarias(desde, hasta);
+    ejecutar();
   });
-
-});
+})();
