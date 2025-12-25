@@ -18,11 +18,16 @@ class creportes extends BaseController
             'subactive' => $subactive
         ]);
     }
+public function resumen()
+{
+  $data = [
+    'title' => 'resumen',
+    'active' => 'reportes',
+    'subactive' => 'resumen'
+  ];
+  return view('admin/reportes/resumen', $data);
+}
 
-    public function index()
-    {
-        return $this->render('index', 'resumen');
-    }
 
     public function top_productos()
     {
