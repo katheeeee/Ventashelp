@@ -202,29 +202,12 @@
   <a href="#" class="nav-link <?= ($active=='admin')?'active':'' ?>">
     <i class="nav-icon fas fa-user-shield"></i>
     <p>
-      Administrador
+      administrador
       <i class="right fas fa-angle-left"></i>
     </p>
   </a>
 
   <ul class="nav nav-treeview">
-
-    <li class="nav-item">
-      <a href="<?= base_url('admin/usuarios') ?>"
-         class="nav-link <?= ($subactive=='usuarios')?'active':'' ?>">
-        <i class="far fa-circle nav-icon"></i>
-        <p>usuarios</p>
-      </a>
-    </li>
-
-    <li class="nav-item">
-      <a href="<?= base_url('admin/empresa') ?>"
-         class="nav-link <?= ($subactive=='empresa')?'active':'' ?>">
-        <i class="far fa-circle nav-icon"></i>
-        <p>empresa</p>
-      </a>
-    </li>
-
     <li class="nav-item">
       <a href="<?= base_url('admin/cambiar_password') ?>"
          class="nav-link <?= ($subactive=='cambiar_password')?'active':'' ?>">
@@ -232,9 +215,9 @@
         <p>cambiar contraseña</p>
       </a>
     </li>
-
   </ul>
 </li>
+
 
 
       </ul>

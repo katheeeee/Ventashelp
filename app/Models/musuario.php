@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class musuario extends Model
 {
     protected $table      = 'usuario';
-    protected $primaryKey = 'idtipo_usuario'; // si tu PK real es otro, cámbialo
+    protected $primaryKey = 'idtipo_usuario';
 
     protected $returnType = 'array';
     protected $allowedFields = [
@@ -18,7 +18,7 @@ class musuario extends Model
     {
         return $this->where('user', $user)
                     ->where('pass', $pass)
-                    ->where('estado', 1)   // opcional (solo si manejas estado)
+                    ->where('estado', 1)
                     ->first();
     }
 }

@@ -24,25 +24,38 @@ class cadmin extends BaseController
             return redirect()->to(base_url('login'));
         }
 
-        $actual = trim($this->request->getPost('password_actual'));
-        $nueva  = trim($this->request->getPost('password_nueva'));
-        $rep    = trim($this->request->getPost('password_repetir'));
+        $actual = trim($this->request->getPost('password_actual') ?? '');
+        $nueva  = trim($this->request->getPost('password_nueva') ?? '');
+        $rep    = trim($this->request->getPost('password_repetir') ?? '');
 
         if ($nueva === '' || strlen($nueva) < 4) {
-            return redirect()->back()->with('msg_error', 'la nueva contraseña es muy corta');
+            return redirect()->back()->with('msg_error', 'la nueva contraseña debe tener al menos 4 caracteres');
         }
 
         if ($nueva !== $rep) {
             return redirect()->back()->with('msg_error', 'las contraseñas no coinciden');
         }
 
+        if ($actual === $nueva) {
+            return redirect()->back()->with('msg_error', 'la nueva contraseña no puede ser igual a la actual');
+        }
+
         $idusuario = session()->get('idusuario');
+        if (!$idusuario) {
+            return redirect()->back()->with('msg_error', 'no se encontró idusuario en sesión');
+        }
 
         $model = new musuario();
-        $user  = $model->find($idusuario);
+
+        // ✅ forzamos traer pass sí o sí
+        $user = $model->select('idtipo_usuario, pass')->find($idusuario);
 
         if (!$user) {
             return redirect()->back()->with('msg_error', 'usuario no encontrado');
+        }
+
+        if (!isset($user['pass'])) {
+            return redirect()->back()->with('msg_error', 'no se pudo leer la contraseña del usuario');
         }
 
         // validar contraseña actual (TEXTO PLANO)

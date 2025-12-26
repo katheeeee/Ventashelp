@@ -5,13 +5,13 @@
 
     <?php if (session()->getFlashdata('msg_ok')): ?>
       <div class="alert alert-success">
-        <?= session()->getFlashdata('msg_ok') ?>
+        <?= esc(session()->getFlashdata('msg_ok')) ?>
       </div>
     <?php endif; ?>
 
     <?php if (session()->getFlashdata('msg_error')): ?>
       <div class="alert alert-danger">
-        <?= session()->getFlashdata('msg_error') ?>
+        <?= esc(session()->getFlashdata('msg_error')) ?>
       </div>
     <?php endif; ?>
 
@@ -32,19 +32,22 @@
 
           <div class="form-group">
             <label>nueva contraseña</label>
-            <input type="password" name="password_nueva" class="form-control" required>
+            <input type="password" name="password_nueva" class="form-control" required minlength="4">
           </div>
 
           <div class="form-group">
             <label>repetir nueva contraseña</label>
-            <input type="password" name="password_repetir" class="form-control" required>
+            <input type="password" name="password_repetir" class="form-control" required minlength="4">
           </div>
 
         </div>
 
         <div class="card-footer">
-          <button type="submit" class="btn btn-primary">guardar</button>
+          <button type="submit" class="btn btn-primary">
+            guardar
+          </button>
         </div>
+
       </form>
     </div>
 
