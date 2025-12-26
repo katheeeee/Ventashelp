@@ -1,7 +1,7 @@
     </div> <!-- /.content-wrapper -->
 
     <footer class="main-footer text-sm">
-      <strong>Helpnet &copy; <?= date('Y') ?></strong>
+      <strong>Katventas, for you. &copy; <?= date('Y') ?></strong>
       <div class="float-right d-none d-sm-inline-block">
         Sistema de Ventas
       </div>

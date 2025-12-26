@@ -39,7 +39,7 @@
     </li>
     <li class="nav-item">
       <a class="navbar-brand font-weight-bold ml-2" href="<?= base_url('dashboard') ?>">
-        HELPNET
+        katventas
       </a>
     </li>
   </ul>
