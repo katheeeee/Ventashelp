@@ -62,7 +62,7 @@
       </div>
     </div>
 
-    <!-- Gráfica + resumen -->
+    <!-- Gráfica + Resumen -->
     <div class="row">
       <div class="col-md-8">
         <div class="card">
@@ -97,12 +97,12 @@
       </div>
     </div>
 
-    <!-- Top productos + stock bajo -->
+    <!-- Tablas -->
     <div class="row">
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Top 5 productos</h3>
+            <h3 class="card-title">Top 5 productos (<?= (int)$dias ?> días)</h3>
           </div>
           <div class="card-body p-0">
             <table class="table table-striped mb-0">
@@ -136,63 +136,3 @@
           <div class="card-header">
             <h3 class="card-title">Stock bajo (≤ <?= (int)$stockMin ?>)</h3>
           </div>
-          <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-              <thead>
-                <tr>
-                  <th>Producto</th>
-                  <th class="text-right">Stock</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php if (!empty($stockBajo)): ?>
-                  <?php foreach ($stockBajo as $s): ?>
-                    <tr>
-                      <td><?= esc($s['nombre']) ?></td>
-                      <td class="text-right">
-                        <span class="badge badge-danger"><?= (int)$s['stock'] ?></span>
-                      </td>
-                    </tr>
-                  <?php endforeach; ?>
-                <?php else: ?>
-                  <tr><td colspan="2" class="text-center text-muted p-3">Todo OK</td></tr>
-                <?php endif; ?>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
-  const labels = <?= json_encode($chartLabels ?? []) ?>;
-  const cant   = <?= json_encode($chartCantidad ?? []) ?>;
-  const tot    = <?= json_encode($chartTotal ?? []) ?>;
-
-  const ctx = document.getElementById('chartVentas');
-
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Cantidad de ventas', data: cant, tension: 0.3, yAxisID: 'y' },
-        { label: 'Total S/', data: tot, tension: 0.3, yAxisID: 'y1' }
-      ]
-    },
-    options: {
-      responsive: true,
-      interaction: { mode: 'index', intersect: false },
-      scales: {
-        y: { beginAtZero: true, title: { display: true, text: 'Ventas' } },
-        y1:{ beginAtZero: true, position:'right', grid:{ drawOnChartArea:false }, title:{ display:true, text:'S/' } }
-      }
-    }
-  });
-</script>
-
-<?= $this->include('layouts/footer') ?>

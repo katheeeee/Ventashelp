@@ -2,10 +2,10 @@
 
 namespace App\Controllers;
 
-use App\Models\Mventa;
-use App\Models\MdetalleVenta;
-use App\Models\Mproducto;
-use App\Models\Mcliente;
+use App\Models\mventa;
+use App\Models\mdetalle_venta;
+use App\Models\mproducto;
+use App\Models\mcliente;
 
 class Home extends BaseController
 {
@@ -13,13 +13,14 @@ class Home extends BaseController
     {
         $dias = 15;
 
-        // Ajusta si tus modelos se llaman distinto:
-        $ventaModel    = new Mventa();
-        $detalleModel  = new MdetalleVenta();
-        $productoModel = new Mproducto();
-        $clienteModel  = new Mcliente();
+        $ventaModel    = new mventa();
+        $detalleModel  = new mdetalle_venta();
+        $productoModel = new mproducto();
+        $clienteModel  = new mcliente();
 
+        // =========================
         // FECHAS
+        // =========================
         $hoyInicio = date('Y-m-d 00:00:00');
         $hoyFin    = date('Y-m-d 23:59:59');
 
@@ -29,7 +30,9 @@ class Home extends BaseController
         $inicioRango = date('Y-m-d 00:00:00', strtotime("-" . ($dias - 1) . " days"));
         $finRango    = $hoyFin;
 
-        // KPIs (asumo venta.total y venta.estado=1)
+        // =========================
+        // KPIs
+        // =========================
         $ventasHoy = (int)$ventaModel->where('estado', 1)
             ->where('fecha >=', $hoyInicio)
             ->where('fecha <=', $hoyFin)
@@ -55,7 +58,9 @@ class Home extends BaseController
         $clientesActivos  = (int)$clienteModel->where('estado', 1)->countAllResults();
         $productosActivos = (int)$productoModel->where('estado', 1)->countAllResults();
 
-        // GRAFICA: ventas por día (últimos N días)
+        // =========================
+        // GRÁFICA: ventas por día (últimos N días)
+        // =========================
         $rows = $ventaModel->select("DATE(fecha) as dia, COUNT(*) as cant, COALESCE(SUM(total),0) as total")
             ->where('estado', 1)
             ->where('fecha >=', $inicioRango)
@@ -64,34 +69,41 @@ class Home extends BaseController
             ->orderBy('dia', 'ASC')
             ->findAll();
 
+        // rellenar días sin ventas con 0 (para la gráfica)
         $map = [];
         foreach ($rows as $r) $map[$r['dia']] = $r;
 
-        $chartLabels = [];
+        $chartLabels   = [];
         $chartCantidad = [];
-        $chartTotal = [];
+        $chartTotal    = [];
 
         for ($i = $dias - 1; $i >= 0; $i--) {
             $d = date('Y-m-d', strtotime("-$i days"));
             $chartLabels[] = date('d/m', strtotime($d));
+
             $chartCantidad[] = isset($map[$d]) ? (int)$map[$d]['cant'] : 0;
-            $chartTotal[] = isset($map[$d]) ? (float)$map[$d]['total'] : 0;
+            $chartTotal[]    = isset($map[$d]) ? (float)$map[$d]['total'] : 0;
         }
 
-        // TOP PRODUCTOS (si detalle_venta tiene cantidad e importe)
+        // =========================
+        // TOP PRODUCTOS (por cantidad) en el rango
+        // =========================
         $topProductos = $detalleModel
-            ->select("producto.nombre, SUM(detalle_venta.cantidad) as cantidad, COALESCE(SUM(detalle_venta.importe),0) as importe")
-            ->join('venta', 'venta.idventa = detalle_venta.idventa')
-            ->join('producto', 'producto.idproducto = detalle_venta.idproducto')
-            ->where('venta.estado', 1)
-            ->where('venta.fecha >=', $inicioRango)
-            ->where('venta.fecha <=', $finRango)
-            ->groupBy('producto.nombre')
+            ->select("p.nombre, SUM(d.cantidad) as cantidad, COALESCE(SUM(d.importe),0) as importe")
+            ->from('detalle_venta d')
+            ->join('venta v', 'v.idventa = d.idventa')
+            ->join('producto p', 'p.idproducto = d.idproducto')
+            ->where('v.estado', 1)
+            ->where('v.fecha >=', $inicioRango)
+            ->where('v.fecha <=', $finRango)
+            ->groupBy('p.nombre')
             ->orderBy('cantidad', 'DESC')
             ->limit(5)
             ->findAll();
 
+        // =========================
         // STOCK BAJO
+        // =========================
         $stockMin = 5;
         $stockBajo = $productoModel
             ->select('idproducto, nombre, stock')
