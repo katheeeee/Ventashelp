@@ -274,4 +274,18 @@ class cproducto extends BaseController
         return redirect()->to(base_url('mantenimiento/producto'))
             ->with('success', 'Producto eliminado');
     }
+    public function ver_imagen($file)
+{
+    $path = FCPATH . 'uploads/productos/' . $file;
+
+    if (!is_file($path)) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+    }
+
+    $mime = mime_content_type($path) ?: 'image/jpeg';
+    return $this->response
+        ->setHeader('Content-Type', $mime)
+        ->setBody(file_get_contents($path));
+}
+
 }
