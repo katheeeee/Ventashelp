@@ -1,56 +1,70 @@
 (function () {
   "use strict";
 
-  let chart = null;
-
-  function setExcelLink(desde, hasta) {
-    const base = (window.reportes_cfg && window.reportes_cfg.url_excel) || "";
-    const url = base + `?desde=${encodeURIComponent(desde)}&hasta=${encodeURIComponent(hasta)}&limit=10`;
-    const a = document.getElementById("btn_excel");
-    if (a) a.href = url;
+  function onReady(fn) {
+    if (typeof window.jQuery === "undefined") {
+      setTimeout(function () { onReady(fn); }, 50);
+      return;
+    }
+    window.jQuery(fn);
   }
 
-  function cargar() {
-    const desde = document.getElementById("desde").value;
-    const hasta = document.getElementById("hasta").value;
+  onReady(function () {
+    const $ = window.jQuery;
+    const cfg = window.reportes_cfg || {};
+    const url_data = cfg.url_data || "";
+    const url_excel = cfg.url_excel || "";
 
-    setExcelLink(desde, hasta);
+    let chart = null;
 
-    const url = (window.reportes_cfg && window.reportes_cfg.url_data) || "";
-    fetch(url + `?desde=${encodeURIComponent(desde)}&hasta=${encodeURIComponent(hasta)}`)
-      .then(r => r.json())
-      .then(data => {
-        const labels = data.map(i => i.nombre);
-        const valores = data.map(i => Number(i.cantidad)); // ✅ string -> number
+    function ejecutar() {
+      const desde = $("#desde").val();
+      const hasta = $("#hasta").val();
 
-        const canvas = document.getElementById("grafica");
+      $.getJSON(url_data, { desde, hasta }).done(function (rows) {
+        // OJO: tu JSON trae "nombre" y "cantidad"
+        const labels = (rows || []).map(x => x.nombre);
+        const data = (rows || []).map(x => Number(x.cantidad || 0));
+
+        const canvas = document.getElementById("grafica_top");
         if (!canvas) return;
 
-        const ctx = canvas.getContext("2d");
-        if (chart) chart.destroy(); // ✅ evita “reinit”
+        if (chart) chart.destroy();
 
-        chart = new Chart(ctx, {
+        chart = new Chart(canvas, {
           type: "bar",
           data: {
             labels,
             datasets: [{
               label: "cantidad vendida",
-              data: valores
+              data
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true } }
+            scales: {
+              y: { beginAtZero: true }
+            }
           }
         });
-      })
-      .catch(err => {
-        console.error(err);
+
+        $("#btn_excel").attr("href", url_excel + "?desde=" + encodeURIComponent(desde) + "&hasta=" + encodeURIComponent(hasta));
+      }).fail(function (xhr) {
+        console.error(xhr.status, xhr.responseText);
         alert("error cargando top productos");
       });
-  }
+    }
 
-  document.getElementById("btn_filtrar").addEventListener("click", cargar);
-  cargar();
+    const hoy = new Date().toISOString().slice(0, 10);
+    $("#desde").val(hoy);
+    $("#hasta").val(hoy);
+
+    $("#btn_filtrar").on("click", function (e) {
+      e.preventDefault();
+      ejecutar();
+    });
+
+    ejecutar();
+  });
 })();

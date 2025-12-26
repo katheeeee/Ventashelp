@@ -1,58 +1,69 @@
 (function () {
   "use strict";
 
-  let chart = null;
-
-  function setExcelLink(desde, hasta) {
-    const base = (window.reportes_cfg && window.reportes_cfg.url_excel) || "";
-    const url = base + `?desde=${encodeURIComponent(desde)}&hasta=${encodeURIComponent(hasta)}`;
-    const a = document.getElementById("btn_excel");
-    if (a) a.href = url;
+  function onReady(fn) {
+    if (typeof window.jQuery === "undefined") {
+      setTimeout(function () { onReady(fn); }, 50);
+      return;
+    }
+    window.jQuery(fn);
   }
 
-  function cargar() {
-    const desde = document.getElementById("desde").value;
-    const hasta = document.getElementById("hasta").value;
+  onReady(function () {
+    const $ = window.jQuery;
+    const cfg = window.reportes_cfg || {};
+    const url_data = cfg.url_data || "";
+    const url_excel = cfg.url_excel || "";
 
-    setExcelLink(desde, hasta);
+    let chart = null;
 
-    const url = (window.reportes_cfg && window.reportes_cfg.url_data) || "";
-    fetch(url + `?desde=${encodeURIComponent(desde)}&hasta=${encodeURIComponent(hasta)}`)
-      .then(r => r.json())
-      .then(data => {
+    function ejecutar() {
+      const desde = $("#desde").val();
+      const hasta = $("#hasta").val();
 
-        // ✅ se espera: [{ dia:"2025-12-22", total:"251.98" }, ...]
-        const labels = data.map(i => i.dia);
-        const valores = data.map(i => Number(i.total));
+      $.getJSON(url_data, { desde, hasta }).done(function (rows) {
+        const labels = (rows || []).map(x => x.dia);
+        const data = (rows || []).map(x => Number(x.total || 0));
 
-        const canvas = document.getElementById("grafica");
+        const canvas = document.getElementById("grafica_ventas");
         if (!canvas) return;
 
-        const ctx = canvas.getContext("2d");
         if (chart) chart.destroy();
 
-        chart = new Chart(ctx, {
+        chart = new Chart(canvas, {
           type: "bar",
           data: {
             labels,
             datasets: [{
-              label: "total vendido (S/)",
-              data: valores
+              label: "total vendido",
+              data
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true } }
+            scales: {
+              y: { beginAtZero: true }
+            }
           }
         });
-      })
-      .catch(err => {
-        console.error(err);
+
+        $("#btn_excel").attr("href", url_excel + "?desde=" + encodeURIComponent(desde) + "&hasta=" + encodeURIComponent(hasta));
+      }).fail(function (xhr) {
+        console.error(xhr.status, xhr.responseText);
         alert("error cargando ventas diarias");
       });
-  }
+    }
 
-  document.getElementById("btn_filtrar").addEventListener("click", cargar);
-  cargar();
+    const hoy = new Date().toISOString().slice(0, 10);
+    $("#desde").val(hoy);
+    $("#hasta").val(hoy);
+
+    $("#btn_filtrar").on("click", function (e) {
+      e.preventDefault();
+      ejecutar();
+    });
+
+    ejecutar();
+  });
 })();

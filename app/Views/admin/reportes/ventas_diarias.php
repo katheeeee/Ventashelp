@@ -6,17 +6,19 @@
   <div class="row mb-3">
     <div class="col-md-3">
       <label>desde</label>
-      <input type="date" id="desde" class="form-control" value="<?= date('Y-m-01') ?>">
+      <input type="date" id="desde" class="form-control">
     </div>
     <div class="col-md-3">
       <label>hasta</label>
-      <input type="date" id="hasta" class="form-control" value="<?= date('Y-m-d') ?>">
+      <input type="date" id="hasta" class="form-control">
     </div>
+
     <div class="col-md-2 d-flex align-items-end">
       <button id="btn_filtrar" class="btn btn-primary btn-block">filtrar</button>
     </div>
+
     <div class="col-md-2 d-flex align-items-end">
-      <a id="btn_excel" class="btn btn-success btn-block" target="_blank">excel</a>
+      <a id="btn_excel" class="btn btn-success btn-block" href="#">excel</a>
     </div>
   </div>
 
@@ -25,7 +27,7 @@
       <h3 class="card-title">ventas por día</h3>
     </div>
     <div class="card-body" style="height:360px;">
-      <canvas id="grafica"></canvas>
+      <canvas id="grafica_ventas"></canvas>
     </div>
   </div>
 
@@ -34,6 +36,7 @@
 
 <script>
   window.reportes_cfg = {
+    base_url: "<?= base_url() ?>",
     url_data: "<?= base_url('reportes/ventas_diarias_data') ?>",
     url_excel: "<?= base_url('reportes/export/ventas_diarias') ?>"
   };
