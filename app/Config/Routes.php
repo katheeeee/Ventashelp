@@ -144,17 +144,22 @@ $routes->get('reportes/top_clientes_data', 'reportes\cestadisticas::top_clientes
 $routes->get('reportes/ventas_diarias_data', 'reportes\cestadisticas::ventas_diarias');
 
 $routes->group('admin', function($routes) {
-  $routes->get('usuarios', 'admin\cadmin::usuarios');
-  $routes->get('empresa', 'admin\cadmin::empresa');
 
+  // cambiar contraseña
   $routes->get('cambiar_password', 'admin\cadmin::cambiar_password');
   $routes->post('cambiar_password', 'admin\cadmin::guardar_password');
-   $routes->get('usuarios', 'admin\cusuarios::index');
-    $routes->get('usuarios/add', 'admin\cusuarios::add');
-    $routes->post('usuarios/store', 'admin\cusuarios::store');
-    $routes->get('usuarios/edit/(:num)', 'admin\cusuarios::edit/$1');
-    $routes->post('usuarios/update/(:num)', 'admin\cusuarios::update/$1');
-    $routes->get('usuarios/toggle/(:num)', 'admin\cusuarios::toggle/$1');
+
+  // usuarios
+  $routes->get('usuarios', 'admin\cusuarios::index');
+  $routes->get('usuarios/add', 'admin\cusuarios::add');
+  $routes->post('usuarios/store', 'admin\cusuarios::store');
+  $routes->get('usuarios/edit/(:num)', 'admin\cusuarios::edit/$1');
+  $routes->post('usuarios/update/(:num)', 'admin\cusuarios::update/$1');
+  $routes->get('usuarios/toggle/(:num)', 'admin\cusuarios::toggle/$1');
+
+  // empresa (lo hacemos luego si quieres)
+  // $routes->get('empresa', 'admin\cadmin::empresa');
+
 });
 
 
