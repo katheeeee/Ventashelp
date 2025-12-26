@@ -6,12 +6,12 @@
 <div class="card">
   <div class="card-body">
 
-    <h4>Detalle Producto</h4>
+    <h4 class="mb-3">Detalle del Producto</h4>
 
     <table class="table table-bordered">
 
       <tr>
-        <th>ID</th>
+        <th style="width:200px;">ID</th>
         <td><?= esc($p['idproducto']) ?></td>
       </tr>
 
@@ -25,21 +25,28 @@
         <td><?= esc($p['nombre']) ?></td>
       </tr>
 
-      <!-- ✅ IMAGEN (en su fila correcta dentro de la tabla) -->
+      <!-- ✅ IMAGEN -->
       <tr>
         <th>Imagen</th>
-        <td>
-          <?php if (!empty($p['imagen'])): ?>
-            <a href="<?= base_url('uploads/productos/'.$p['imagen']) ?>"
-               data-toggle="lightbox"
-               data-title="<?= esc($p['nombre']) ?>">
-              <img src="<?= base_url('uploads/productos/'.$p['imagen']) ?>"
-                   class="img-fluid img-thumbnail"
-                   style="max-height:300px;">
-            </a>
-          <?php else: ?>
-            <span class="text-muted">Este producto no tiene imagen.</span>
-          <?php endif; ?>
+        <td class="text-center">
+
+          <?php
+            $img = !empty($p['imagen']) ? $p['imagen'] : 'no.jpg';
+            $img_url = base_url('uploads/productos/' . rawurlencode($img));
+            $fallback = base_url('uploads/productos/no.jpg');
+          ?>
+
+          <a href="<?= $img_url ?>"
+             data-toggle="lightbox"
+             data-title="<?= esc($p['nombre']) ?>">
+
+            <img src="<?= $img_url ?>"
+                 class="img-thumbnail"
+                 style="max-height:300px;"
+                 onerror="this.onerror=null;this.src='<?= $fallback ?>';">
+
+          </a>
+
         </td>
       </tr>
 
@@ -69,18 +76,18 @@
       </tr>
 
       <tr>
-        <th>Tipo Material</th>
+        <th>Tipo material</th>
         <td><?= esc($p['tipo_material']) ?></td>
       </tr>
 
       <tr>
-        <th>Unidad Medida</th>
+        <th>Unidad de medida</th>
         <td><?= esc($p['unmedida']) ?></td>
       </tr>
 
       <tr>
         <th>Precio</th>
-        <td><?= esc($p['precio']) ?></td>
+        <td>S/ <?= number_format($p['precio'], 2) ?></td>
       </tr>
 
       <tr>
@@ -90,13 +97,17 @@
 
       <tr>
         <th>Estado</th>
-        <td><?= ((int)$p['estado'] === 1) ? 'Activo' : 'Inactivo' ?></td>
+        <td>
+          <?= ((int)$p['estado'] === 1)
+              ? '<span class="badge badge-success">Activo</span>'
+              : '<span class="badge badge-danger">Inactivo</span>' ?>
+        </td>
       </tr>
 
     </table>
 
-    <a href="<?= base_url('mantenimiento/producto') ?>" class="btn btn-secondary">
-      Volver
+    <a href="<?= base_url('mantenimiento/producto') ?>" class="btn btn-secondary mt-3">
+      <i class="fa fa-arrow-left"></i> Volver
     </a>
 
   </div>
