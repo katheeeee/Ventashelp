@@ -113,59 +113,62 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     // =================================================
     // VENTAS
     // =================================================
-    $routes->group('ventas',  function ($routes) {
+      // =================================================
+    // VENTAS
+    // =================================================
+    $routes->group('ventas', function ($routes) {
 
         $routes->get('/', 'ventas\cventa::index');
         $routes->get('add', 'ventas\cventa::add');
         $routes->post('store', 'ventas\cventa::store');
         $routes->get('view/(:num)', 'ventas\cventa::view/$1');
-        
+
         // AJAX
         $routes->get('ajaxClientes', 'ventas\cventa::ajaxClientes');
         $routes->get('ajaxProductos', 'ventas\cventa::ajaxProductos');
         $routes->get('ajaxComprobanteData/(:num)', 'ventas\cventa::ajaxComprobanteData/$1');
 
         $routes->get('pdf/(:num)', 'ventas\cventa::pdf/$1');
-
-
     });
-$routes->group('reportes', function($routes) {
 
-  // vistas
-  $routes->get('/', 'reportes\creportes::resumen');
-  $routes->get('ventas_diarias', 'reportes\creportes::ventas_diarias');
-  $routes->get('top_productos', 'reportes\creportes::top_productos');
-  $routes->get('top_clientes', 'reportes\creportes::top_clientes');
+    // =================================================
+    // REPORTES  ✅ (FUERA de ventas)
+    // =================================================
+    $routes->group('reportes', function($routes) {
 
-  // data (json)
-  $routes->get('ventas_diarias_data', 'reportes\creportesdata::ventas_diarias_data');
-  $routes->get('top_productos_data', 'reportes\creportesdata::top_productos_data');
-  $routes->get('top_clientes_data', 'reportes\creportesdata::top_clientes_data');
+        // vistas
+        $routes->get('/', 'reportes\creportes::resumen');
+        $routes->get('ventas_diarias', 'reportes\creportes::ventas_diarias');
+        $routes->get('top_productos', 'reportes\creportes::top_productos');
+        $routes->get('top_clientes', 'reportes\creportes::top_clientes');
 
-  // export (csv "excel")
-  $routes->get('export/ventas_diarias', 'reportes\cexportar::ventas_diarias');
-  $routes->get('export/top_productos', 'reportes\cexportar::top_productos');
-  $routes->get('export/top_clientes', 'reportes\cexportar::top_clientes');
-});
+        // data (json)
+        $routes->get('ventas_diarias_data', 'reportes\creportesdata::ventas_diarias_data');
+        $routes->get('top_productos_data', 'reportes\creportesdata::top_productos_data');
+        $routes->get('top_clientes_data', 'reportes\creportesdata::top_clientes_data');
 
-$routes->group('admin', function($routes) {
+        // export (csv "excel")
+        $routes->get('export/ventas_diarias', 'reportes\cexportar::ventas_diarias');
+        $routes->get('export/top_productos', 'reportes\cexportar::top_productos');
+        $routes->get('export/top_clientes', 'reportes\cexportar::top_clientes');
+    });
 
-  // cambiar contraseña
-  $routes->get('cambiar_password', 'admin\cadmin::cambiar_password');
-  $routes->post('cambiar_password', 'admin\cadmin::guardar_password');
+    // =================================================
+    // ADMIN  ✅ (FUERA de ventas)
+    // =================================================
+    $routes->group('admin', function($routes) {
 
-  // usuarios
-  $routes->get('usuarios', 'admin\cusuarios::index');
-  $routes->get('usuarios/add', 'admin\cusuarios::add');
-  $routes->post('usuarios/store', 'admin\cusuarios::store');
-  $routes->get('usuarios/edit/(:num)', 'admin\cusuarios::edit/$1');
-  $routes->post('usuarios/update/(:num)', 'admin\cusuarios::update/$1');
-  $routes->get('usuarios/toggle/(:num)', 'admin\cusuarios::toggle/$1');
+        // cambiar contraseña
+        $routes->get('cambiar_password', 'admin\cadmin::cambiar_password');
+        $routes->post('cambiar_password', 'admin\cadmin::guardar_password');
 
-  // empresa (lo hacemos luego si quieres)
-  // $routes->get('empresa', 'admin\cadmin::empresa');
+        // usuarios
+        $routes->get('usuarios', 'admin\cusuarios::index');
+        $routes->get('usuarios/add', 'admin\cusuarios::add');
+        $routes->post('usuarios/store', 'admin\cusuarios::store');
+        $routes->get('usuarios/edit/(:num)', 'admin\cusuarios::edit/$1');
+        $routes->post('usuarios/update/(:num)', 'admin\cusuarios::update/$1');
+        $routes->get('usuarios/toggle/(:num)', 'admin\cusuarios::toggle/$1');
+    });
 
-});
-
-
-});
+}); // ✅ cierre del group auth
