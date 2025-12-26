@@ -216,9 +216,6 @@
       </a>
     </li>
   </ul>
-</li>
-
-
   <li class="nav-item">
     <a href="<?= base_url('admin/usuarios') ?>"
        class="nav-link <?= ($subactive=='usuarios')?'active':'' ?>">
@@ -227,6 +224,7 @@
     </a>
   </li>
 </ul>
+</li>
 
 
 
