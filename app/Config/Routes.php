@@ -129,19 +129,24 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
 
     });
+$routes->group('reportes', function($routes) {
 
-   $routes->get('reportes', 'reportes\creportes::resumen');
-$routes->get('reportes/resumen', 'reportes\creportes::resumen');
-$routes->get('reportes/resumen_data', 'reportes\cestadisticas::resumen');
+  // vistas
+  $routes->get('/', 'reportes\creportes::resumen');
+  $routes->get('ventas_diarias', 'reportes\creportes::ventas_diarias');
+  $routes->get('top_productos', 'reportes\creportes::top_productos');
+  $routes->get('top_clientes', 'reportes\creportes::top_clientes');
 
-$routes->get('reportes/top_productos', 'reportes\creportes::top_productos');
-$routes->get('reportes/top_clientes', 'reportes\creportes::top_clientes');
-$routes->get('reportes/ventas_diarias', 'reportes\creportes::ventas_diarias');
-$routes->get('reportes/ventas_diarias', 'reportes\creportes::ventas_diarias');
+  // data (json)
+  $routes->get('ventas_diarias_data', 'reportes\creportesdata::ventas_diarias_data');
+  $routes->get('top_productos_data', 'reportes\creportesdata::top_productos_data');
+  $routes->get('top_clientes_data', 'reportes\creportesdata::top_clientes_data');
 
-$routes->get('reportes/top_productos_data', 'reportes\cestadisticas::top_productos');
-$routes->get('reportes/top_clientes_data', 'reportes\cestadisticas::top_clientes');
-$routes->get('reportes/ventas_diarias_data', 'reportes\cestadisticas::ventas_diarias');
+  // export (csv "excel")
+  $routes->get('export/ventas_diarias', 'reportes\cexportar::ventas_diarias');
+  $routes->get('export/top_productos', 'reportes\cexportar::top_productos');
+  $routes->get('export/top_clientes', 'reportes\cexportar::top_clientes');
+});
 
 $routes->group('admin', function($routes) {
 
