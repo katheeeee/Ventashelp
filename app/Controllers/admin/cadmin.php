@@ -4,8 +4,7 @@ namespace App\Controllers\admin;
 
 use App\Controllers\BaseController;
 use App\Models\musuario;
-if (!session()->get('login')) return redirect()->to(base_url('login'));
-if ((int)session()->get('idrol') !== 1) return redirect()->to(base_url('dashboard'));
+
 
 class cadmin extends BaseController
 {
