@@ -28,6 +28,10 @@
 
 </div>
 </section>
+<a class="btn btn-success btn-sm"
+   href="<?= base_url('reportes/export/top_productos?desde='.$desde.'&hasta='.$hasta.'&limit=10') ?>">
+  exportar excel
+</a>
 
 <script>
   window.reportes_cfg = {
