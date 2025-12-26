@@ -1,71 +1,60 @@
 (function () {
   "use strict";
 
-  function onReady(fn) {
-    if (typeof window.jQuery === "undefined") {
-      setTimeout(function () { onReady(fn); }, 50);
-      return;
-    }
-    window.jQuery(fn);
+  let chart = null;
+
+  function buildUrl(base, params) {
+    const qs = new URLSearchParams(params).toString();
+    return base + (base.includes('?') ? '&' : '?') + qs;
   }
 
-  onReady(function () {
-    const $ = window.jQuery;
-    const cfg = window.reportes_cfg || {};
-    const url_data = cfg.url_data || "";
+  async function cargar() {
+    const desde = document.getElementById('desde').value;
+    const hasta = document.getElementById('hasta').value;
 
-    console.log("✅ ventas_diarias.js cargado (bar)");
-    console.log("url_data =", url_data);
+    const url = buildUrl(window.reportes_cfg.url_data, { desde, hasta });
+    const res = await fetch(url);
+    const json = await res.json();
 
-    let chart = null;
+    const ctx = document.getElementById('grafica_ventas');
 
-    function ejecutar() {
-      const desde = $("#desde").val();
-      const hasta = $("#hasta").val();
+    if (chart) chart.destroy();
 
-      $.getJSON(url_data, { desde, hasta })
-        .done(function (rows) {
-          console.log("rows =", rows);
+    chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: json.labels || [],
+        datasets: [{
+          label: 'total',
+          data: json.data || []
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  }
 
-          const labels = (rows || []).map(r => r.fecha);
-          const data = (rows || []).map(r => Number(r.total || 0));
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('btn_filtrar').addEventListener('click', function () {
+      cargar();
+    });
 
-          const canvas = document.getElementById("grafica_ventas");
-          if (!canvas) return;
+    document.getElementById('btn_exportar').addEventListener('click', function (e) {
+      e.preventDefault();
+      const desde = document.getElementById('desde').value;
+      const hasta = document.getElementById('hasta').value;
 
-          if (chart) chart.destroy();
+      if (!desde || !hasta) {
+        alert('selecciona desde y hasta');
+        return;
+      }
 
-          chart = new Chart(canvas, {
-            type: "bar",
-            data: {
-              labels: labels,
-              datasets: [{
-                label: "total vendido",
-                data: data
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                y: { beginAtZero: true }
-              }
-            }
-          });
-        })
-        .fail(function (xhr) {
-          console.error("❌ ajax error:", xhr.status, xhr.responseText);
-          alert("no carga datos (mira consola)");
-        });
-    }
+      const url = buildUrl(window.reportes_cfg.url_export, { desde, hasta });
+      window.location.href = url;
+    });
 
-    $("#btn_filtrar").on("click", ejecutar);
-
-    // si tu input date es yyyy-mm-dd, esto está bien:
-    const hoy = new Date().toISOString().slice(0, 10);
-    $("#desde").val(hoy);
-    $("#hasta").val(hoy);
-
-    ejecutar();
+    cargar();
   });
 })();

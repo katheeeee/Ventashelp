@@ -1,55 +1,57 @@
 (function () {
   "use strict";
 
-  function onReady(fn) {
-    if (typeof window.jQuery === "undefined") {
-      setTimeout(function () { onReady(fn); }, 50);
-      return;
-    }
-    window.jQuery(fn);
+  let chart = null;
+
+  function buildUrl(base, params) {
+    const qs = new URLSearchParams(params).toString();
+    return base + (base.includes('?') ? '&' : '?') + qs;
   }
 
-  onReady(function () {
-    const $ = window.jQuery;
-    const cfg = window.reportes_cfg || {};
-    const url_data = cfg.url_data || "";
+  async function cargar() {
+    const desde = document.getElementById('desde').value;
+    const hasta = document.getElementById('hasta').value;
+    const limit = document.getElementById('limit').value;
 
-    let chart = null;
+    const url = buildUrl(window.reportes_cfg.url_data, { desde, hasta, limit });
+    const res = await fetch(url);
+    const json = await res.json();
 
-    function ejecutar() {
-      const desde = $("#desde").val();
-      const hasta = $("#hasta").val();
+    const ctx = document.getElementById('grafica');
 
-      $.getJSON(url_data, { desde, hasta }).done(function (rows) {
-        const labels = (rows || []).map(r => r.nombre);
-        const data = (rows || []).map(r => Number(r.total || 0));
+    if (chart) chart.destroy();
 
-        const canvas = document.getElementById("grafica_top");
-        if (!canvas) return;
+    chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: json.labels || [],
+        datasets: [{
+          label: 'total',
+          data: json.data || []
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  }
 
-        if (chart) chart.destroy();
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('btn_filtrar').addEventListener('click', cargar);
 
-        chart = new Chart(canvas, {
-          type: "bar",
-          data: { labels, datasets: [{ label: "total comprado", data }] },
-          options: {
-            indexAxis: "y",
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { x: { beginAtZero: true } }
-          }
-        });
-      }).fail(function (xhr) {
-        console.error(xhr.status, xhr.responseText);
-        alert("error cargando top clientes");
-      });
-    }
+    document.getElementById('btn_exportar').addEventListener('click', function (e) {
+      e.preventDefault();
 
-    const hoy = new Date().toISOString().slice(0, 10);
-    $("#desde").val(hoy);
-    $("#hasta").val(hoy);
+      const desde = document.getElementById('desde').value;
+      const hasta = document.getElementById('hasta').value;
+      const limit = document.getElementById('limit').value;
 
-    $("#btn_filtrar").on("click", ejecutar);
-    ejecutar();
+      const url = buildUrl(window.reportes_cfg.url_export, { desde, hasta, limit });
+      window.location.href = url;
+    });
+
+    cargar();
   });
 })();

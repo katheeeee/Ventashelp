@@ -4,35 +4,17 @@ namespace App\Controllers\reportes;
 
 use App\Controllers\BaseController;
 
-class cexportar extends BaseController
+class creportesdata extends BaseController
 {
     private function solo_logueado()
     {
         if (!session()->get('login')) {
-            return redirect()->to(base_url('login'));
+            return $this->response->setStatusCode(403)->setJSON(['error' => 'no autorizado']);
         }
         return null;
     }
 
-    private function csv_download(string $filename, array $headers, array $rows)
-    {
-        $this->response->setHeader('Content-Type', 'text/csv; charset=UTF-8');
-        $this->response->setHeader('Content-Disposition', 'attachment; filename="'.$filename.'"');
-
-        $out = fopen('php://output', 'w');
-        fprintf($out, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM excel
-
-        fputcsv($out, $headers);
-
-        foreach ($rows as $r) {
-            fputcsv($out, $r);
-        }
-
-        fclose($out);
-        return $this->response;
-    }
-
-    public function ventas_diarias()
+    public function ventas_diarias_data()
     {
         if ($r = $this->solo_logueado()) return $r;
 
@@ -50,27 +32,26 @@ class cexportar extends BaseController
             $q->where('estado', 1);
         }
 
-        $rowsDb = $q->groupBy('DATE(fecha)')
+        $rows = $q->groupBy('DATE(fecha)')
             ->orderBy('dia', 'ASC')
             ->get()->getResultArray();
 
-        $rows = [];
-        foreach ($rowsDb as $rdb) {
-            $rows[] = [
-                $rdb['dia'],
-                (int)$rdb['nro_ventas'],
-                number_format((float)$rdb['total'], 2, '.', '')
-            ];
+        // formato para chart
+        $labels = [];
+        $totales = [];
+
+        foreach ($rows as $r) {
+            $labels[]  = $r['dia'];
+            $totales[] = (float)$r['total'];
         }
 
-        return $this->csv_download(
-            "ventas_diarias_{$desde}_{$hasta}.csv",
-            ['dia', 'nro_ventas', 'total'],
-            $rows
-        );
+        return $this->response->setJSON([
+            'labels' => $labels,
+            'data'   => $totales
+        ]);
     }
 
-    public function top_productos()
+    public function top_productos_data()
     {
         if ($r = $this->solo_logueado()) return $r;
 
@@ -81,7 +62,7 @@ class cexportar extends BaseController
         $db = \Config\Database::connect();
 
         $q = $db->table('detalle_venta dv')
-            ->select('p.codigo, p.nombre, SUM(dv.cantidad) as cantidad, SUM(dv.importe) as total')
+            ->select('p.nombre, SUM(dv.cantidad) as cantidad')
             ->join('venta v', 'v.idventa = dv.idventa', 'inner')
             ->join('producto p', 'p.idproducto = dv.idproducto', 'inner')
             ->where('DATE(v.fecha) >=', $desde)
@@ -91,29 +72,26 @@ class cexportar extends BaseController
             $q->where('v.estado', 1);
         }
 
-        $rowsDb = $q->groupBy('dv.idproducto')
+        $rows = $q->groupBy('dv.idproducto')
             ->orderBy('cantidad', 'DESC')
             ->limit($limit)
             ->get()->getResultArray();
 
-        $rows = [];
-        foreach ($rowsDb as $rdb) {
-            $rows[] = [
-                $rdb['codigo'],
-                $rdb['nombre'],
-                number_format((float)$rdb['cantidad'], 2, '.', ''),
-                number_format((float)$rdb['total'], 2, '.', '')
-            ];
+        $labels = [];
+        $data = [];
+
+        foreach ($rows as $r) {
+            $labels[] = $r['nombre'];
+            $data[]   = (float)$r['cantidad'];
         }
 
-        return $this->csv_download(
-            "top_productos_{$desde}_{$hasta}.csv",
-            ['codigo', 'producto', 'cantidad', 'total'],
-            $rows
-        );
+        return $this->response->setJSON([
+            'labels' => $labels,
+            'data'   => $data
+        ]);
     }
 
-    public function top_clientes()
+    public function top_clientes_data()
     {
         if ($r = $this->solo_logueado()) return $r;
 
@@ -124,7 +102,7 @@ class cexportar extends BaseController
         $db = \Config\Database::connect();
 
         $q = $db->table('venta v')
-            ->select('c.codigo, c.nombre, COUNT(*) as nro_ventas, SUM(v.total) as total')
+            ->select('c.nombre, SUM(v.total) as total')
             ->join('cliente c', 'c.idcliente = v.idcliente', 'inner')
             ->where('DATE(v.fecha) >=', $desde)
             ->where('DATE(v.fecha) <=', $hasta);
@@ -133,25 +111,22 @@ class cexportar extends BaseController
             $q->where('v.estado', 1);
         }
 
-        $rowsDb = $q->groupBy('v.idcliente')
+        $rows = $q->groupBy('v.idcliente')
             ->orderBy('total', 'DESC')
             ->limit($limit)
             ->get()->getResultArray();
 
-        $rows = [];
-        foreach ($rowsDb as $rdb) {
-            $rows[] = [
-                $rdb['codigo'],
-                $rdb['nombre'],
-                (int)$rdb['nro_ventas'],
-                number_format((float)$rdb['total'], 2, '.', '')
-            ];
+        $labels = [];
+        $data = [];
+
+        foreach ($rows as $r) {
+            $labels[] = $r['nombre'];
+            $data[]   = (float)$r['total'];
         }
 
-        return $this->csv_download(
-            "top_clientes_{$desde}_{$hasta}.csv",
-            ['codigo', 'cliente', 'nro_ventas', 'total'],
-            $rows
-        );
+        return $this->response->setJSON([
+            'labels' => $labels,
+            'data'   => $data
+        ]);
     }
 }
