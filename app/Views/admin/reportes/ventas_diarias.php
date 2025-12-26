@@ -29,10 +29,6 @@
 
 </div>
 </section>
-<a class="btn btn-success btn-sm"
-   href="<?= base_url('reportes/export/ventas_diarias?desde='.$desde.'&hasta='.$hasta) ?>">
-  exportar excel
-</a>
 
 <script>
   window.reportes_cfg = {
