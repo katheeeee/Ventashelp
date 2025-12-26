@@ -14,26 +14,27 @@ class cexportar extends BaseController
         return null;
     }
 
-    private function csv_download(string $filename, array $headers, array $rows)
-    {
-        $this->response->setHeader('Content-Type', 'text/csv; charset=UTF-8');
-        $this->response->setHeader('Content-Disposition', 'attachment; filename="'.$filename.'"');
-        $this->response->setHeader('Pragma', 'no-cache');
-        $this->response->setHeader('Expires', '0');
+ private function csv_download(string $filename, array $headers, array $rows)
+{
+    $this->response->setHeader('Content-Type', 'text/csv; charset=UTF-8');
+    $this->response->setHeader('Content-Disposition', 'attachment; filename="'.$filename.'"');
 
-        // Excel-friendly UTF-8 BOM
-        $out = fopen('php://output', 'w');
-        fprintf($out, chr(0xEF).chr(0xBB).chr(0xBF));
+    $out = fopen('php://output', 'w');
 
-        fputcsv($out, $headers);
+    // BOM para que Excel respete tildes/ñ
+    fprintf($out, chr(0xEF).chr(0xBB).chr(0xBF));
 
-        foreach ($rows as $r) {
-            fputcsv($out, $r);
-        }
+    // delimiter ; (Excel ES lo reconoce mejor)
+    fputcsv($out, $headers, ';');
 
-        fclose($out);
-        return $this->response;
+    foreach ($rows as $r) {
+        fputcsv($out, $r, ';');
     }
+
+    fclose($out);
+    return $this->response;
+}
+
 
     // ✅ EXPORT: ventas diarias
     public function ventas_diarias()
