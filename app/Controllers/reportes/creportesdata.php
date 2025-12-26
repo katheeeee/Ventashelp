@@ -6,25 +6,21 @@ use App\Controllers\BaseController;
 
 class creportesdata extends BaseController
 {
-    private function solo_logueado()
+    private function rango_fechas(): array
     {
-        if (!session()->get('login')) {
-            return $this->response->setStatusCode(403)->setJSON(['error' => 'no autorizado']);
-        }
-        return null;
+        $desde = $this->request->getGet('desde') ?? date('Y-m-01');
+        $hasta = $this->request->getGet('hasta') ?? date('Y-m-d');
+        return [$desde, $hasta];
     }
 
     public function ventas_diarias_data()
     {
-        if ($r = $this->solo_logueado()) return $r;
-
-        $desde = $this->request->getGet('desde') ?? date('Y-m-01');
-        $hasta = $this->request->getGet('hasta') ?? date('Y-m-d');
+        [$desde, $hasta] = $this->rango_fechas();
 
         $db = \Config\Database::connect();
 
         $q = $db->table('venta')
-            ->select('DATE(fecha) as dia, COUNT(*) as nro_ventas, SUM(total) as total')
+            ->select('DATE(fecha) as dia, SUM(total) as total')
             ->where('DATE(fecha) >=', $desde)
             ->where('DATE(fecha) <=', $hasta);
 
@@ -36,33 +32,30 @@ class creportesdata extends BaseController
             ->orderBy('dia', 'ASC')
             ->get()->getResultArray();
 
-        // formato para chart
+        // formato chartjs
         $labels = [];
-        $totales = [];
+        $data   = [];
 
         foreach ($rows as $r) {
-            $labels[]  = $r['dia'];
-            $totales[] = (float)$r['total'];
+            $labels[] = $r['dia'];
+            $data[]   = (float)$r['total'];
         }
 
         return $this->response->setJSON([
             'labels' => $labels,
-            'data'   => $totales
+            'data'   => $data
         ]);
     }
 
     public function top_productos_data()
     {
-        if ($r = $this->solo_logueado()) return $r;
-
-        $desde = $this->request->getGet('desde') ?? date('Y-m-01');
-        $hasta = $this->request->getGet('hasta') ?? date('Y-m-d');
+        [$desde, $hasta] = $this->rango_fechas();
         $limit = (int)($this->request->getGet('limit') ?? 10);
 
         $db = \Config\Database::connect();
 
         $q = $db->table('detalle_venta dv')
-            ->select('p.nombre, SUM(dv.cantidad) as cantidad')
+            ->select('p.nombre, SUM(dv.cantidad) as cantidad, SUM(dv.importe) as total')
             ->join('venta v', 'v.idventa = dv.idventa', 'inner')
             ->join('producto p', 'p.idproducto = dv.idproducto', 'inner')
             ->where('DATE(v.fecha) >=', $desde)
@@ -73,16 +66,16 @@ class creportesdata extends BaseController
         }
 
         $rows = $q->groupBy('dv.idproducto')
-            ->orderBy('cantidad', 'DESC')
+            ->orderBy('total', 'DESC')
             ->limit($limit)
             ->get()->getResultArray();
 
         $labels = [];
-        $data = [];
+        $data   = [];
 
         foreach ($rows as $r) {
             $labels[] = $r['nombre'];
-            $data[]   = (float)$r['cantidad'];
+            $data[]   = (float)$r['total']; // total vendido por producto
         }
 
         return $this->response->setJSON([
@@ -93,10 +86,7 @@ class creportesdata extends BaseController
 
     public function top_clientes_data()
     {
-        if ($r = $this->solo_logueado()) return $r;
-
-        $desde = $this->request->getGet('desde') ?? date('Y-m-01');
-        $hasta = $this->request->getGet('hasta') ?? date('Y-m-d');
+        [$desde, $hasta] = $this->rango_fechas();
         $limit = (int)($this->request->getGet('limit') ?? 10);
 
         $db = \Config\Database::connect();
@@ -117,11 +107,11 @@ class creportesdata extends BaseController
             ->get()->getResultArray();
 
         $labels = [];
-        $data = [];
+        $data   = [];
 
         foreach ($rows as $r) {
             $labels[] = $r['nombre'];
-            $data[]   = (float)$r['total'];
+            $data[]   = (float)$r['total']; // total vendido por cliente
         }
 
         return $this->response->setJSON([

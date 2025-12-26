@@ -4,154 +4,25 @@ namespace App\Controllers\reportes;
 
 use App\Controllers\BaseController;
 
-class cexportar extends BaseController
+class creportes extends BaseController
 {
-    private function solo_logueado()
+    public function resumen()
     {
-        if (!session()->get('login')) {
-            return redirect()->to(base_url('login'));
-        }
-        return null;
-    }
-
-    private function csv_download(string $filename, array $headers, array $rows)
-    {
-        $this->response->setHeader('Content-Type', 'text/csv; charset=UTF-8');
-        $this->response->setHeader('Content-Disposition', 'attachment; filename="'.$filename.'"');
-
-        $out = fopen('php://output', 'w');
-        fprintf($out, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM excel
-
-        fputcsv($out, $headers);
-
-        foreach ($rows as $r) {
-            fputcsv($out, $r);
-        }
-
-        fclose($out);
-        return $this->response;
+        return view('admin/reportes/resumen');
     }
 
     public function ventas_diarias()
     {
-        if ($r = $this->solo_logueado()) return $r;
-
-        $desde = $this->request->getGet('desde') ?? date('Y-m-01');
-        $hasta = $this->request->getGet('hasta') ?? date('Y-m-d');
-
-        $db = \Config\Database::connect();
-
-        $q = $db->table('venta')
-            ->select('DATE(fecha) as dia, COUNT(*) as nro_ventas, SUM(total) as total')
-            ->where('DATE(fecha) >=', $desde)
-            ->where('DATE(fecha) <=', $hasta);
-
-        if ($db->fieldExists('estado', 'venta')) {
-            $q->where('estado', 1);
-        }
-
-        $rowsDb = $q->groupBy('DATE(fecha)')
-            ->orderBy('dia', 'ASC')
-            ->get()->getResultArray();
-
-        $rows = [];
-        foreach ($rowsDb as $rdb) {
-            $rows[] = [
-                $rdb['dia'],
-                (int)$rdb['nro_ventas'],
-                number_format((float)$rdb['total'], 2, '.', '')
-            ];
-        }
-
-        return $this->csv_download(
-            "ventas_diarias_{$desde}_{$hasta}.csv",
-            ['dia', 'nro_ventas', 'total'],
-            $rows
-        );
+        return view('admin/reportes/ventas_diarias');
     }
 
     public function top_productos()
     {
-        if ($r = $this->solo_logueado()) return $r;
-
-        $desde = $this->request->getGet('desde') ?? date('Y-m-01');
-        $hasta = $this->request->getGet('hasta') ?? date('Y-m-d');
-        $limit = (int)($this->request->getGet('limit') ?? 10);
-
-        $db = \Config\Database::connect();
-
-        $q = $db->table('detalle_venta dv')
-            ->select('p.codigo, p.nombre, SUM(dv.cantidad) as cantidad, SUM(dv.importe) as total')
-            ->join('venta v', 'v.idventa = dv.idventa', 'inner')
-            ->join('producto p', 'p.idproducto = dv.idproducto', 'inner')
-            ->where('DATE(v.fecha) >=', $desde)
-            ->where('DATE(v.fecha) <=', $hasta);
-
-        if ($db->fieldExists('estado', 'venta')) {
-            $q->where('v.estado', 1);
-        }
-
-        $rowsDb = $q->groupBy('dv.idproducto')
-            ->orderBy('cantidad', 'DESC')
-            ->limit($limit)
-            ->get()->getResultArray();
-
-        $rows = [];
-        foreach ($rowsDb as $rdb) {
-            $rows[] = [
-                $rdb['codigo'],
-                $rdb['nombre'],
-                number_format((float)$rdb['cantidad'], 2, '.', ''),
-                number_format((float)$rdb['total'], 2, '.', '')
-            ];
-        }
-
-        return $this->csv_download(
-            "top_productos_{$desde}_{$hasta}.csv",
-            ['codigo', 'producto', 'cantidad', 'total'],
-            $rows
-        );
+        return view('admin/reportes/top_productos');
     }
 
     public function top_clientes()
     {
-        if ($r = $this->solo_logueado()) return $r;
-
-        $desde = $this->request->getGet('desde') ?? date('Y-m-01');
-        $hasta = $this->request->getGet('hasta') ?? date('Y-m-d');
-        $limit = (int)($this->request->getGet('limit') ?? 10);
-
-        $db = \Config\Database::connect();
-
-        $q = $db->table('venta v')
-            ->select('c.codigo, c.nombre, COUNT(*) as nro_ventas, SUM(v.total) as total')
-            ->join('cliente c', 'c.idcliente = v.idcliente', 'inner')
-            ->where('DATE(v.fecha) >=', $desde)
-            ->where('DATE(v.fecha) <=', $hasta);
-
-        if ($db->fieldExists('estado', 'venta')) {
-            $q->where('v.estado', 1);
-        }
-
-        $rowsDb = $q->groupBy('v.idcliente')
-            ->orderBy('total', 'DESC')
-            ->limit($limit)
-            ->get()->getResultArray();
-
-        $rows = [];
-        foreach ($rowsDb as $rdb) {
-            $rows[] = [
-                $rdb['codigo'],
-                $rdb['nombre'],
-                (int)$rdb['nro_ventas'],
-                number_format((float)$rdb['total'], 2, '.', '')
-            ];
-        }
-
-        return $this->csv_download(
-            "top_clientes_{$desde}_{$hasta}.csv",
-            ['codigo', 'cliente', 'nro_ventas', 'total'],
-            $rows
-        );
+        return view('admin/reportes/top_clientes');
     }
 }
