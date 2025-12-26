@@ -113,9 +113,6 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     // =================================================
     // VENTAS
     // =================================================
-      // =================================================
-    // VENTAS
-    // =================================================
     $routes->group('ventas', function ($routes) {
 
         $routes->get('/', 'ventas\cventa::index');
@@ -128,13 +125,14 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('ajaxProductos', 'ventas\cventa::ajaxProductos');
         $routes->get('ajaxComprobanteData/(:num)', 'ventas\cventa::ajaxComprobanteData/$1');
 
+        // PDF
         $routes->get('pdf/(:num)', 'ventas\cventa::pdf/$1');
     });
 
     // =================================================
-    // REPORTES  ✅ (FUERA de ventas)
+    // REPORTES ✅ (FUERA de ventas)
     // =================================================
-    $routes->group('reportes', function($routes) {
+    $routes->group('reportes', function ($routes) {
 
         // vistas
         $routes->get('/', 'reportes\creportes::resumen');
@@ -143,6 +141,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('top_clientes', 'reportes\creportes::top_clientes');
 
         // data (json)
+        $routes->get('resumen_data', 'reportes\creportesdata::resumen_data'); // ✅ NUEVA RUTA
         $routes->get('ventas_diarias_data', 'reportes\creportesdata::ventas_diarias_data');
         $routes->get('top_productos_data', 'reportes\creportesdata::top_productos_data');
         $routes->get('top_clientes_data', 'reportes\creportesdata::top_clientes_data');
@@ -154,9 +153,9 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     });
 
     // =================================================
-    // ADMIN  ✅ (FUERA de ventas)
+    // ADMIN ✅ (FUERA de ventas)
     // =================================================
-    $routes->group('admin', function($routes) {
+    $routes->group('admin', function ($routes) {
 
         // cambiar contraseña
         $routes->get('cambiar_password', 'admin\cadmin::cambiar_password');
@@ -170,5 +169,4 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->post('usuarios/update/(:num)', 'admin\cusuarios::update/$1');
         $routes->get('usuarios/toggle/(:num)', 'admin\cusuarios::toggle/$1');
     });
-
-}); // ✅ cierre del group auth
+});
