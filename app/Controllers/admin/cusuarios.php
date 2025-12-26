@@ -4,11 +4,15 @@ namespace App\Controllers\admin;
 
 use App\Controllers\BaseController;
 use App\Models\musuario;
+if (!session()->get('login')) return redirect()->to(base_url('login'));
+if ((int)session()->get('idrol') !== 1) return redirect()->to(base_url('dashboard'));
 
 class cusuarios extends BaseController
 {
     public function index()
     {
+                if($r = $this->solo_admin()) return $r;
+
         if (!session()->get('login')) return redirect()->to(base_url('login'));
 
         $model = new musuario();
@@ -25,6 +29,8 @@ class cusuarios extends BaseController
 
     public function add()
     {
+                if($r = $this->solo_admin()) return $r;
+
         if (!session()->get('login')) return redirect()->to(base_url('login'));
 
         $data = [
@@ -139,4 +145,20 @@ class cusuarios extends BaseController
 
         return redirect()->to(base_url('admin/usuarios'))->with('msg_ok', 'estado actualizado');
     }
+    private function solo_admin()
+{
+    if (!session()->get('login')) {
+        return redirect()->to(base_url('login'));
+    }
+
+    // 1 = admin (como dijiste)
+    if ((int)session()->get('idrol') !== 1) {
+        return redirect()->to(base_url('dashboard'));
+        // o si prefieres:
+        // return $this->response->setStatusCode(403, 'acceso denegado');
+    }
+
+    return null; // ok
+}
+
 }

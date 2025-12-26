@@ -26,12 +26,13 @@ class Clogin extends BaseController
                 ->with('error', 'Usuario y/o contraseña incorrectos');
         }
 
-        session()->set([
-            'idusuario'      => $res['idtipo_usuario'], // ✅ necesario para cambiar contraseña
-            'idtipo_usuario' => $res['idtipo_usuario'],
-            'user'           => $res['user'],
-            'login'          => true
-        ]);
+session()->set([
+    'idusuario'      => $res['idtipo_usuario'],
+    'idtipo_usuario' => $res['idtipo_usuario'],
+    'idrol'          => $res['idrol'],        // ✅ NUEVO
+    'user'           => $res['user'],
+    'login'          => true
+]);
 
         return redirect()->to(base_url('dashboard'));
     }

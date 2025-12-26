@@ -4,11 +4,15 @@ namespace App\Controllers\admin;
 
 use App\Controllers\BaseController;
 use App\Models\musuario;
+if (!session()->get('login')) return redirect()->to(base_url('login'));
+if ((int)session()->get('idrol') !== 1) return redirect()->to(base_url('dashboard'));
 
 class cadmin extends BaseController
 {
+    
     public function cambiar_password()
     {
+        if($r = $this->solo_admin()) return $r;
         $data = [
             'title'     => 'cambiar contraseña',
             'active'    => 'admin',
@@ -20,6 +24,8 @@ class cadmin extends BaseController
 
     public function guardar_password()
     {
+                if($r = $this->solo_admin()) return $r;
+
         if (!session()->get('login')) {
             return redirect()->to(base_url('login'));
         }
@@ -70,5 +76,22 @@ class cadmin extends BaseController
 
         return redirect()->to(base_url('admin/cambiar_password'))
             ->with('msg_ok', 'contraseña actualizada correctamente');
+            
     }
+    private function solo_admin()
+{
+    if (!session()->get('login')) {
+        return redirect()->to(base_url('login'));
+    }
+
+    // 1 = admin (como dijiste)
+    if ((int)session()->get('idrol') !== 1) {
+        return redirect()->to(base_url('dashboard'));
+        // o si prefieres:
+        // return $this->response->setStatusCode(403, 'acceso denegado');
+    }
+
+    return null; // ok
+}
+
 }

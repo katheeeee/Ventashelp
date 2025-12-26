@@ -208,6 +208,7 @@
   </a>
 
   <ul class="nav nav-treeview">
+
     <li class="nav-item">
       <a href="<?= base_url('admin/cambiar_password') ?>"
          class="nav-link <?= ($subactive=='cambiar_password')?'active':'' ?>">
@@ -215,16 +216,17 @@
         <p>cambiar contraseña</p>
       </a>
     </li>
+
+    <li class="nav-item">
+      <a href="<?= base_url('admin/usuarios') ?>"
+         class="nav-link <?= ($subactive=='usuarios')?'active':'' ?>">
+        <i class="far fa-circle nav-icon"></i>
+        <p>usuarios</p>
+      </a>
+    </li>
+
   </ul>
-  <li class="nav-item">
-    <a href="<?= base_url('admin/usuarios') ?>"
-       class="nav-link <?= ($subactive=='usuarios')?'active':'' ?>">
-      <i class="far fa-circle nav-icon"></i>
-      <p>usuarios</p>
-    </a>
-  </li>
- </ul>
- </li>
+</li>
 
 
 
