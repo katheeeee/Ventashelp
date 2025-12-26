@@ -15,8 +15,8 @@
     <div class="col-md-2 d-flex align-items-end">
       <button id="btn_filtrar" class="btn btn-primary btn-block">filtrar</button>
     </div>
-    <div class="col-md-3 d-flex align-items-end">
-      <a id="btn_excel" class="btn btn-success btn-block" target="_blank">exportar excel</a>
+    <div class="col-md-2 d-flex align-items-end">
+      <a id="btn_excel" class="btn btn-success btn-block" target="_blank">excel</a>
     </div>
   </div>
 
@@ -25,7 +25,7 @@
       <h3 class="card-title">ventas por día</h3>
     </div>
     <div class="card-body" style="height:360px;">
-      <canvas id="grafica_ventas"></canvas>
+      <canvas id="grafica"></canvas>
     </div>
   </div>
 

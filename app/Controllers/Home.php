@@ -18,16 +18,14 @@ class Home extends BaseController
         $productoModel = new mproducto();
         $clienteModel  = new mcliente();
 
-        // =========================
         // FECHAS
-        // =========================
         $hoyInicio = date('Y-m-d 00:00:00');
         $hoyFin    = date('Y-m-d 23:59:59');
 
         $mesInicio = date('Y-m-01 00:00:00');
         $mesFin    = date('Y-m-t 23:59:59');
 
-        $inicioRango = date('Y-m-d 00:00:00', strtotime("-" . ($dias - 1) . " days"));
+        $inicioRango = date('Y-m-d 00:00:00', strtotime('-' . ($dias - 1) . ' days'));
         $finRango    = $hoyFin;
 
         // =========================
@@ -59,7 +57,7 @@ class Home extends BaseController
         $productosActivos = (int)$productoModel->where('estado', 1)->countAllResults();
 
         // =========================
-        // GRÁFICA: ventas por día (últimos N días)
+        // GRÁFICA (últimos N días)
         // =========================
         $rows = $ventaModel->select("DATE(fecha) as dia, COUNT(*) as cant, COALESCE(SUM(total),0) as total")
             ->where('estado', 1)
@@ -69,28 +67,27 @@ class Home extends BaseController
             ->orderBy('dia', 'ASC')
             ->findAll();
 
-        // rellenar días sin ventas con 0 (para la gráfica)
         $map = [];
-        foreach ($rows as $r) $map[$r['dia']] = $r;
+        foreach ($rows as $r) {
+            $map[$r['dia']] = $r;
+        }
 
-        $chartLabels   = [];
+        $chartLabels = [];
         $chartCantidad = [];
-        $chartTotal    = [];
+        $chartTotal = [];
 
         for ($i = $dias - 1; $i >= 0; $i--) {
             $d = date('Y-m-d', strtotime("-$i days"));
             $chartLabels[] = date('d/m', strtotime($d));
-
             $chartCantidad[] = isset($map[$d]) ? (int)$map[$d]['cant'] : 0;
             $chartTotal[]    = isset($map[$d]) ? (float)$map[$d]['total'] : 0;
         }
 
         // =========================
-        // TOP PRODUCTOS (por cantidad) en el rango
+        // TOP PRODUCTOS (seguro, con query builder)
         // =========================
-        $topProductos = $detalleModel
+        $topProductos = $detalleModel->db->table('detalle_venta d')
             ->select("p.nombre, SUM(d.cantidad) as cantidad, COALESCE(SUM(d.importe),0) as importe")
-            ->from('detalle_venta d')
             ->join('venta v', 'v.idventa = d.idventa')
             ->join('producto p', 'p.idproducto = d.idproducto')
             ->where('v.estado', 1)
@@ -99,14 +96,14 @@ class Home extends BaseController
             ->groupBy('p.nombre')
             ->orderBy('cantidad', 'DESC')
             ->limit(5)
-            ->findAll();
+            ->get()
+            ->getResultArray();
 
         // =========================
         // STOCK BAJO
         // =========================
         $stockMin = 5;
-        $stockBajo = $productoModel
-            ->select('idproducto, nombre, stock')
+        $stockBajo = $productoModel->select('idproducto, nombre, stock')
             ->where('estado', 1)
             ->where('stock <=', $stockMin)
             ->orderBy('stock', 'ASC')
@@ -114,7 +111,7 @@ class Home extends BaseController
             ->findAll();
 
         return view('admin/dashboard', [
-            'title'       => 'Helpnet',
+            'title'       => 'Katventas',
             'active'      => 'dashboard',
             'pageTitle'   => 'Dashboard',
             'pageSub'     => 'Panel principal',

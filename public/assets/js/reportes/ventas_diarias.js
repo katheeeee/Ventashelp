@@ -3,34 +3,47 @@
 
   let chart = null;
 
-  function qs(id){ return document.getElementById(id); }
+  function setExcelLink(desde, hasta) {
+    const base = (window.reportes_cfg && window.reportes_cfg.url_excel) || "";
+    const url = base + `?desde=${encodeURIComponent(desde)}&hasta=${encodeURIComponent(hasta)}`;
+    const a = document.getElementById("btn_excel");
+    if (a) a.href = url;
+  }
 
   function cargar() {
-    const desde = qs("desde").value;
-    const hasta = qs("hasta").value;
+    const desde = document.getElementById("desde").value;
+    const hasta = document.getElementById("hasta").value;
 
-    // link excel
-    qs("btn_excel").href = reportes_cfg.url_excel + "?desde=" + encodeURIComponent(desde) + "&hasta=" + encodeURIComponent(hasta);
+    setExcelLink(desde, hasta);
 
-    fetch(reportes_cfg.url_data + "?desde=" + encodeURIComponent(desde) + "&hasta=" + encodeURIComponent(hasta))
+    const url = (window.reportes_cfg && window.reportes_cfg.url_data) || "";
+    fetch(url + `?desde=${encodeURIComponent(desde)}&hasta=${encodeURIComponent(hasta)}`)
       .then(r => r.json())
-      .then(json => {
-        const ctx = qs("grafica_ventas").getContext("2d");
+      .then(data => {
 
+        // ✅ se espera: [{ dia:"2025-12-22", total:"251.98" }, ...]
+        const labels = data.map(i => i.dia);
+        const valores = data.map(i => Number(i.total));
+
+        const canvas = document.getElementById("grafica");
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
         if (chart) chart.destroy();
 
         chart = new Chart(ctx, {
-          type: "bar", // BARRAS ✅
+          type: "bar",
           data: {
-            labels: json.labels || [],
+            labels,
             datasets: [{
-              label: "total vendido",
-              data: json.data || []
+              label: "total vendido (S/)",
+              data: valores
             }]
           },
           options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } }
           }
         });
       })
@@ -40,8 +53,6 @@
       });
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    qs("btn_filtrar").addEventListener("click", cargar);
-    cargar();
-  });
+  document.getElementById("btn_filtrar").addEventListener("click", cargar);
+  cargar();
 })();

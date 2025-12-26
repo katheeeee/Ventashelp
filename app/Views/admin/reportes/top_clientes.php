@@ -24,7 +24,7 @@
     <div class="card-header">
       <h3 class="card-title">top clientes</h3>
     </div>
-    <div class="card-body" style="height:360px;">
+    <div class="card-body" style="height:420px;">
       <canvas id="grafica"></canvas>
     </div>
   </div>
