@@ -21,4 +21,21 @@ class musuario extends Model
                     ->where('estado', 1)
                     ->first();
     }
+    public function listar()
+{
+    return $this->where('estado', 1)->orderBy('nombre', 'ASC')->findAll();
+}
+
+public function listar_todos()
+{
+    return $this->orderBy('nombre', 'ASC')->findAll();
+}
+
+public function buscar_por_user(string $user, $except_id = null)
+{
+    $q = $this->where('user', $user);
+    if ($except_id) $q->where('idtipo_usuario !=', $except_id);
+    return $q->first();
+}
+
 }
