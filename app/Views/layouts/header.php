@@ -2,20 +2,18 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <title><?= esc($title ?? 'Helpnet') ?></title>
+  <title><?= esc($title ?? 'Katventas') ?></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- ================= ADMINLTE 3 / BOOTSTRAP 4 ================= -->
+  <!-- ================= FONT AWESOME ================= -->
   <link rel="stylesheet" href="<?= base_url('assets/template/plugins/fontawesome-free/css/all.min.css') ?>">
+
+  <!-- ================= ADMINLTE ================= -->
   <link rel="stylesheet" href="<?= base_url('assets/template/dist/css/adminlte.min.css') ?>">
 
-  <!-- DataTables CSS (LOCAL que sí tienes) -->
-<link rel="stylesheet" href="<?= base_url('assets/template/plugins/datatables/dataTables.bootstrap4.min.css') ?>">
-
-
-
-  <!-- ================= EKKO LIGHTBOX ================= -->
-  <link rel="stylesheet" href="<?= base_url('assets/template/plugins/ekko-lightbox/ekko-lightbox.css') ?>">
+  <!-- ================= DATATABLES (COMPLETO) ================= -->
+  <link rel="stylesheet" href="<?= base_url('assets/template/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/template/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') ?>">
 
   <!-- ================= ESTILOS PROPIOS ================= -->
   <style>
