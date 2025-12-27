@@ -5,15 +5,13 @@
   <title><?= esc($title ?? 'Katventas') ?></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- ================= FONT AWESOME ================= -->
+  <!-- ================= ADMINLTE 3 / BOOTSTRAP 4 ================= -->
   <link rel="stylesheet" href="<?= base_url('assets/template/plugins/fontawesome-free/css/all.min.css') ?>">
-
-  <!-- ================= ADMINLTE ================= -->
   <link rel="stylesheet" href="<?= base_url('assets/template/dist/css/adminlte.min.css') ?>">
 
-  <!-- ================= DATATABLES (COMPLETO) ================= -->
-  <link rel="stylesheet" href="<?= base_url('assets/template/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') ?>">
-  <link rel="stylesheet" href="<?= base_url('assets/template/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') ?>">
+  <!-- ================= DATATABLES (CDN - evita 404) ================= -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
 
   <!-- ================= ESTILOS PROPIOS ================= -->
   <style>
