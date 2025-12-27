@@ -121,9 +121,9 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('view/(:num)', 'ventas\cventa::view/$1');
 
         // AJAX
-        $routes->get('ajaxClientes', 'ventas\cventa::ajaxClientes');
-        $routes->get('ajaxProductos', 'ventas\cventa::ajaxProductos');
-        $routes->get('ajaxComprobanteData/(:num)', 'ventas\cventa::ajaxComprobanteData/$1');
+        $routes->get('ajaxclientes', 'ventas\cventa::ajaxclientes');
+        $routes->get('ajaxproductos', 'ventas\cventa::ajaxproductos');
+        $routes->get('ajaxcomprobantedata/(:num)', 'ventas\cventa::ajaxcomprobantedata/$1');
 
         // PDF
         $routes->get('pdf/(:num)', 'ventas\cventa::pdf/$1');
