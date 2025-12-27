@@ -1,6 +1,9 @@
 (function () {
   "use strict";
 
+  // =========================================================
+  // onReady: espera jQuery
+  // =========================================================
   function onReady(fn) {
     if (typeof window.jQuery === "undefined") {
       setTimeout(function () { onReady(fn); }, 50);
@@ -13,21 +16,31 @@
     const $ = window.jQuery;
     const CFG = window.VENTA_CFG || {};
 
-    const IGV_RATE = CFG.IGV_RATE ?? 0.18;
+    const BASE_URL     = (CFG.BASE_URL || "").replace(/\/+$/, "") + "/";
+    const IGV_RATE     = CFG.IGV_RATE ?? 0.18;
+
     const URL_CLIENTES = CFG.URL_CLIENTES || "";
     const URL_PRODUCTOS = CFG.URL_PRODUCTOS || "";
-    const URL_COMP_DATA = CFG.URL_COMP_DATA || "";
-    const IMG_DEFAULT = CFG.IMG_DEFAULT || "";
+    const URL_COMP_DATA = CFG.URL_COMP_DATA || "";   // base_url('ventas/ajaxComprobanteData')
+    const IMG_DEFAULT  = CFG.IMG_DEFAULT || "";
 
-    // ================= UTILIDADES =================
+    // =========================================================
+    // Helpers numéricos
+    // =========================================================
     function n2(v) {
       let x = parseFloat(String(v ?? "0").replace(",", "."));
-      return isNaN(x) ? 0 : Math.round(x * 100) / 100;
+      if (isNaN(x)) x = 0;
+      return Math.round(x * 100) / 100;
     }
     function fmt(v) { return n2(v).toFixed(2); }
-    function num(v) { return Number(String(v ?? "0").replace(",", ".")); }
+    function numStock(v) {
+      const x = Number(String(v ?? "0").replace(",", "."));
+      return isNaN(x) ? 0 : x;
+    }
 
-    // ================= DETALLE =================
+    // =========================================================
+    // DETALLE: utilidades
+    // =========================================================
     function getRowById(id) {
       return $('#tablaDetalle tbody tr[data-id="' + id + '"]');
     }
@@ -37,10 +50,10 @@
       $("#tablaDetalle tbody tr").each(function () {
         const $tr = $(this);
         items.push({
-          idproducto: parseInt($tr.data("id")),
+          idproducto: parseInt($tr.attr("data-id"), 10),
           precio: n2($tr.find(".precio").text()),
           cantidad: n2($tr.find(".cantidad").val()),
-          importe: n2($tr.find(".importe").text())
+          importe: n2($tr.find(".importe").text()),
         });
       });
       $("#items").val(JSON.stringify(items));
@@ -53,7 +66,7 @@
         const $tr = $(this);
         const precio = n2($tr.find(".precio").text());
         const cant = n2($tr.find(".cantidad").val());
-        const imp = precio * cant;
+        const imp = n2(precio * cant);
 
         $tr.find(".importe").text(fmt(imp));
         total += imp;
@@ -69,148 +82,392 @@
       buildItems();
     }
 
-    function enforceStock($tr) {
-      const max = num($tr.data("stock"));
-      let v = num($tr.find(".cantidad").val());
-      if (v <= 0) v = 1;
+    function enforceRowStock($tr) {
+      const max = numStock($tr.attr("data-stock"));
+      if (max <= 0) return;
+
+      const $inp = $tr.find(".cantidad");
+      let v = numStock($inp.val());
+      if (isNaN(v) || v <= 0) v = 1;
       if (v > max) v = max;
-      $tr.find(".cantidad").val(v);
+      $inp.val(v);
     }
 
     function addProducto(p) {
-      const id = parseInt(p.idproducto);
+      const id = parseInt(p.idproducto, 10);
       if (!id) return;
 
-      if (num(p.stock) <= 0) {
-        alert("Producto sin stock");
+      const st = numStock(p.stock);
+
+      if (st <= 0) {
+        alert("Este producto no tiene stock.");
         return;
       }
 
       const $row = getRowById(id);
       if ($row.length) {
-        $row.find(".cantidad").val(num($row.find(".cantidad").val()) + 1);
-        enforceStock($row);
+        let c = numStock($row.find(".cantidad").val());
+        $row.find(".cantidad").val(Math.max(1, Math.round(c + 1)));
+        enforceRowStock($row);
         calc();
         return;
       }
 
+      const img = p.img_url ? p.img_url : IMG_DEFAULT;
+      const precio = fmt(p.precio);
+      const stockNum = st;
+
       const $tr = $(`
-        <tr data-id="${id}" data-stock="${p.stock}">
-          <td>${p.codigo ?? ""}</td>
-          <td>${p.nombre ?? ""}</td>
-          <td class="text-center"><img src="${p.img_url || IMG_DEFAULT}" class="img-thumbnail" style="max-width:60px"></td>
-          <td>${p.unmedida ?? ""}</td>
-          <td class="precio text-right">${fmt(p.precio)}</td>
-          <td class="text-right">${p.stock}</td>
-          <td><input type="number" class="form-control cantidad" value="1" min="1"></td>
-          <td class="importe text-right">0.00</td>
+        <tr data-id="${id}" data-stock="${stockNum}">
+          <td class="codigo"></td>
+          <td class="nombre"></td>
           <td class="text-center">
-            <button type="button" class="btn btn-danger btn-sm btnDel"><i class="fa fa-times"></i></button>
+            <img src="${img}" class="img-thumbnail" style="max-width:60px; max-height:60px;">
+          </td>
+          <td class="um"></td>
+          <td class="precio text-right"></td>
+          <td class="stock text-right"></td>
+          <td style="width:140px;">
+            <input type="number" min="1" step="1" class="form-control cantidad" value="1" max="${stockNum}">
+          </td>
+          <td class="importe text-right">0.00</td>
+          <td class="text-center" style="width:60px;">
+            <button type="button" class="btn btn-danger btn-sm btnDel">
+              <i class="fa fa-times"></i>
+            </button>
           </td>
         </tr>
       `);
 
+      $tr.find(".codigo").text(p.codigo ?? "");
+      $tr.find(".nombre").text(p.nombre ?? "");
+      $tr.find(".um").text(p.unmedida ?? "");
+      $tr.find(".precio").text(precio);
+
+      if (stockNum <= 0) {
+        $tr.find(".stock").html('<span class="badge badge-danger">NO HAY STOCK</span>');
+      } else {
+        $tr.find(".stock").text(stockNum);
+      }
+
       $("#tablaDetalle tbody").append($tr);
+      enforceRowStock($tr);
       calc();
     }
 
-    // ================= CLIENTES =================
+    // =========================================================
+    // CLIENTES: modal + búsqueda
+    // =========================================================
     function cargarClientes(q) {
       return $.getJSON(URL_CLIENTES, { q: q || "" });
     }
 
-    $("#btnBuscarCliente").on("click", function () {
-      $("#modalClientes").modal("show");
-      cargarClientes("").done(renderClientes);
-    });
-
     function renderClientes(rows) {
-      const $tb = $("#tablaClientes tbody").empty();
-      rows.forEach(r => {
-        $tb.append(`
-          <tr data-id="${r.idcliente}" data-nombre="${r.nombre}">
-            <td><button class="btn btn-success btn-sm selCli">Add</button></td>
-            <td>${r.codigo}</td>
-            <td>${r.nombre}</td>
+      const $tb = $("#tablaClientes tbody");
+      $tb.empty();
+
+      (rows || []).forEach((r) => {
+        const $tr = $(`
+          <tr data-id="${r.idcliente}" data-nombre="${r.nombre ?? ""}">
+            <td class="text-center">
+              <button type="button" class="btn btn-success btn-sm selCli">Add</button>
+            </td>
+            <td>${r.codigo ?? ""}</td>
+            <td>${r.nombre ?? ""}</td>
           </tr>
         `);
+        $tb.append($tr);
       });
+
+      // auto-selección si solo hay 1
+      if (rows && rows.length === 1) {
+        $("#idcliente").val(rows[0].idcliente);
+        $("#cliente_nombre").val(rows[0].nombre ?? "");
+        $("#modalClientes").modal("hide");
+      }
     }
+
+    let tCli = null;
+
+    $("#btnBuscarCliente").on("click", function () {
+      $("#modalClientes").modal("show");
+      $("#qCliente").val("");
+      cargarClientes("").done(renderClientes);
+      setTimeout(() => $("#qCliente").focus(), 200);
+    });
+
+    $("#qCliente").on("keyup", function () {
+      clearTimeout(tCli);
+      const q = $(this).val().trim();
+      tCli = setTimeout(() => { cargarClientes(q).done(renderClientes); }, 200);
+    });
+
+    let tCli2 = null;
+    $("#cliente_nombre").on("keyup", function (e) {
+      const q = $(this).val().trim();
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        $("#btnBuscarCliente").click();
+        return;
+      }
+
+      clearTimeout(tCli2);
+      tCli2 = setTimeout(function () {
+        if (q.length >= 2) {
+          $("#modalClientes").modal("show");
+          $("#qCliente").val(q);
+          cargarClientes(q).done(renderClientes);
+          setTimeout(() => $("#qCliente").focus(), 150);
+        }
+      }, 250);
+    });
+
+    // si editas nombre, invalidar selección
+    $("#cliente_nombre").on("input", function () {
+      $("#idcliente").val("");
+    });
 
     $(document).on("click", ".selCli", function () {
       const $tr = $(this).closest("tr");
-      $("#idcliente").val($tr.data("id"));
-      $("#cliente_nombre").val($tr.data("nombre"));
+      $("#idcliente").val($tr.attr("data-id"));
+      $("#cliente_nombre").val($tr.attr("data-nombre"));
       $("#modalClientes").modal("hide");
     });
 
-    // ================= PRODUCTOS =================
+    // =========================================================
+    // PRODUCTOS: modal + DataTable (SIN duplicados)
+    // =========================================================
     let dtProd = null;
 
-    function initProductos(rows) {
+    function cargarProductos(q) {
+      return $.getJSON(URL_PRODUCTOS, { q: q || "" });
+    }
+
+    function initDtProductosConData(rows) {
+      // si no está DataTables, fallback simple (igual lista)
+      if (!$.fn.DataTable) {
+        const $tb = $("#dtProductos tbody");
+        $tb.empty();
+
+        (rows || []).forEach((r) => {
+          const st = numStock(r.stock);
+          const img = r.img_url || IMG_DEFAULT;
+          const disabled = st <= 0 ? "disabled" : "";
+
+          $tb.append(`
+            <tr>
+              <td class="text-center">
+                <button type="button" class="btn btn-success btn-sm selProdRaw" ${disabled} title="Agregar">
+                  <i class="fa fa-check"></i>
+                </button>
+              </td>
+              <td>${r.codigo ?? ""}</td>
+              <td>${r.nombre ?? ""}</td>
+              <td class="text-center">
+                <img src="${img}" class="img-thumbnail" style="max-width:60px; max-height:60px;">
+              </td>
+              <td class="text-right">${fmt(r.precio)}</td>
+              <td class="text-right">${st <= 0 ? '<span class="badge badge-danger">SIN STOCK</span>' : st}</td>
+              <td>${r.unmedida ?? ""}</td>
+            </tr>
+          `);
+        });
+
+        $("#dtProductos tbody")
+          .off("click", ".selProdRaw")
+          .on("click", ".selProdRaw", function () {
+            const idx = $(this).closest("tr").index();
+            const row = (rows || [])[idx];
+            if (row) addProducto(row);
+            $("#modalProductos").modal("hide");
+            $("#producto_buscar").val("");
+          });
+
+        return;
+      }
+
+      // destruir limpio si ya existe
       if ($.fn.DataTable.isDataTable("#dtProductos")) {
         $("#dtProductos").DataTable().clear().destroy();
+        $("#dtProductos tbody").empty();
       }
 
       dtProd = $("#dtProductos").DataTable({
-        data: rows,
         pageLength: 10,
+        data: rows || [],
         columns: [
+          // Add
           {
             data: null,
-            render: r => num(r.stock) > 0
-              ? `<button class="btn btn-success btn-sm selProd"><i class="fa fa-check"></i></button>`
-              : `<span class="badge badge-danger">SIN STOCK</span>`
+            orderable: false,
+            searchable: false,
+            className: "text-center",
+            render: function (data, type, row) {
+              const st = numStock(row.stock);
+              if (st <= 0) {
+                return `<button type="button" class="btn btn-secondary btn-sm" disabled title="No hay stock">
+                          <i class="fa fa-ban"></i>
+                        </button>`;
+              }
+              return `<button type="button" class="btn btn-success btn-sm selProdDt" title="Agregar">
+                        <i class="fa fa-check"></i>
+                      </button>`;
+            }
           },
-          { data: "codigo" },
-          { data: "nombre" },
-          { data: "precio", className: "text-right", render: v => fmt(v) },
-          { data: "stock", className: "text-right" }
+          // Código
+          { data: "codigo", defaultContent: "" },
+          // Nombre
+          { data: "nombre", defaultContent: "" },
+          // Imagen  ✅ (aquí estaba tu desorden de columnas)
+          {
+            data: "img_url",
+            orderable: false,
+            searchable: false,
+            className: "text-center",
+            render: function (url) {
+              const img = url || IMG_DEFAULT;
+              return `<img src="${img}" class="img-thumbnail" style="max-width:60px; max-height:60px;">`;
+            }
+          },
+          // Precio
+          { data: "precio", className: "text-right", render: function (v) { return fmt(v); }, defaultContent: "0.00" },
+          // Stock
+          {
+            data: "stock",
+            className: "text-right",
+            render: function (v) {
+              const st = numStock(v);
+              if (st <= 0) return `<span class="badge badge-danger">SIN STOCK</span>`;
+              return st;
+            },
+            defaultContent: "0"
+          },
+          // UM
+          { data: "unmedida", defaultContent: "" }
         ],
         language: { url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json" }
       });
+
+      // click agregar
+      $("#dtProductos tbody")
+        .off("click", ".selProdDt")
+        .on("click", ".selProdDt", function () {
+          const row = dtProd.row($(this).closest("tr")).data();
+          addProducto(row);
+          $("#modalProductos").modal("hide");
+          $("#producto_buscar").val("");
+        });
     }
 
     $("#btnBuscarProducto").on("click", function () {
       $("#modalProductos").modal("show");
-      $.getJSON(URL_PRODUCTOS).done(initProductos);
+      setTimeout(function () {
+        cargarProductos("").done(function (rows) {
+          initDtProductosConData(rows);
+        });
+      }, 150);
     });
 
-    $(document).on("click", ".selProd", function () {
-      const row = dtProd.row($(this).closest("tr")).data();
-      addProducto(row);
-      $("#modalProductos").modal("hide");
+    let tProdKey = null;
+    $("#producto_buscar").on("keyup", function (e) {
+      const q = $(this).val().trim();
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        $("#btnBuscarProducto").click();
+        return;
+      }
+
+      clearTimeout(tProdKey);
+      tProdKey = setTimeout(function () {
+        $("#modalProductos").modal("show");
+        cargarProductos(q).done(function (rows) {
+          initDtProductosConData(rows);
+        });
+      }, 250);
     });
 
-    // ================= EVENTOS =================
-    $(document).on("input", ".cantidad", function () {
-      enforceStock($(this).closest("tr"));
+    // =========================================================
+    // AUTOLLENADO SERIE / NUMERO
+    // =========================================================
+    $("#idtipo_comprobante").on("change", function () {
+      const id = $(this).val();
+
+      if (!id) {
+        $("#serie").val("");
+        $("#num_documento").val("");
+        return;
+      }
+
+      // si tu endpoint es .../ajaxComprobanteData/{id}
+      const url = URL_COMP_DATA.replace(/\/+$/, "") + "/" + id;
+
+      $.getJSON(url)
+        .done(function (r) {
+          $("#serie").val(r.serie || "");
+          $("#num_documento").val(r.numero || "");
+        })
+        .fail(function (xhr) {
+          console.error("❌ ajaxComprobanteData falló:", xhr.status, xhr.responseText);
+        });
+    });
+
+    // =========================================================
+    // DETALLE EVENTS
+    // =========================================================
+    $(document).on("input", "#tablaDetalle .cantidad", function () {
+      const $tr = $(this).closest("tr");
+      enforceRowStock($tr);
       calc();
     });
 
-    $(document).on("click", ".btnDel", function () {
+    $(document).on("click", "#tablaDetalle .btnDel", function () {
       $(this).closest("tr").remove();
       calc();
     });
 
-    $("#idtipo_comprobante").on("change", function () {
-      const id = $(this).val();
-      if (!id) return;
-
-      $.getJSON(URL_COMP_DATA + "/" + id).done(r => {
-        $("#serie").val(r.serie);
-        $("#num_documento").val(r.numero);
-      });
-    });
-
+    // =========================================================
+    // SUBMIT: validaciones
+    // =========================================================
     $("#formVenta").on("submit", function (e) {
+      if (!$("#idtipo_comprobante").val()) {
+        e.preventDefault();
+        alert("Seleccione un comprobante.");
+        return;
+      }
+
+      if (!$("#idcliente").val()) {
+        e.preventDefault();
+        alert("Seleccione un cliente (de la lista).");
+        $("#btnBuscarCliente").click();
+        return;
+      }
+
       if ($("#tablaDetalle tbody tr").length === 0) {
         e.preventDefault();
-        alert("Agrega productos");
+        alert("Agregue al menos 1 producto.");
+        return;
       }
+
+      // validar stock en front
+      let ok = true;
+      $("#tablaDetalle tbody tr").each(function () {
+        const stock = numStock($(this).attr("data-stock"));
+        const cant = numStock($(this).find(".cantidad").val());
+        if (stock > 0 && cant > stock) ok = false;
+      });
+
+      if (!ok) {
+        e.preventDefault();
+        alert("Hay productos con cantidad mayor al stock. Corrige antes de guardar.");
+        return;
+      }
+
       buildItems();
     });
 
+    // Inicial
     calc();
   });
 })();
