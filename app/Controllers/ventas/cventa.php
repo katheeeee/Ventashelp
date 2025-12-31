@@ -327,6 +327,7 @@ public function store()
     // Crear PDF
     require_once ROOTPATH . 'vendor/setasign/fpdf/fpdf.php';
 
+    date_default_timezone_set('America/Lima');
 $pdf = new \FPDF('P', 'mm', 'A4');
 
     $pdf->SetTitle("Comprobante {$cab['serie']}-{$cab['num_documento']}");
@@ -335,11 +336,11 @@ $pdf = new \FPDF('P', 'mm', 'A4');
 
     // ====== ENCABEZADO EMPRESA ======
     $pdf->SetFont('Arial', 'B', 14);
-    $pdf->Cell(0, 8, 'HELPNET', 0, 1, 'L');
+    $pdf->Cell(0, 8, 'KATVENTAS--.', 0, 1, 'L');
 
     $pdf->SetFont('Arial', '', 10);
-    $pdf->Cell(0, 5, 'Direccion: (pon tu direccion aqui)', 0, 1, 'L');
-    $pdf->Cell(0, 5, 'Telefono: (pon tu telefono aqui)', 0, 1, 'L');
+    $pdf->Cell(0, 5, 'Direccion: Jr. Tikiyaka', 0, 1, 'L');
+    $pdf->Cell(0, 5, 'Telefono: 975 678 115', 0, 1, 'L');
     $pdf->Ln(3);
 
     // ====== TITULO COMPROBANTE ======
@@ -351,6 +352,7 @@ $pdf = new \FPDF('P', 'mm', 'A4');
     $pdf->Ln(2);
 
     // ====== DATOS CLIENTE ======
+    
     $fecha = $cab['fecha'] ? date('d/m/Y H:i', strtotime($cab['fecha'])) : '';
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->Cell(30, 6, 'Fecha:', 0, 0, 'L');
