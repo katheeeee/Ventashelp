@@ -19,10 +19,11 @@
     const BASE_URL      = (CFG.BASE_URL || "").replace(/\/+$/, "") + "/";
     const IGV_RATE      = CFG.IGV_RATE ?? 0.18;
 
-    const URL_CLIENTES  = CFG.URL_CLIENTES || "";  // ej: base_url('ventas/ajaxclientes')
-    const URL_PRODUCTOS = CFG.URL_PRODUCTOS || ""; // ej: base_url('ventas/ajaxproductos')
-    const URL_COMP_DATA = CFG.URL_COMP_DATA || ""; // ej: base_url('ventas/ajaxcomprobantedata')
-    const IMG_DEFAULT   = CFG.IMG_DEFAULT || "";
+    // URLs que inyectas desde la vista (vadd.php)
+    const URL_CLIENTES  = CFG.URL_CLIENTES  || "";  // base_url('ventas/ajaxclientes')
+    const URL_PRODUCTOS = CFG.URL_PRODUCTOS || "";  // base_url('ventas/ajaxproductos')
+    const URL_COMP_DATA = CFG.URL_COMP_DATA || "";  // base_url('ventas/ajaxcomprobantedata')
+    const IMG_DEFAULT   = CFG.IMG_DEFAULT   || "";
 
     // =========================================================
     // Helpers numéricos
@@ -39,7 +40,7 @@
     }
 
     // =========================================================
-    // DOM helpers (por si cambiaste ids en HTML)
+    // DOM helpers (ids)
     // =========================================================
     const SEL = {
       form: "#formVenta",
@@ -348,7 +349,6 @@
         pageLength: 10,
         data: rows || [],
         columns: [
-          // Add
           {
             data: null,
             orderable: false,
@@ -368,7 +368,6 @@
           },
           { data: "codigo", defaultContent: "" },
           { data: "nombre", defaultContent: "" },
-          // Imagen
           {
             data: "img_url",
             orderable: false,
@@ -379,9 +378,7 @@
               return `<img src="${img}" class="img-thumbnail" style="max-width:60px; max-height:60px;">`;
             }
           },
-          // Precio
           { data: "precio", className: "text-right", render: function (v) { return fmt(v); }, defaultContent: "0.00" },
-          // Stock
           {
             data: "stock",
             className: "text-right",
@@ -392,7 +389,6 @@
             },
             defaultContent: "0"
           },
-          // UM
           { data: "unmedida", defaultContent: "" }
         ],
         language: { url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json" }
@@ -439,7 +435,7 @@
     });
 
     // =========================================================
-    // AUTOLLENADO SERIE / NUMERO  ✅ (rutas minúsculas)
+    // AUTOLLENADO SERIE / NUMERO ✅ (FIX REAL)
     // =========================================================
     function fillSerieNumeroByTipo(id) {
       if (!id) {
@@ -453,29 +449,36 @@
         return;
       }
 
-      // Tu ruta real: ventas/ajaxcomprobantedata/(:num)
+      // URL_COMP_DATA debe ser: https://katverse.space/ventas/ajaxcomprobantedata
       const url = URL_COMP_DATA.replace(/\/+$/, "") + "/" + id;
 
-      $.getJSON(url)
+      console.log("📌 Request comprobante:", url);
+
+      $.ajax({
+        url: url,
+        method: "GET",
+        dataType: "json",
+        cache: false
+      })
         .done(function (r) {
+          console.log("✅ comprobante ok:", r);
           $(SEL.serie).val(r.serie || "");
-          $(SEL.numero).val(r.numero || ""); // tu backend retorna "numero"
+          $(SEL.numero).val(r.numero || "");
         })
         .fail(function (xhr) {
-          console.error("❌ ajaxcomprobantedata falló:", xhr.status, xhr.responseText);
+          console.error("❌ comprobante fail:", xhr.status, xhr.responseText);
+          $(SEL.serie).val("");
+          $(SEL.numero).val("");
         });
     }
 
     $(SEL.tipoComprobante).on("change", function () {
-      const id = $(this).val();
-      fillSerieNumeroByTipo(id);
+      fillSerieNumeroByTipo($(this).val());
     });
 
-    // Si ya viene seleccionado (por ejemplo al volver con withInput), que autollene
+    // autollena si ya viene seleccionado
     const initTipo = $(SEL.tipoComprobante).val();
-    if (initTipo) {
-      fillSerieNumeroByTipo(initTipo);
-    }
+    if (initTipo) fillSerieNumeroByTipo(initTipo);
 
     // =========================================================
     // DETALLE EVENTS
@@ -492,7 +495,7 @@
     });
 
     // =========================================================
-    // SUBMIT: validaciones completas
+    // SUBMIT
     // =========================================================
     $(SEL.form).on("submit", function (e) {
       if (!$(SEL.tipoComprobante).val()) {
@@ -501,7 +504,6 @@
         return;
       }
 
-      // serie / numero obligatorios
       if (!$(SEL.serie).val() || !$(SEL.numero).val()) {
         e.preventDefault();
         alert("No se generó Serie/Número. Vuelve a elegir el comprobante.");
@@ -521,7 +523,7 @@
         return;
       }
 
-      // validar stock en front
+      // validar stock
       let ok = true;
       $(`${SEL.tablaDetalle} tbody tr`).each(function () {
         const stock = numStock($(this).attr("data-stock"));

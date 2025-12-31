@@ -190,9 +190,9 @@
   window.VENTA_CFG = {
     BASE_URL: "<?= base_url() ?>",
     IGV_RATE: 0.18,
-    URL_CLIENTES: "<?= base_url('ventas/ajaxClientes') ?>",
-    URL_PRODUCTOS: "<?= base_url('ventas/ajaxProductos') ?>",
-    URL_COMP_DATA: "<?= base_url('ventas/ajaxComprobanteData') ?>",
+    URL_CLIENTES: "<?= base_url('ventas/ajaxclientes') ?>",
+    URL_PRODUCTOS: "<?= base_url('ventas/ajaxproductos') ?>",
+    URL_COMP_DATA: "<?= base_url('ventas/ajaxcomprobantedata') ?>",
     IMG_DEFAULT: "<?= base_url('uploads/productos/no.jpg') ?>"
   };
 </script>
