@@ -83,7 +83,8 @@ public function index()
             'telefono'         => $this->request->getPost('telefono'),
             'idtipo_documento' => (int)$this->request->getPost('idtipo_documento'),
             'idtipo_cliente'   => (int)$this->request->getPost('idtipo_cliente'),
-            'estado'           => 1
+            'estado'           => 1,
+            'hobby'            => $this->request->getPost('hobby')
         ]);
 
         return redirect()->to(base_url('mantenimiento/cliente'))
@@ -144,6 +145,7 @@ public function index()
             'idtipo_documento' => (int)$this->request->getPost('idtipo_documento'),
             'idtipo_cliente'   => (int)$this->request->getPost('idtipo_cliente'),
             'estado'           => (int)$this->request->getPost('estado'),
+            'hobby'            => $this->request->getPost('hobby')
         ]);
 
         return redirect()->to(base_url('mantenimiento/cliente'))

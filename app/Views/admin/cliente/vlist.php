@@ -35,6 +35,7 @@
           <th>Nombre</th>
           <th>Teléfono</th>
           <th>Dirección</th>
+          <th>Hobby</th>
           <th>Tipo Doc</th>
           <th>Tipo Cliente</th>
           <th>Estado</th>
@@ -50,6 +51,7 @@
             <td><?= esc($c['nombre']) ?></td>
             <td><?= esc($c['telefono']) ?></td>
             <td><?= esc($c['direccion']) ?></td>
+            <td><?= esc($c['hobby']) ?></td>
 <td><?= esc($c['tipo_doc'] ?? '') ?></td>
 <td><?= esc($c['tipo_cliente'] ?? '') ?></td>
 

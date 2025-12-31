@@ -43,6 +43,13 @@
                value="<?= old('telefono', $cli['telefono']) ?>">
       </div>
 
+
+      <div class="form-group">
+        <label>Hobby</label>
+        <input type="text" name="hobby" class="form-control"
+               value="<?= old('hobby', $cli['hobby']) ?>">
+      </div>
+
       <div class="form-group">
         <label>Tipo Documento</label>
         <select name="idtipo_documento" class="form-control" required>

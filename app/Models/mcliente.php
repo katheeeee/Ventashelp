@@ -16,7 +16,8 @@ class mcliente extends Model
         'telefono',
         'estado',
         'idtipo_documento',
-        'idtipo_cliente'
+        'idtipo_cliente',
+        'hobby',
     ];
 
     // 🔹 LISTADO CON NOMBRES

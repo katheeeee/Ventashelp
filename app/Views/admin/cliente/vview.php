@@ -17,6 +17,7 @@
       <tr><th>Tipo Doc</th><td><?= esc($cli['idtipo_documento']) ?></td></tr>
       <tr><th>Tipo Cliente</th><td><?= esc($cli['idtipo_cliente']) ?></td></tr>
       <tr><th>Estado</th><td><?= $cli['estado']==1?'Activo':'Inactivo' ?></td></tr>
+      <tr><th>Hobby</th><td><?= esc($cli['hobby']) ?></td></tr>
     </table>
 
     <a href="<?= base_url('mantenimiento/cliente') ?>" class="btn btn-secondary">
