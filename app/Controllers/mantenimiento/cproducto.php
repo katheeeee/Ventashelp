@@ -177,33 +177,40 @@ class cproducto extends BaseController
             'estado'          => 'required|in_list[0,1]',
         ];
 
-        $img = $this->request->getFile('imagen');
-        if ($img && $img->getError() !== UPLOAD_ERR_NO_FILE) {
-            $rules['imagen'] = 'uploaded[imagen]|max_size[imagen,2048]|is_image[imagen]';
+$img = $this->request->getFile('imagen');
+if ($img && $img->getError() !== UPLOAD_ERR_NO_FILE) {
+    $rules['imagen'] = 'uploaded[imagen]|max_size[imagen,2048]|is_image[imagen]';
+}
+
+if (!$this->validate($rules)) {
+    return redirect()->back()->withInput()->with('error', $this->validator->getErrors());
+}
+
+// ✅ mantener la imagen actual si NO sube otra
+$imagenActual = $this->request->getPost('imagen_actual') ?: 'no.jpg';
+$nombreImagen = $imagenActual;
+
+// ✅ si sube nueva, mover y guardar
+if ($img && $img->isValid() && !$img->hasMoved()) {
+
+    // Nombre original limpio
+    $original = $img->getClientName();
+    $original = preg_replace('/[^A-Za-z0-9\.\-_]/', '_', $original);
+
+    // Evitar choques
+    $nombreImagen = time() . '_' . $original;
+
+    // Guardar
+    $img->move(FCPATH . 'uploads/productos', $nombreImagen);
+
+    // ✅ borrar la vieja solo si NO es no.jpg
+    if (!empty($imagenActual) && $imagenActual !== 'no.jpg') {
+        $rutaVieja = FCPATH . 'uploads/productos/' . $imagenActual;
+        if (is_file($rutaVieja)) {
+            @unlink($rutaVieja);
         }
-
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('error', $this->validator->getErrors());
-        }
-
-        // ✅ mantener la imagen actual si NO sube otra
-        $imagenActual = $this->request->getPost('imagen_actual') ?: 'no.jpg';
-        $nombreImagen = $imagenActual;
-
-        // ✅ si sube nueva, mover y guardar
-        if ($img && $img->isValid() && !$img->hasMoved()) {
-
-            $nombreImagen = $img->getRandomName();
-            $img->move(FCPATH . 'uploads/productos', $nombreImagen);
-
-            // ✅ borrar la vieja solo si NO es no.jpg
-            if (!empty($imagenActual) && $imagenActual !== 'no.jpg') {
-                $rutaVieja = FCPATH . 'uploads/productos/' . $imagenActual;
-                if (is_file($rutaVieja)) {
-                    @unlink($rutaVieja);
-                }
-            }
-        }
+    }
+}
 
         $this->producto->update($id, [
             'codigo'          => $this->request->getPost('codigo'),
