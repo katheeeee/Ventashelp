@@ -7,7 +7,7 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 // =====================================================
-// RUTAS PÚBLICAS
+// RUTAS PÃšBLICAS
 // =====================================================
 $routes->get('/', 'clogin::index');
 $routes->get('login', 'clogin::index');
@@ -130,7 +130,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     });
 
     // =================================================
-    // REPORTES ✅ (FUERA de ventas)
+    // REPORTES âœ… (FUERA de ventas)
     // =================================================
     $routes->group('reportes', function ($routes) {
 
@@ -141,7 +141,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('top_clientes', 'reportes\creportes::top_clientes');
 
         // data (json)
-        $routes->get('resumen_data', 'reportes\creportesdata::resumen_data'); // ✅ NUEVA RUTA
+        $routes->get('resumen_data', 'reportes\creportesdata::resumen_data'); // âœ… NUEVA RUTA
         $routes->get('ventas_diarias_data', 'reportes\creportesdata::ventas_diarias_data');
         $routes->get('top_productos_data', 'reportes\creportesdata::top_productos_data');
         $routes->get('top_clientes_data', 'reportes\creportesdata::top_clientes_data');
@@ -153,11 +153,11 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     });
 
     // =================================================
-    // ADMIN ✅ (FUERA de ventas)
+    // ADMIN âœ… (FUERA de ventas)
     // =================================================
     $routes->group('admin', function ($routes) {
 
-        // cambiar contraseña
+        // cambiar contraseÃ±a
         $routes->get('cambiar_password', 'admin\cadmin::cambiar_password');
         $routes->post('cambiar_password', 'admin\cadmin::guardar_password');
 
