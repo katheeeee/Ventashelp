@@ -1,29 +1,9 @@
-# Disable directory browsing
-Options -Indexes
-
 <IfModule mod_rewrite.c>
-    Options +FollowSymlinks
     RewriteEngine On
 
-    # ✅ Si estás en /ventas/public/ deja esto:
-    RewriteBase /ventas/public/
-
-    # Redirect Trailing Slashes...
+    # Evita que se reescriba si ya es archivo/carpeta real
+    RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_URI} (.+)/$
-    RewriteRule ^ %1 [L,R=301]
 
-    # ✅ NO reescribir archivos o carpetas reales (imagenes, css, js, uploads, etc.)
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
-    RewriteRule ^ - [L]
-
-    # ✅ Reescribir lo demás al front controller
     RewriteRule ^ index.php [L]
 </IfModule>
-
-<IfModule !mod_rewrite.c>
-    ErrorDocument 404 index.php
-</IfModule>
-
-ServerSignature Off

@@ -40,7 +40,7 @@
               <a href="<?= base_url('mantenimiento/categoria') ?>"
                  class="nav-link <?= ($subactive=='categoria')?'active':'' ?>">
                 <i class="fas fa-tags nav-icon"></i>
-                <p>Categorías</p>
+                <p>Categoría</p>
               </a>
             </li>
 
@@ -142,6 +142,16 @@
                  class="nav-link <?= ($subactive=='venta_list')?'active':'' ?>">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Listar</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+                    <li class="nav-item">
+              <a href="<?= base_url('ventas') ?>"
+                 class="nav-link <?= ($subactive=='venta_list')?'active':'' ?>">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Hobby</p>
               </a>
             </li>
           </ul>
